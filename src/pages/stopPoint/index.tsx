@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import Map, { Layer, Marker, NavigationControl, Source } from 'react-map-gl/mapbox';
+import Map, { Layer, NavigationControl, Source } from 'react-map-gl/mapbox';
 
 interface StopPoint {
     id: string;
@@ -138,3 +138,22 @@ export function StopsPointsPage() {
         </div>
     );
 }
+
+export { Sidebar } from '../../components/uiPart/Sidebar';
+export { Header } from '../../components/uiPart/Header';
+export { WelcomeBanner } from '../../components/uiPart/WelcomeBanner';
+export { ScheduleCard } from '../../components/uiPart/ScheduleCard';
+export { TripCard } from '../../components/uiPart/TripCard';
+export { QuickInfoSidebar } from '../../components/uiPart/QuickInfoSidebar';
+
+// Export layout
+export { DriverLayout } from '../../layouts/DriverLayout';
+// Export pages
+export { WorkSchedulePage } from '../driver/WorkSchedulePage';
+export { StudentListPage } from '../driver/StudentListPage';
+export { NotificationsPage } from '../driver/NotificationsPage';
+
+// Export types
+export type { Driver, ScheduleCardProps } from '../../components/uiPart/ScheduleCard';
+export type { TripCardProps } from '../../components/uiPart/TripCard';
+export type { QuickInfoProps } from '../../components/uiPart/QuickInfoSidebar';
