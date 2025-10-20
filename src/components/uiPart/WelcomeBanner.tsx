@@ -12,7 +12,7 @@ export const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
     vehicleId,
     date
 }) => {
-    return (
+    return (    
         <div className="bg-gradient-to-r from-primary via-primary/90 to-primary/80 p-6 rounded-2xl shadow-lg">
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">

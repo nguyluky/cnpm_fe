@@ -9,12 +9,12 @@ interface DriverLayoutProps {
 
 export const DriverLayout: React.FC<DriverLayoutProps> = ({ children }) => {
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="flex h-screen bg-slate-50">
       {/* Sidebar */}
       <Sidebar />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
         <Header 
           title="Lịch làm việc" 

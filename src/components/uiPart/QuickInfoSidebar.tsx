@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card } from '../uiItem/card';
 import { Badge } from '../uiItem/badge';
 import { Button } from '../uiItem/button';
+import { ReportAlert } from "../uiPart/ReportAlert";
 
 export interface QuickInfoProps {
   electricCount: number;
@@ -19,12 +20,19 @@ export const QuickInfoSidebar: React.FC<QuickInfoProps> = ({
   studyCount,
   routeInfo
 }) => {
+  const [isReportOpen, setIsReportOpen] = useState(false);
+
+  const handleReportSubmit = (description: string) => {
+    console.log("🚨 Báo cáo sự cố:", description);
+    // 👉 Ở đây bạn có thể gọi API thực tế nếu cần
+  };
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Quick Info */}
       <Card className="p-4">
         <h3 className="font-semibold text-slate-900 mb-4">Thông tin nhanh</h3>
-        
+
         <div className="space-y-3">
           <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
             <div className="flex items-center gap-2">
@@ -83,10 +91,11 @@ export const QuickInfoSidebar: React.FC<QuickInfoProps> = ({
               strokeLinecap="round"
             />
           </svg>
-          <h3 className="font-semibold text-slate-900">Ghi chú dành báo</h3>
+          <h3 className="font-semibold text-slate-900">Ghi chú</h3>
         </div>
-        
-        <Button className="w-full bg-amber-600 hover:bg-amber-700 text-white">
+
+        <Button className="w-full bg-amber-600 hover:bg-amber-700 text-white cursor-pointer"
+        onClick={() => setIsReportOpen(true)}>
           {/* FileText SVG */}
           <svg
             className="w-4 h-4 mr-2"
@@ -142,7 +151,7 @@ export const QuickInfoSidebar: React.FC<QuickInfoProps> = ({
       {/* Route Info */}
       <Card className="p-4">
         <h3 className="font-semibold text-slate-900 mb-4">Thông tin tuyến</h3>
-        
+
         <div className="space-y-3 text-sm">
           <div>
             <p className="text-slate-500 mb-1">Tuyến đường</p>
@@ -160,6 +169,13 @@ export const QuickInfoSidebar: React.FC<QuickInfoProps> = ({
           </div>
         </div>
       </Card>
-    </div>
+
+        {/* Modal báo cáo sự cố */}
+      <ReportAlert
+        isOpen={isReportOpen}
+        onClose={() => setIsReportOpen(false)}
+        onSubmit={handleReportSubmit}
+      />
+    </div> 
   );
 };

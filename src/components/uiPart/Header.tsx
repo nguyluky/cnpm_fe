@@ -18,7 +18,7 @@ export const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
 
                 <div className="flex items-center gap-4">
                     <Button variant="outline" size="sm" className="gap-2">
-                        <span className="text-emerald-600 font-medium">Phụ huynh</span>
+                        <span className="text-emerald-600 font-medium">Trực tuyến</span>
                     </Button>
 
                     <Button variant="ghost" size="icon">
