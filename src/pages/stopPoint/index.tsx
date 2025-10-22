@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import Map, { Layer, Marker, NavigationControl, Source } from 'react-map-gl/mapbox';
+import Map, { Layer, /*Marker,*/ NavigationControl, Source } from 'react-map-gl/mapbox';
 
 interface StopPoint {
     id: string;
