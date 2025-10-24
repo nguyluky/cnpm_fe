@@ -54,7 +54,7 @@ export function HomePage() {
         <div className="font-bold text-[30px]">Hệ thống theo dõi xe Bus thông minh</div>
         <div className="font-semibold text-[26px] text-[#656BEB] my-8 -mt-3">SSB 1.0</div>
       </div>
-      <div className="malign-items-center text-center x-10 flex flex-row place-content-evenly">
+      <div className="malign-items-center text-center x-10 mt-20 flex flex-row place-content-evenly">
         {renderItems}
       </div>
     </div>

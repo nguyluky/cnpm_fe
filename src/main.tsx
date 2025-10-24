@@ -16,6 +16,8 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/admin" element={<AdminLayout />}>
           <Route path="stops_points" element={<StopsPointsPage />} />
         </Route>
+        <Route path="/parent" element={<ParentLayout />}>
+        </Route>
       </Routes>
     </BrowserRouter>
   </StrictMode>,
