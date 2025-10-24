@@ -2,10 +2,11 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Route, Routes } from 'react-router'
 import { AdminLayout } from './layouts/AdminLayout'
-import { LoginPage } from './LoginPage';
+import { LoginPage } from './pages/LoginPage';
 import './index.css'
 import { StopsPointsPage } from './pages/stopPoint'
 import { HomePage } from './HomePage'
+import { ParentLayout } from "./layouts/ParentLayout";
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
