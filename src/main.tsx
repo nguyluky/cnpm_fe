@@ -7,6 +7,7 @@ import './index.css'
 import { HomePage } from './HomePage'
 import { ParentLayout } from "./layouts/ParentLayout";
 import { DriverLayout, StopsPointsPage, WorkSchedulePage } from './pages/stopPoint'
+import { WorkOverviewPage } from './pages/driver/WorkOverviewPage';
 // import { WelcomeBanner } from './components/uiPart/WelcomeBanner'
 
 createRoot(document.getElementById('root')!).render(
@@ -22,6 +23,7 @@ createRoot(document.getElementById('root')!).render(
         </Route>
         <Route path="/driver" element={<DriverLayout />}>
           <Route index element={<WorkSchedulePage />} />
+          <Route path="schedule" element={<WorkOverviewPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

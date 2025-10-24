@@ -38,8 +38,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ role = "driver", className = "
   ];
 
   const driverMenuItems = [
-    { icon: ClipboardList, label: "Lịch làm việc", path: "/driver" },
-    { icon: Users, label: "Danh sách học sinh", path: "/driver/students" },
+    { icon: ClipboardList, label: "Tổng quan hôm nay", path: "/driver" },
+    { icon: Users, label: "Lịch làm việc", path: "/driver/schedule" },
     { icon: Bell, label: "Thông báo", path: "/driver/notifications" },
   ];
 
@@ -77,6 +77,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ role = "driver", className = "
               <li key={item.path}>
                 <NavLink
                   to={item.path}
+                  end={item.path === "/driver"}
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                       isActive
