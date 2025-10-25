@@ -1,16 +1,33 @@
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBars } from '@fortawesome/free-solid-svg-icons'
+import React from "react";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Outlet } from 'react-router';
-import { useState } from 'react';
+import { Sidebar } from "../components/uiPart/Sidebar";
+import { Header } from "../components/uiPart/Header";
 
 export function ParentLayout() {
-  const [collapsed, setCollapsed] = useState(false);
-
   return (
+    <div className="flex h-screen bg-slate-50">
+      <Sidebar role="parent" />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Header */}
+        <Header
+          title="Lịch làm việc"
+          subtitle="Thứ Năm Ngày 2 Tháng 10, 2025"
+        />
+
+        {/* Page Content */}
+        <main className="flex-1 overflow-auto">
+          <Outlet />
+        </main>
+      </div >
+    </div>
+  );
+
+  {/*
+  const [collapsed, setCollapsed] = useState(false);
+return (
     <div className="min-h-screen flex flex-row">
-      {/* Sider */}
+      {// Sider }
       <div className={!collapsed ? "bg-base-200 w-[250px] py-2 shadow-xl" : "bg-base-200 w-[60px] py-2 shadow-xl "}>
         <div className="h-[50px] p-4 flex items-center justify-between">
           {!collapsed && <span className="text-2xl">
@@ -45,11 +62,12 @@ export function ParentLayout() {
 
       <div className="w-[2px] bg-primary/20" />
 
-      {/* Main Content */}
+      {// Main Content }
       <div className="flex-grow bg-gray-100">
         <Outlet />
       </div>
 
     </div>
   );
+  */}
 }
