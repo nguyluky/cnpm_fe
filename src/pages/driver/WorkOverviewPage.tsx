@@ -93,6 +93,7 @@ export const WorkOverviewPage: React.FC = () => {
             center: "title",
             right: "dayGridMonth,timeGridWeek,timeGridDay",
           }}
+
           buttonText={{
             today: "Hôm nay",
             month: "Tháng",
