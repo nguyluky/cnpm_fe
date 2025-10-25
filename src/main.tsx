@@ -14,6 +14,7 @@ import { WorkOverviewPage } from './pages/driver/WorkOverviewPage';
 
 import { Overview } from './pages/admin/overview';
 import { Bus } from './pages/admin/Bus';
+import { Student } from './pages/admin/Student';
 // import { WelcomeBanner } from './components/uiPart/WelcomeBanner'
 
 createRoot(document.getElementById('root')!).render(
@@ -37,6 +38,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Overview />} />
           <Route path="buses" element={<Bus />} />
+            <Route path="students" element={<Student />} />
         </Route>
       </Routes>
     </BrowserRouter>
