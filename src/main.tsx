@@ -11,6 +11,9 @@ import { NotiPage } from "./pages/noti";
 import { StudentPage } from "./pages/student";
 import { DriverLayout, StopsPointsPage, WorkSchedulePage } from './pages/stopPoint'
 import { WorkOverviewPage } from './pages/driver/WorkOverviewPage';
+
+import { Overview } from './pages/admin/overview';
+import { Bus } from './pages/admin/Bus';
 // import { WelcomeBanner } from './components/uiPart/WelcomeBanner'
 
 createRoot(document.getElementById('root')!).render(
@@ -30,6 +33,10 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/driver" element={<DriverLayout />}>
           <Route index element={<WorkSchedulePage />} />
           <Route path="schedule" element={<WorkOverviewPage />} />
+        </Route>
+          <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Overview />} />
+          <Route path="buses" element={<Bus />} />
         </Route>
       </Routes>
     </BrowserRouter>
