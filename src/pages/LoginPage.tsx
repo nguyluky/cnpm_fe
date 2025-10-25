@@ -6,13 +6,18 @@ export function LoginPage() {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [usernameFalse, setUsernameFalse] = useState(false);
+  const [passwordFalse, setPasswordFalse] = useState(false);
   const handleLogin = () => {
-    console.log('clicking')
+    setUsernameFalse((username.trim() === "" ? true : false));
+    setPasswordFalse((password.trim() === "" ? true : false));
+
     if (password !== '123') {
-      console.log('Invalid password');
+      setPasswordFalse(true);
     }
     else if (username === 'parent') {
       console.log('navigate to parent');
+
       navigate('/parent');
     }
     else if (username === 'driver') {
@@ -22,6 +27,8 @@ export function LoginPage() {
     else if (username === 'admin') {
       navigate('/admin');
       console.log('navigate to admin');
+    } else {
+      setUsernameFalse(true);
     }
   };
 
@@ -36,10 +43,12 @@ export function LoginPage() {
             <label htmlFor="username" className="w-32 text-left mb-2 font-semibold">Username</label>
             <input type="text" id="username" name="username" className="flex-1 border border-gray-300 p-2 rounded-md" onChange={(e) => setUsername(e.target.value)} placeholder="parent/driver/admin" />
           </div>
+          {usernameFalse && <div className="text-red-500 mb-4">Invalid username</div>}
           <div className="flex items-center mb-4">
             <label htmlFor="password" className="w-32 text-left mb-2 font-semibold">Password</label>
             <input type="password" id="password" name="password" className="flex-1 border border-gray-300 p-2 rounded-md" onChange={(e) => setPassword(e.target.value)} placeholder="123" />
           </div>
+          {passwordFalse && <div className="text-red-500 mb-4">Invalid password</div>}
           <button onClick={handleLogin} className="bg-[#111827] text-[#FFFDFD] text-[15px] font-semibold my-5 px-10 py-3 rounded-xl">Dang nhap</button>
           <div className="text-gray-500">Forgot password?</div>
         </div>
