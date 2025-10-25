@@ -12,12 +12,12 @@ export function ParentLayout() {
     <div className="min-h-screen flex flex-row">
       {/* Sider */}
       <div className={!collapsed ? "bg-base-200 w-[250px] py-2 shadow-xl" : "bg-base-200 w-[60px] py-2 shadow-xl "}>
-        <h1 className="text-2xl font-bold h-[50px] p-4 flex items-center justify-between">
+        <div className="h-[50px] p-4 flex items-center justify-between">
           {!collapsed && <span className="text-2xl">
-            <p>
+            <p className="text-2xl font-bold ">
               Bus
             </p>
-            <p>
+            <p className="text-2xl font-bold ">
               manager
             </p>
           </span>}
@@ -25,7 +25,7 @@ export function ParentLayout() {
           <FontAwesomeIcon icon={faBars} onClick={() => {
             setCollapsed(!collapsed);
           }} />
-        </h1>
+        </div>
 
         {!collapsed && <ul className="menu mt-5 bg-base-200 rounded-box w-full">
           <li>
