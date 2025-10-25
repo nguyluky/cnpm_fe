@@ -90,19 +90,17 @@ export const WorkSchedulePage: React.FC = () => {
 
                 {/* Thông tin ca */}
                 <div
-                  className={`flex justify-between p-4 rounded-lg border mb-5 ${
-                    shift.type === "morning"
+                  className={`flex justify-between p-4 rounded-lg border mb-5 ${shift.type === "morning"
                       ? "bg-orange-50 border-orange-200"
                       : "bg-purple-50 border-purple-200"
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-2">
                     <Clock
-                      className={`h-5 w-5 ${
-                        shift.type === "morning"
+                      className={`h-5 w-5 ${shift.type === "morning"
                           ? "text-orange-600"
                           : "text-purple-600"
-                      }`}
+                        }`}
                     />
                     <span className="font-medium text-gray-800">
                       {shift.timeRange}
@@ -110,11 +108,10 @@ export const WorkSchedulePage: React.FC = () => {
                   </div>
                   <div className="flex items-center gap-2 text-gray-700">
                     <MapPin
-                      className={`h-5 w-5 ${
-                        shift.type === "morning"
+                      className={`h-5 w-5 ${shift.type === "morning"
                           ? "text-blue-600"
                           : "text-purple-600"
-                      }`}
+                        }`}
                     />
                     <span>{shift.route}</span>
                   </div>
