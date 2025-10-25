@@ -95,7 +95,7 @@ export const QuickInfoSidebar: React.FC<QuickInfoProps> = ({
         </div>
 
         <Button className="w-full bg-amber-600 hover:bg-amber-700 text-white cursor-pointer"
-        onClick={() => setIsReportOpen(true)}>
+          onClick={() => setIsReportOpen(true)}>
           {/* FileText SVG */}
           <svg
             className="w-4 h-4 mr-2"
@@ -170,12 +170,12 @@ export const QuickInfoSidebar: React.FC<QuickInfoProps> = ({
         </div>
       </Card>
 
-        {/* Modal báo cáo sự cố */}
+      {/* Modal báo cáo sự cố */}
       <ReportAlert
         isOpen={isReportOpen}
         onClose={() => setIsReportOpen(false)}
         onSubmit={handleReportSubmit}
       />
-    </div> 
+    </div>
   );
 };

@@ -6,9 +6,9 @@ import { LoginPage } from './pages/LoginPage';
 import './index.css'
 import { HomePage } from './HomePage'
 import { ParentLayout } from "./layouts/ParentLayout";
-import { BusLocationPage } from "./pages/busLocation";
-import { NotiPage } from "./pages/noti";
-import { StudentPage } from "./pages/student";
+import { BusLocationPage } from "./pages/parent/busLocationPage.tsx";
+import { NotiPage } from "./pages/parent/notiPage.tsx";
+import { StudentPage } from "./pages/parent/studentPage.tsx";
 import { DriverLayout, StopsPointsPage, WorkSchedulePage } from './pages/stopPoint'
 import { WorkOverviewPage } from './pages/driver/WorkOverviewPage';
 // import { WelcomeBanner } from './components/uiPart/WelcomeBanner'
