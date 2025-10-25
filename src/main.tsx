@@ -4,12 +4,14 @@ import { BrowserRouter, Route, Routes } from 'react-router'
 import { AdminLayout } from './layouts/AdminLayout'
 import { LoginPage } from './pages/LoginPage';
 import './index.css'
-import { StopsPointsPage } from './pages/stopPoint'
 import { HomePage } from './HomePage'
 import { ParentLayout } from "./layouts/ParentLayout";
 import { BusLocationPage } from "./pages/busLocation";
 import { NotiPage } from "./pages/noti";
 import { StudentPage } from "./pages/student";
+import { DriverLayout, StopsPointsPage, WorkSchedulePage } from './pages/stopPoint'
+import { WorkOverviewPage } from './pages/driver/WorkOverviewPage';
+// import { WelcomeBanner } from './components/uiPart/WelcomeBanner'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -24,6 +26,10 @@ createRoot(document.getElementById('root')!).render(
           <Route path="bus-location" element={<BusLocationPage />} />
           <Route path="noti" element={<NotiPage />} />
           <Route path="student" element={<StudentPage />} />
+        </Route>
+        <Route path="/driver" element={<DriverLayout />}>
+          <Route index element={<WorkSchedulePage />} />
+          <Route path="schedule" element={<WorkOverviewPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
