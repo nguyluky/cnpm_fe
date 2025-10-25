@@ -4,9 +4,10 @@ import { BrowserRouter, Route, Routes } from 'react-router'
 import { AdminLayout } from './layouts/AdminLayout'
 import { LoginPage } from './pages/LoginPage';
 import './index.css'
-import { StopsPointsPage } from './pages/stopPoint'
 import { HomePage } from './HomePage'
 import { ParentLayout } from "./layouts/ParentLayout";
+import { DriverLayout, StopsPointsPage, WorkSchedulePage } from './pages/stopPoint'
+// import { WelcomeBanner } from './components/uiPart/WelcomeBanner'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -18,6 +19,9 @@ createRoot(document.getElementById('root')!).render(
           <Route path="stops_points" element={<StopsPointsPage />} />
         </Route>
         <Route path="/parent" element={<ParentLayout />}>
+        </Route>
+        <Route path="/driver" element={<DriverLayout />}>
+          <Route index element={<WorkSchedulePage />} />
         </Route>
       </Routes>
     </BrowserRouter>
