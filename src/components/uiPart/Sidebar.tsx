@@ -50,6 +50,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ role = "driver", className = "
   const roleLabel =
     role === "admin" ? "Quản lý" : role === "parent" ? "Phụ huynh" : "Tài xế";
 
+  const pathPrefix = role === "admin" ? "/admin" : role === "parent" ? "/parent" : "/driver";
+
   return (
     <aside
       className={`w-64 bg-slate-900 text-white min-h-screen flex flex-col border-r border-slate-800 ${className}`}
@@ -77,12 +79,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ role = "driver", className = "
               <li key={item.path}>
                 <NavLink
                   to={item.path}
-                  end={item.path === "/driver"}
+                  end={item.path === pathPrefix}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                      isActive
-                        ? "bg-slate-800 text-white shadow"
-                        : "text-slate-400 hover:bg-slate-800/50 hover:text-white"
+                    `flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${isActive
+                      ? "bg-slate-800 text-white shadow"
+                      : "text-slate-400 hover:bg-slate-800/50 hover:text-white"
                     }`
                   }
                 >

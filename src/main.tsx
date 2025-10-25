@@ -23,9 +23,9 @@ createRoot(document.getElementById('root')!).render(
           <Route path="stops_points" element={<StopsPointsPage />} />
         </Route>
         <Route path="/parent" element={<ParentLayout />}>
-          <Route path="bus-location" element={<BusLocationPage />} />
-          <Route path="noti" element={<NotiPage />} />
-          <Route path="student" element={<StudentPage />} />
+          <Route index element={<BusLocationPage />} />
+          <Route path="notifications" element={<NotiPage />} />
+          <Route path="child-info" element={<StudentPage />} />
         </Route>
         <Route path="/driver" element={<DriverLayout />}>
           <Route index element={<WorkSchedulePage />} />
