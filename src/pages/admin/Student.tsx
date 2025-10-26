@@ -49,7 +49,7 @@ export const Student = () => {
           />
           <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
         </div>
-        <Button variant="default" className="bg-indigo-500 text-white flex items-center">
+        <Button variant="default" className="bg-indigo-500 text-white flex items-center w-50 h-10">
           <Plus className="mr-2" size={18} /> Thêm học sinh mới
         </Button>
       </div>

@@ -115,31 +115,33 @@ export const Overview : React.FC = () => {
       </div>
 
 {/* Navigation Buttons as Cards */}
-<div className="bg-white w-240 h-20 rounded-xl shadow hover:shadow-lg transition flex justify-between items-center p-7 ">
+{/* <div className="bg-white w-262 h-28 rounded-xl shadow hover:shadow-lg transition flex justify-between items-center p-7 "> */}
+  <div className="bg-white rounded-lg shadow p-4 border border-blue-200 mt-4 text-sm transition flex justify-between items-center">
   {/* Card 1 */}
-  <div className="bg-white w-50 h-20 rounded-xl shadow duration-[500ms] hover:[background-color:#111827] transition flex flex-col items-center justify-center cursor-pointer ">
+  <div className="bg-white w-59 h-20 rounded-xl shadow duration-[500ms] hover:[background-color:#111827] transition flex flex-col items-center justify-center cursor-pointer ">
     <Bus className="text-purple-600 w-6 h-6 mb-2" />
     <span className="font-medium text-gray-800 text-sm">Thêm xe mới</span>
   </div>
 
   {/* Card 2 */}
-  <div className="bg-white w-50 h-20 rounded-xl shadow duration-[500ms] hover:[background-color:#111827] transition flex flex-col items-center justify-center cursor-pointer">
+  <div className="bg-white w-59 h-20 rounded-xl shadow duration-[500ms] hover:[background-color:#111827] transition flex flex-col items-center justify-center cursor-pointer">
     <Route className="text-blue-600 w-6 h-6 mb-2" />
     <span className="font-medium text-gray-800 text-sm">Tạo tuyến mới</span>
   </div>
 
   {/* Card 3 */}
-  <div className="bg-white w-50 h-20 rounded-xl  shadow duration-[500ms] hover:[background-color:#111827] transition flex flex-col items-center justify-center cursor-pointer">
+  <div className="bg-white w-59 h-20 rounded-xl  shadow duration-[500ms] hover:[background-color:#111827] transition flex flex-col items-center justify-center cursor-pointer">
     <User className="text-green-600 w-6 h-6 mb-2" />
     <span className="font-medium text-gray-800 text-sm">Thêm học sinh</span>
   </div>
 
   {/* Card 4 */}
-  <div className="bg-white w-50 h-20 rounded-xl  shadow duration-[500ms] hover:[background-color:#111827] transition flex flex-col items-center justify-center cursor-pointer">
+  <div className="bg-white w-59 h-20 rounded-xl  shadow duration-[500ms] hover:[background-color:#111827] transition flex flex-col items-center justify-center cursor-pointer">
     <MapPin className="text-red-600 w-6 h-6 mb-2" />
     <span className="font-medium text-gray-800 text-sm ">Xem bản đồ</span>
   </div>
 </div>
+
 
 
     </div>
