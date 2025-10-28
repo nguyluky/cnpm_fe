@@ -54,7 +54,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ role = "driver", className = "
 
   return (
     <aside
-      className={`w-64 bg-slate-900 text-white min-h-screen flex flex-col border-r border-slate-800 ${className}`}
+      className={`md:w-64 w-25 bg-slate-900 text-white min-h-screen flex flex-col border-r border-slate-800 ${className}`}
     >
       {/* Logo Header */}
       <div className="p-6 border-b border-slate-800">
@@ -63,8 +63,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ role = "driver", className = "
             <Bus className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-lg font-bold">SSB 1.0</h1>
-            <p className="text-xs text-slate-400">{roleLabel}</p>
+            <h1 className="hidden md:block text-lg font-bold">SSB 1.0</h1>
+            <p className="hidden md:block text-xs text-slate-400">{roleLabel}</p>
           </div>
         </div>
       </div>
@@ -88,7 +88,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ role = "driver", className = "
                   }
                 >
                   <Icon className="w-5 h-5" />
-                  <span className="text-sm font-medium">{item.label}</span>
+                  <span className="hidden md:block text-sm font-medium">{item.label}</span>
                 </NavLink>
               </li>
             );
