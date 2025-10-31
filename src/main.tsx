@@ -13,9 +13,10 @@ import { DriverLayout, StopsPointsPage, WorkSchedulePage } from './pages/stopPoi
 import { WorkOverviewPage } from './pages/driver/WorkOverviewPage';
 
 import { Overview } from './pages/admin/Overview';
-import { Bus } from './pages/admin/Bus';
+import { Buss } from './pages/admin/Buss.tsx';
 import { Student } from './pages/admin/Student';
 import { Schedules } from './pages/admin/Schedules';
+import { RouteAdmin } from './pages/admin/RouteAdmin';
 // import { WelcomeBanner } from './components/uiPart/WelcomeBanner'
 
 createRoot(document.getElementById('root')!).render(
@@ -38,9 +39,10 @@ createRoot(document.getElementById('root')!).render(
         </Route>
           <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Overview />} />
-          <Route path="buses" element={<Bus />} />
+          <Route path="buses" element={<Buss />} />
             <Route path="students" element={<Student />} />
               <Route path="schedules" element={<Schedules />} />
+               <Route path="routes" element={<RouteAdmin />} />
             
         </Route>
       </Routes>
