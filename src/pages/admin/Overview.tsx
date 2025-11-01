@@ -1,7 +1,6 @@
 import React from "react";
-import { Button } from "../../components/uiItem/button";
 import { Bus, AlertTriangle, User, MapPin, Route } from "lucide-react";
-import adminIcon from "../../assets/vector_admin.png";
+
 
 export const Overview : React.FC = () => {
   const busRoutes = [
