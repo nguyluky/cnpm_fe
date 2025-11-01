@@ -9,12 +9,12 @@ export const Card: React.FC<CardProps> = ({ className, children }) => {
   return (
     <div
       className={
-        'rounded-lg shadow bg-white overflow-hidden border border-gray-200' +
-        (className ? ` ${className}` : '')
+        'rounded-lg shadow overflow-hidden border border-gray-200' +
+        (className ? ` ${className}` : '') + (className && className.includes('bg-') ? '' : ' bg-white')
       }
     >
       {children}
-    </div>
+    </div >
   );
 };
 

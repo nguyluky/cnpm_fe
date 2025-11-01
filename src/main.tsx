@@ -6,11 +6,16 @@ import { LoginPage } from './pages/LoginPage';
 import './index.css'
 import { HomePage } from './HomePage'
 import { ParentLayout } from "./layouts/ParentLayout";
-import { BusLocationPage } from "./pages/busLocation";
-import { NotiPage } from "./pages/noti";
-import { StudentPage } from "./pages/student";
+import { BusLocationPage } from "./pages/parent/busLocationPage.tsx";
+import { NotiPage } from "./pages/parent/notiPage.tsx";
+import { StudentPage } from "./pages/parent/studentPage.tsx";
 import { DriverLayout, StopsPointsPage, WorkSchedulePage } from './pages/stopPoint'
 import { WorkOverviewPage } from './pages/driver/WorkOverviewPage';
+
+import { Overview } from './pages/admin/Overview';
+import { Bus } from './pages/admin/Bus';
+import { Student } from './pages/admin/Student';
+import { Schedules } from './pages/admin/Schedules';
 // import { WelcomeBanner } from './components/uiPart/WelcomeBanner'
 
 createRoot(document.getElementById('root')!).render(
@@ -30,6 +35,13 @@ createRoot(document.getElementById('root')!).render(
         <Route path="/driver" element={<DriverLayout />}>
           <Route index element={<WorkSchedulePage />} />
           <Route path="schedule" element={<WorkOverviewPage />} />
+        </Route>
+          <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Overview />} />
+          <Route path="buses" element={<Bus />} />
+            <Route path="students" element={<Student />} />
+              <Route path="schedules" element={<Schedules />} />
+            
         </Route>
       </Routes>
     </BrowserRouter>

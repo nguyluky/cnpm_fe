@@ -1,17 +1,25 @@
-import React from "react";
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Outlet } from 'react-router';
 import { Sidebar } from "../components/uiPart/Sidebar";
 import { Header } from "../components/uiPart/Header";
+import { useLocation } from "react-router-dom";
 
 export function ParentLayout() {
+  const location = useLocation();
+  const pathname: Record<string, string> = {
+    '/parent': 'Theo doi xe Bus',
+    '/parent/notifications': 'Thong bao',
+    '/parent/child-info': 'Thong tin hoc sinh',
+  }
+
+  const title = pathname[location.pathname] || 'Dashboard';
   return (
     <div className="flex h-screen bg-slate-50">
       <Sidebar role="parent" />
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
         <Header
-          title="Lịch làm việc"
+          title={title}
           subtitle="Thứ Năm Ngày 2 Tháng 10, 2025"
         />
 
