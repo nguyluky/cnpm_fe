@@ -38,9 +38,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ role = "driver", className = "
   ];
 
   const driverMenuItems = [
-    { icon: ClipboardList, label: "Tổng quan hôm nay", path: "/driver" },
+    { icon: ClipboardList, label: "Tổng quan hôm nay", path: "/driver" }, 
     { icon: Users, label: "Lịch làm việc", path: "/driver/schedule" },
-    { icon: Bell, label: "Thông báo", path: "/driver/notifications" },
+    // { icon: Bell, label: "Thông báo", path: "/driver/notifications" },
   ];
 
   const menuItems =
