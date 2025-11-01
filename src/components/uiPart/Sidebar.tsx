@@ -1,5 +1,6 @@
 import React from "react";
-import { Avatar, AvatarFallback, AvatarImage } from '../uiItem/avatar'; // Sửa đường dẫn nếu alias `@` chưa được cấu hình
+import {useState} from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "../uiItem/avatar"; // Sửa đường dẫn nếu alias `@` chưa được cấu hình
 import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -13,17 +14,22 @@ import {
   User,
   ClipboardList,
 } from "lucide-react";
-import { Button } from '../uiItem/button'; // Sửa đường dẫn nếu alias `@` chưa được cấu hình
+import { Button } from "../uiItem/button"; // Sửa đường dẫn nếu alias `@` chưa được cấu hình
+import { LogOutConfirmation } from "./LogOutConfirmation";
 
 interface SidebarProps {
   role?: "admin" | "parent" | "driver";
   className?: string;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ role = "driver", className = "" }) => {
+export const Sidebar: React.FC<SidebarProps> = ({
+  role = "driver",
+  className = "",
+}) => {
   // const location = useLocation();
 
   // 🧭 Các menu cho từng vai trò
+	const [isLogoutWindowOpen, setLogoutWindowOpen] = useState(false);
   const adminMenuItems = [
     { icon: LayoutDashboard, label: "Tổng quan", path: "/admin" },
     { icon: Bus, label: "Quản lý xe buýt", path: "/admin/buses" },
@@ -46,13 +52,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ role = "driver", className = "
   ];
 
   const menuItems =
-    role === "admin" ? adminMenuItems : role === "parent" ? parentMenuItems : driverMenuItems;
+    role === "admin"
+      ? adminMenuItems
+      : role === "parent"
+      ? parentMenuItems
+      : driverMenuItems;
 
   // 🖌️ Màu tiêu đề phụ thuộc role
   const roleLabel =
     role === "admin" ? "Quản lý" : role === "parent" ? "Phụ huynh" : "Tài xế";
 
-  const pathPrefix = role === "admin" ? "/admin" : role === "parent" ? "/parent" : "/driver";
+  const pathPrefix =
+    role === "admin" ? "/admin" : role === "parent" ? "/parent" : "/driver";
 
   return (
     <aside
@@ -66,7 +77,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ role = "driver", className = "
           </div>
           <div>
             <h1 className="hidden md:block text-lg font-bold">SSB 1.0</h1>
-            <p className="hidden md:block text-xs text-slate-400">{roleLabel}</p>
+            <p className="hidden md:block text-xs text-slate-400">
+              {roleLabel}
+            </p>
           </div>
         </div>
       </div>
@@ -83,14 +96,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ role = "driver", className = "
                   to={item.path}
                   end={item.path === pathPrefix}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${isActive
-                      ? "bg-slate-800 text-white shadow"
-                      : "text-slate-400 hover:bg-slate-800/50 hover:text-white"
+                    `flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                      isActive
+                        ? "bg-slate-800 text-white shadow"
+                        : "text-slate-400 hover:bg-slate-800/50 hover:text-white"
                     }`
                   }
                 >
                   <Icon className="w-5 h-5" />
-                  <span className="hidden md:block text-sm font-medium">{item.label}</span>
+                  <span className="hidden md:block text-sm font-medium">
+                    {item.label}
+                  </span>
                 </NavLink>
               </li>
             );
@@ -98,17 +114,38 @@ export const Sidebar: React.FC<SidebarProps> = ({ role = "driver", className = "
         </ul>
       </nav>
 
-      <div className="p-5 flex flex-row gap-5 text-white transition hover:bg-slate-800"> 
-      
-	    <Avatar className="w-10 h-10 border-2 border-primary">
-		<AvatarFallback className="bg-primary text-white font-bold">
-		    Q
-		</AvatarFallback>
-	    </Avatar>
-	    <div className="my-auto">Quốc Đại ngáy ngủ</div>
+      <div className="p-5 flex flex-row gap-5 text-white transition hover:bg-slate-800">
+        <div className="aspect-square">
+          <Avatar className="w-10 h-10 border-2 border-primary">
+          <AvatarFallback className="bg-primary text-white font-bold">
+            Q
+          </AvatarFallback>
+        </Avatar>
+        </div>
+        
+        <div className="my-auto truncate">Quốc Đại ngáy ngủ</div>
+        <button onClick={() => setLogoutWindowOpen(true)}>
+	<svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          className="my-auto lucide lucide-log-out-icon lucide-log-out"
+	  
+        >
+          <path d="m16 17 5-5-5-5" />
+          <path d="M21 12H9" />
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+        </svg>
+	</button>
       </div>
-      
 
+      <LogOutConfirmation isOpen={isLogoutWindowOpen} onClose={() => setLogoutWindowOpen(false)} />
     </aside>
   );
 };
