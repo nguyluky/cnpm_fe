@@ -15,7 +15,7 @@ export const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
                     <h1 className="text-2xl font-bold text-slate-900">{title}</h1>
                     {subtitle && <p className="text-sm text-slate-500 mt-1">{subtitle}</p>}
                 </div>
-
+<div className="hidden sm:block">
                 <div className="flex items-center gap-4">
                     <Button variant="outline" size="sm" className="gap-2">
                         <span className="text-emerald-600 font-medium">Trực tuyến</span>
@@ -45,6 +45,7 @@ export const Header: React.FC<HeaderProps> = ({ title, subtitle }) => {
                         </AvatarFallback>
                     </Avatar>
                 </div>
+		</div>
             </div>
         </header>
     );

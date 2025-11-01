@@ -15,10 +15,10 @@ export function AdminLayout() {
       <Sidebar role="admin" />
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <Header
+	{/*<Header
           title="Tổng quan"
           subtitle="Thứ Năm Ngày 2 Tháng 10, 2025"
-        />
+        />*/}
 
         {/* Page Content */}
         <main className="flex-1 overflow-auto">

@@ -36,7 +36,7 @@ export function HomePage() {
   const renderItems = [];
   for (let i = 0; i < roles.length; i++) {
     renderItems.push(
-      <div key={i} className="rounded-xl bg-white max-w-80 p-5 shadow-2xl text-center">
+      <div key={i} className="rounded-xl bg-white lg:max-w-80 min-w-30 p-5 shadow-2xl text-center">
         <img src={roles[i].icon} alt={roles[i].title} className="w-20 h-20 mb-4 mx-auto" />
         <div className="font-semibold text-[20px]">{roles[i].title}</div>
         <div className="text-[17px] text-[#421F06] py-5">{roles[i].description}</div>
@@ -54,7 +54,7 @@ export function HomePage() {
         <div className="font-bold text-[30px]">Hệ thống theo dõi xe Bus thông minh</div>
         <div className="font-semibold text-[26px] text-[#656BEB] my-8 -mt-3">SSB 1.0</div>
       </div>
-      <div className="malign-items-center text-center x-10 mt-20 flex flex-row place-content-evenly">
+      <div className="malign-items-center text-center x-10 mt-20 flex flex-col gap-5 lg:flex-row w-full place-content-evenly">
         {renderItems}
       </div>
     </div>
