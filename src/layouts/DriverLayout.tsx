@@ -16,10 +16,12 @@ export const DriverLayout: React.FC<DriverLayoutProps> = ({ children }) => {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <Header
+	{/*
+	<Header
           title="Lịch làm việc"
           subtitle="Thứ Năm Ngày 2 Tháng 10, 2025"
         />
+	*/}
 
         {/* Page Content */}
         <main className="flex-1 overflow-auto">

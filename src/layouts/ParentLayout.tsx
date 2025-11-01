@@ -1,7 +1,7 @@
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Outlet } from 'react-router';
 import { Sidebar } from "../components/uiPart/Sidebar";
-import { Header } from "../components/uiPart/Header";
+// import { Header } from "../components/uiPart/Header";
 import { useLocation } from "react-router-dom";
 
 export function ParentLayout() {
@@ -18,10 +18,10 @@ export function ParentLayout() {
       <Sidebar role="parent" />
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <Header
+	{/*<Header
           title={title}
           subtitle="Thứ Năm Ngày 2 Tháng 10, 2025"
-        />
+        />*/}
 
         {/* Page Content */}
         <main className="flex-1 overflow-auto">

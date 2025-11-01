@@ -1,4 +1,5 @@
 import React from "react";
+import { Avatar, AvatarFallback, AvatarImage } from '../uiItem/avatar'; // Sửa đường dẫn nếu alias `@` chưa được cấu hình
 import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -12,6 +13,7 @@ import {
   User,
   ClipboardList,
 } from "lucide-react";
+import { Button } from '../uiItem/button'; // Sửa đường dẫn nếu alias `@` chưa được cấu hình
 
 interface SidebarProps {
   role?: "admin" | "parent" | "driver";
@@ -95,6 +97,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ role = "driver", className = "
           })}
         </ul>
       </nav>
+
+      <div className="p-5 flex flex-row gap-5 text-white transition hover:bg-slate-800"> 
+      
+	    <Avatar className="w-10 h-10 border-2 border-primary">
+		<AvatarFallback className="bg-primary text-white font-bold">
+		    Q
+		</AvatarFallback>
+	    </Avatar>
+	    <div className="my-auto">Quốc Đại ngáy ngủ</div>
+      </div>
+      
+
     </aside>
   );
 };
