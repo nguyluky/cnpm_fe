@@ -1,51 +1,11 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Route, Routes } from 'react-router'
-import { AdminLayout } from './layouts/AdminLayout'
-import { LoginPage } from './pages/LoginPage';
+import { RouterProvider } from 'react-router-dom'
 import './index.css'
-import { HomePage } from './HomePage'
-import { ParentLayout } from "./layouts/ParentLayout";
-import { BusLocationPage } from "./pages/parent/busLocationPage.tsx";
-import { NotiPage } from "./pages/parent/notiPage.tsx";
-import { StudentPage } from "./pages/parent/studentPage.tsx";
-import { DriverLayout, StopsPointsPage, WorkSchedulePage } from './pages/stopPoint'
-import { WorkOverviewPage } from './pages/driver/WorkOverviewPage';
-
-import { Overview } from './pages/admin/Overview';
-import { Buss } from './pages/admin/Buss.tsx';
-import { Student } from './pages/admin/Student';
-import { Schedules } from './pages/admin/Schedules';
-import { RouteAdmin } from './pages/admin/RouteAdmin';
-// import { WelcomeBanner } from './components/uiPart/WelcomeBanner'
+import { router } from './router/index.tsx';
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route path="stops_points" element={<StopsPointsPage />} />
-        </Route>
-        <Route path="/parent" element={<ParentLayout />}>
-          <Route index element={<BusLocationPage />} />
-          <Route path="notifications" element={<NotiPage />} />
-          <Route path="child-info" element={<StudentPage />} />
-        </Route>
-        <Route path="/driver" element={<DriverLayout />}>
-          <Route index element={<WorkSchedulePage />} />
-          <Route path="schedule" element={<WorkOverviewPage />} />
-        </Route>
-          <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Overview />} />
-          <Route path="buses" element={<Buss />} />
-            <Route path="students" element={<Student />} />
-              <Route path="schedules" element={<Schedules />} />
-               <Route path="routes" element={<RouteAdmin />} />
-            
-        </Route>
-      </Routes>
-    </BrowserRouter>
-  </StrictMode>,
+    <StrictMode>
+        <RouterProvider router={router} />
+    </StrictMode>,
 )

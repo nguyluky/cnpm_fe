@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import bigBusIcon from "./assets/bus-side-solid-full.png";
-import adminIcon from "./assets/vector_admin.png";
-import busIcon from "./assets/vector_bus.png";
-import parentIcon from "./assets/vector_parent.png";
+import bigBusIcon from "../assets/bus-side-solid-full.png";
+import adminIcon from "../assets/vector_admin.png";
+import busIcon from "../assets/vector_bus.png";
+import parentIcon from "../assets/vector_parent.png";
 
 // HomePage.tsx
 
