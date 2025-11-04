@@ -15,103 +15,107 @@ import { WorkOverviewPage } from "../pages/driver/WorkOverviewPage"
 import { RootLayout } from "../layouts/RootLayout"
 
 export const path = {
-    INDEX: "/",
-    LOGIN: "/login",
-    ADMIN: "/admin",
+  INDEX: "/",
+  LOGIN: "/login",
+  ADMIN: "/admin",
 
-    ADMIN_OVERVIEW: "/admin",
-    ADMIN_BUSES: "/admin/buses",
-    ADMIN_STOPS_POINTS: "/admin/stops_points",
-    ADMIN_STUDENTS: "/admin/students",
-    ADMIN_SCHEDULES: "/admin/schedules",
-    ADMIN_ROUTES: "/admin/routes",
+  ADMIN_OVERVIEW: "/admin",
+  ADMIN_BUSES: "/admin/buses",
+  ADMIN_STOPS_POINTS: "/admin/stops_points",
+  ADMIN_STUDENTS: "/admin/students",
+  ADMIN_SCHEDULES: "/admin/schedules",
+  ADMIN_ROUTES: "/admin/routes",
 
-    PARENT: "/parent",
-    PARENT_NOTIFICATIONS: "/parent/notifications",
-    PARENT_CHILD_INFO: "/parent/child-info",
+  PARENT: "/parent",
+  PARENT_NOTIFICATIONS: "/parent/notifications",
+  PARENT_CHILD_INFO: "/parent/child-info",
 
-    DRIVER: "/driver",
-    DRIVER_SCHEDULE: "/driver/schedule",
+  DRIVER: "/driver",
+  DRIVER_SCHEDULE: "/driver/schedule",
 }
 
 
 export const router = createBrowserRouter([
-    // provider api for all routes
-    {
-        path: "/",
-        element: <RootLayout />,
+  // provider api for all routes
+  {
+    path: "/",
+    element: <RootLayout />,
+    children: [
+      {
+        index: true,
+        element: <HomePage />
+      },
+      {
+        path: path.LOGIN,
+        element: <LoginPage />
+      },
+      {
+        path: path.PARENT,
+        element: <ParentLayout />,
         children: [
-            {
-                index: true,
-                element: <HomePage />
-            },
-            {
-                path: path.LOGIN,
-                element: <LoginPage />
-            },
-            {
-                path: path.PARENT,
-                element: <ParentLayout />,
-                children: [
-                    {
-                        index: true,
-                        element: <BusLocationPage />
-                    },
-                    {
-                        path: path.PARENT_NOTIFICATIONS,
-                        element: <NotiPage />
-                    }
-                ]
-            },
-            {
-                path: path.ADMIN,
-                element: <AdminLayout />,
-                children: [
-                    {
-                        index: true,
-                        element: <Overview />
-                    },
-                    {
-                        path: path.ADMIN_BUSES,
-                        element: <Buss />
-                    },
-                    {
-                        path: path.ADMIN_STOPS_POINTS,
-                        element: <StopsPointsPage />
-                    },
-                    {
-                        path: path.ADMIN_STUDENTS,
-                        element: <StudentPage />
-                    },
-                    {
-                        path: path.ADMIN_SCHEDULES,
-                        element: <Schedules />
-                    },
-                    {
-                        path: path.ADMIN_ROUTES,
-                        element: <RouteAdmin />
-                    }
-                ]
-            },
-            {
-                path: path.DRIVER,
-                element: <div>Driver Layout Placeholder</div>,
-                children: [
-                    {
-                        index: true,
-                        element: <WorkSchedulePage />
-                    },
-                    {
-                     path: path.DRIVER_SCHEDULE,
-                     element: <WorkOverviewPage />
-                    }
-                ]
-            },
-            {
-                path: "*",
-                element: <div>404 Not Found</div>
-            }
+          {
+            index: true,
+            element: <BusLocationPage />
+          },
+          {
+            path: path.PARENT_NOTIFICATIONS,
+            element: <NotiPage />
+          },
+          {
+            path: path.PARENT_CHILD_INFO,
+            element: <StudentPage />
+          }
         ]
-    }
+      },
+      {
+        path: path.ADMIN,
+        element: <AdminLayout />,
+        children: [
+          {
+            index: true,
+            element: <Overview />
+          },
+          {
+            path: path.ADMIN_BUSES,
+            element: <Buss />
+          },
+          {
+            path: path.ADMIN_STOPS_POINTS,
+            element: <StopsPointsPage />
+          },
+          {
+            path: path.ADMIN_STUDENTS,
+            element: <StudentPage />
+          },
+          {
+            path: path.ADMIN_SCHEDULES,
+            element: <Schedules />
+          },
+          {
+            path: path.ADMIN_ROUTES,
+            element: <RouteAdmin />
+          }
+        ]
+      },
+      {
+        path: path.DRIVER,
+        element: <div>Driver Layout Placeholder</div>,
+        children: [
+          {
+            index: true,
+            element: <WorkSchedulePage />
+          },
+          {
+            path: path.DRIVER_SCHEDULE,
+            element: <WorkOverviewPage />
+          }
+        ]
+      },
+      {
+        path: "*",
+        element: <div>404 Not Found</div>
+      }
+    ]
+  }
 
 ])
