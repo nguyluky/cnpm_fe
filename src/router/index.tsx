@@ -7,12 +7,13 @@ import { NotiPage } from "../pages/parent/notiPage"
 import { AdminLayout } from "../layouts/AdminLayout"
 import { Overview } from "../pages/admin/Overview"
 import { Buss } from "../pages/admin/Buss"
-import { StopsPointsPage, WorkSchedulePage } from "../pages/stopPoint"
+import { StopsPointsPage } from "../pages/stopPoint"
 import { StudentPage } from "../pages/parent/studentPage"
 import { Schedules } from "../pages/admin/Schedules"
 import { RouteAdmin } from "../pages/admin/RouteAdmin"
 import { WorkOverviewPage } from "../pages/driver/WorkOverviewPage"
 import { RootLayout } from "../layouts/RootLayout"
+import { WorkSchedulePage } from "../pages/driver/WorkSchedulePage"
 
 export const path = {
     INDEX: "/",

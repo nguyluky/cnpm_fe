@@ -48,6 +48,9 @@ export const ApiProvider = ({ children }: {
         api.setSecurityData = (data) => {
             setSecurityData(data);
             oldSetSecurityData(data);
+            if (data) {
+                localStorage.setItem('securityData', JSON.stringify(data));
+            }
         };
 
         const oldRequest = api.request;
