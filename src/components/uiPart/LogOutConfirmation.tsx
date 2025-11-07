@@ -1,55 +1,35 @@
 import React, { useState } from "react";
 import { Button } from "../uiItem/button";
-import {useNavigate} from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useModal } from "../../contexts/modalContext";
+import { useApi } from "../../contexts/apiConetxt";
+
 
 interface LogoutConfirmationProps {
-  isOpen: boolean;
-  onClose: () => void;
 }
 
-export const LogOutConfirmation: React.FC<LogoutConfirmationProps> = ({
-  isOpen,
-  onClose,
-}) => {
+export const LogOutConfirmation: React.FC<LogoutConfirmationProps> = () => {
+    const api = useApi();
+    const { closeModal: onClose } = useModal();
 
-  const navigate = useNavigate();
-  if (!isOpen) return null;
+    const navigate = useNavigate();
 
-  const handleLogout = () => {
-	  onClose();
-	  navigate('/');
-  };
+    const handleLogout = () => {
+        api.setSecurityData(null);
+        onClose();
+        navigate('/');
+    };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-white rounded-xl shadow-xl w-[500px] max-w-[90%]">
-        <div className="flex items-center justify-between border-b px-5 py-3">
-          <h3 className="font-semibold text-slate-900">Bạn có chắc chắn muốn đăng xuất không?</h3>
-          <button
-            onClick={onClose}
-            className="text-slate-500 hover:text-slate-700 text-lg"
-          >
-            ✕
-          </button>
+    return (
+        <div className="relative bg-white rounded-lg shadow-sm ">
+            <div className="p-4 md:p-5 text-center">
+                <h3 className="mb-5 text-lg font-normal text-gray-500 ">Bạn có chắc là muốn đăng xuất khỗng</h3>
+                <button onClick={handleLogout} type="button" className="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300  font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">
+                    Yes, I'm sure
+                </button>
+                <button onClick={onClose} type="button" className="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100      ">No, cancel</button>
+            </div>
         </div>
-
-        <div className="flex justify-end gap-3 px-5 pb-4">
-          <Button
-            variant="outline"
-            className="border-slate-300"
-            onClick={onClose}
-          >
-            Không
-          </Button>
-          <Button
-            className="bg-amber-600 hover:bg-amber-700 text-white"
-            onClick={handleLogout}
-          >
-            Có 
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
+    );
 };
 

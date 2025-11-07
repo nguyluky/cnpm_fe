@@ -9,7 +9,7 @@ import { path } from "../router";
 // HomePage.tsx
 
 export function HomePage() {
-    const api = useApi();
+    const {api} = useApi();
     const navigate = useNavigate();
     const roles = [
         {
@@ -27,7 +27,7 @@ export function HomePage() {
             icon: busIcon,
             features: ["Lịch làm việc", "Danh sách học sinh", "Báo cáo sự cố"],
             buttonText: "Đăng nhập tài xế",
-            path: path.DRIVER
+            pat: path.DRIVER
         },
         {
             title: "Phụ huynh",

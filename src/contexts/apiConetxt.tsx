@@ -18,14 +18,14 @@ interface SecurityData {
 }
 
 
-const ApiContext = createContext<Api<SecurityData>>(null!);
+const ApiContext = createContext<{api: Api<SecurityData>, securityData: SecurityData | null | undefined}>(null!);
 
 export const ApiProvider = ({ children }: {
     children: React.ReactNode;
 }) => {
     const navigate = useNavigate();
     const api = useState(() => new Api<SecurityData>({
-        baseUrl: 'http://localhost:3000',
+        baseUrl: 'https://api.nguyluky.site',
         securityWorker: (securityData) => {
             if (securityData && securityData.accessToken) {
                 return {
@@ -50,6 +50,8 @@ export const ApiProvider = ({ children }: {
             oldSetSecurityData(data);
             if (data) {
                 localStorage.setItem('securityData', JSON.stringify(data));
+            } else {
+                localStorage.removeItem('securityData');
             }
         };
 
@@ -60,7 +62,8 @@ export const ApiProvider = ({ children }: {
                 return await oldRequest.apply(api, args);
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
             } catch (error: any) {
-                if (error?.status === 401) {
+                console.log('API error detected in global handler:', error);
+                if (error?.status === 401 || error?.status === 403) {
                     api.setSecurityData(null);
                     navigate('/login');
                 }
@@ -73,12 +76,13 @@ export const ApiProvider = ({ children }: {
             api.setSecurityData(
                 JSON.parse(securedData!)
             );
+            setSecurityData(JSON.parse(securedData!));
         }
     }, [])
 
 
     return (
-        <ApiContext.Provider value={api}>
+        <ApiContext.Provider value={{api, securityData}}>
             {children}
         </ApiContext.Provider>
     );

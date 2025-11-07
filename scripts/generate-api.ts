@@ -5,7 +5,7 @@ import * as process from "node:process";
 import * as fs from "node:fs/promises";
 import { generateApi } from "swagger-typescript-api";
 
-const swaggerUrl = "https://raw.githubusercontent.com/nguyluky/cnpm/refs/heads/main/docs/swagger.json"
+const swaggerUrl = "https://api.nguyluky.site/docs/swagger.json"
 
 fetch(swaggerUrl)
     .then((response) => response.json())

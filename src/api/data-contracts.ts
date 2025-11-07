@@ -48,7 +48,10 @@ export interface RouteData {
   name: string;
   startLocation: GeoLocation;
   endLocation: GeoLocation;
-  metadata: any;
+  metadata: {
+    distanceInKm?: number;
+    estimatedTimeInMin?: number;
+  };
 }
 
 export interface TimeTable {
@@ -68,13 +71,15 @@ export interface StopPointsData {
   id: string;
   name: string;
   location: GeoLocation;
-  meta: {
-    zone?: string;
-    ward?: string;
-    addressNo?: string;
-    street?: string;
-    supportDisability?: string;
-    status?: string;
-    search?: string;
-  };
+  meta: StopPointsMeta;
+}
+
+export interface StopPointsMeta {
+  zone?: string;
+  ward?: string;
+  addressNo?: string;
+  street?: string;
+  supportDisability?: string;
+  status?: string;
+  search?: string;
 }

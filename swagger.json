@@ -9,6 +9,10 @@
     {
       "url": "http://localhost:3000",
       "description": "Local development server"
+    },
+    {
+      "url": "https://api.nguyluky.site",
+      "description": "Production server"
     }
   ],
   "components": {
@@ -123,7 +127,18 @@
           "endLocation": {
             "$ref": "#/components/schemas/GeoLocation"
           },
-          "metadata": {}
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "distanceInKm": {
+                "type": "number"
+              },
+              "estimatedTimeInMin": {
+                "type": "number"
+              }
+            },
+            "additionalProperties": false
+          }
         },
         "required": [
           "id",
@@ -174,31 +189,7 @@
             "$ref": "#/components/schemas/GeoLocation"
           },
           "meta": {
-            "type": "object",
-            "properties": {
-              "zone": {
-                "type": "string"
-              },
-              "ward": {
-                "type": "string"
-              },
-              "addressNo": {
-                "type": "string"
-              },
-              "street": {
-                "type": "string"
-              },
-              "supportDisability": {
-                "type": "string"
-              },
-              "status": {
-                "type": "string"
-              },
-              "search": {
-                "type": "string"
-              }
-            },
-            "additionalProperties": false
+            "$ref": "#/components/schemas/StopPointsMeta"
           }
         },
         "required": [
@@ -209,6 +200,35 @@
         ],
         "additionalProperties": false,
         "id": "StopPointsData"
+      },
+      "StopPointsMeta": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "zone": {
+            "type": "string"
+          },
+          "ward": {
+            "type": "string"
+          },
+          "addressNo": {
+            "type": "string"
+          },
+          "street": {
+            "type": "string"
+          },
+          "supportDisability": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "search": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false,
+        "id": "StopPointsMeta"
       }
     }
   },
@@ -436,8 +456,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad request",
+          "404": {
+            "description": "Resource not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -1662,7 +1682,18 @@
                         "endLocation": {
                           "$ref": "#/components/schemas/GeoLocation"
                         },
-                        "metadata": {},
+                        "metadata": {
+                          "type": "object",
+                          "properties": {
+                            "distanceInKm": {
+                              "type": "number"
+                            },
+                            "estimatedTimeInMin": {
+                              "type": "number"
+                            }
+                          },
+                          "additionalProperties": false
+                        },
                         "stopPoints": {
                           "type": "array",
                           "items": {
@@ -1680,31 +1711,7 @@
                                 "$ref": "#/components/schemas/GeoLocation"
                               },
                               "meta": {
-                                "type": "object",
-                                "properties": {
-                                  "zone": {
-                                    "type": "string"
-                                  },
-                                  "ward": {
-                                    "type": "string"
-                                  },
-                                  "addressNo": {
-                                    "type": "string"
-                                  },
-                                  "street": {
-                                    "type": "string"
-                                  },
-                                  "supportDisability": {
-                                    "type": "string"
-                                  },
-                                  "status": {
-                                    "type": "string"
-                                  },
-                                  "search": {
-                                    "type": "string"
-                                  }
-                                },
-                                "additionalProperties": false
+                                "$ref": "#/components/schemas/StopPointsMeta"
                               },
                               "sequence": {
                                 "type": "number"
@@ -3486,12 +3493,16 @@
                   },
                   "location": {
                     "$ref": "#/components/schemas/GeoLocation"
+                  },
+                  "meta": {
+                    "$ref": "#/components/schemas/StopPointsMeta"
                   }
                 },
                 "required": [
                   "sequence",
                   "name",
-                  "location"
+                  "location",
+                  "meta"
                 ],
                 "additionalProperties": false
               }

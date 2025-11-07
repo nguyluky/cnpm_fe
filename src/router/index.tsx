@@ -14,6 +14,7 @@ import { RouteAdmin } from "../pages/admin/RouteAdmin"
 import { WorkOverviewPage } from "../pages/driver/WorkOverviewPage"
 import { RootLayout } from "../layouts/RootLayout"
 import { WorkSchedulePage } from "../pages/driver/WorkSchedulePage"
+import { NotFoundPage } from "../pages/404Page"
 
 export const path = {
   INDEX: "/",
@@ -114,7 +115,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "*",
-        element: <div>404 Not Found</div>
+        element: <NotFoundPage />
       }
     ]
   }

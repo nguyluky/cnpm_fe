@@ -17,6 +17,7 @@ import type {
   PaginationMetaData,
   RouteData,
   StopPointsData,
+  StopPointsMeta,
   TimeTable,
 } from "./data-contracts";
 import { ContentType, HttpClient, type RequestParams } from "./http-client";
@@ -295,27 +296,27 @@ export class Api<
         };
       },
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-        /** Error class name */
-        name?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
     >({
       path: `/api/buses/`,
       method: "GET",
@@ -367,27 +368,27 @@ export class Api<
         };
       },
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-        /** Error class name */
-        name?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
     >({
       path: `/api/buses/`,
       method: "POST",
@@ -434,27 +435,27 @@ export class Api<
         };
       },
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-        /** Error class name */
-        name?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
     >({
       path: `/api/buses/${id}`,
       method: "GET",
@@ -488,27 +489,27 @@ export class Api<
         message?: string;
       },
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-        /** Error class name */
-        name?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
     >({
       path: `/api/buses/${id}`,
       method: "DELETE",
@@ -565,27 +566,27 @@ export class Api<
         };
       },
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-        /** Error class name */
-        name?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
     >({
       path: `/api/routes/`,
       method: "GET",
@@ -653,27 +654,27 @@ export class Api<
         };
       },
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-        /** Error class name */
-        name?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
     >({
       path: `/api/routes/`,
       method: "POST",
@@ -716,7 +717,10 @@ export class Api<
           name: string;
           startLocation: GeoLocation;
           endLocation: GeoLocation;
-          metadata: any;
+          metadata: {
+            distanceInKm?: number;
+            estimatedTimeInMin?: number;
+          };
           stopPoints: {
             /**
              * @format uuid
@@ -725,15 +729,7 @@ export class Api<
             id: string;
             name: string;
             location: GeoLocation;
-            meta: {
-              zone?: string;
-              ward?: string;
-              addressNo?: string;
-              street?: string;
-              supportDisability?: string;
-              status?: string;
-              search?: string;
-            };
+            meta: StopPointsMeta;
             sequence: number;
           }[];
           /**
@@ -744,27 +740,27 @@ export class Api<
         };
       },
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-        /** Error class name */
-        name?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
     >({
       path: `/api/routes/${id}`,
       method: "GET",
@@ -823,27 +819,27 @@ export class Api<
         };
       },
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-        /** Error class name */
-        name?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
     >({
       path: `/api/routes/${id}`,
       method: "PUT",
@@ -879,27 +875,27 @@ export class Api<
         message?: string;
       },
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-        /** Error class name */
-        name?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
     >({
       path: `/api/routes/${id}`,
       method: "DELETE",
@@ -983,27 +979,27 @@ export class Api<
         };
       },
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-        /** Error class name */
-        name?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
     >({
       path: `/api/schedules/`,
       method: "GET",
@@ -1092,27 +1088,27 @@ export class Api<
         };
       },
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-        /** Error class name */
-        name?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
     >({
       path: `/api/schedules/`,
       method: "POST",
@@ -1176,27 +1172,27 @@ export class Api<
         };
       },
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-        /** Error class name */
-        name?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
     >({
       path: `/api/schedules/${id}`,
       method: "GET",
@@ -1257,27 +1253,27 @@ export class Api<
         message?: string;
       },
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-        /** Error class name */
-        name?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
     >({
       path: `/api/schedules/${id}`,
       method: "PUT",
@@ -1313,27 +1309,27 @@ export class Api<
         message?: string;
       },
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-        /** Error class name */
-        name?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
     >({
       path: `/api/schedules/${id}`,
       method: "DELETE",
@@ -1381,27 +1377,27 @@ export class Api<
         };
       },
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-        /** Error class name */
-        name?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
     >({
       path: `/api/drivers/schedules/today`,
       method: "GET",
@@ -1444,27 +1440,27 @@ export class Api<
         };
       },
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-        /** Error class name */
-        name?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
     >({
       path: `/api/parents/getStudents`,
       method: "GET",
@@ -1502,27 +1498,27 @@ export class Api<
         };
       },
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-        /** Error class name */
-        name?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
     >({
       path: `/api/stoppoints/stoppoints`,
       method: "GET",
@@ -1548,6 +1544,7 @@ export class Api<
       sequence: number;
       name: string;
       location: GeoLocation;
+      meta: StopPointsMeta;
     },
     params: RequestParams = {},
   ) =>
@@ -1563,27 +1560,27 @@ export class Api<
         message?: string;
       },
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-        /** Error class name */
-        name?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
     >({
       path: `/api/stoppoints/stoppoints`,
       method: "POST",
@@ -1634,27 +1631,27 @@ export class Api<
         };
       },
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-        /** Error class name */
-        name?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
     >({
       path: `/api/stoppoints/stoppoints/${id}`,
       method: "GET",
@@ -1696,27 +1693,27 @@ export class Api<
         message?: string;
       },
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-        /** Error class name */
-        name?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
     >({
       path: `/api/stoppoints/stoppoints/${id}`,
       method: "PUT",
@@ -1752,27 +1749,27 @@ export class Api<
         message?: string;
       },
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
       | {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-        /** Error class name */
-        name?: string;
-      }
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
     >({
       path: `/api/stoppoints/stoppoints/${id}`,
       method: "DELETE",
