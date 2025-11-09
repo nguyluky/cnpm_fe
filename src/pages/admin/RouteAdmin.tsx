@@ -171,18 +171,12 @@ export const RouteAdmin: React.FC = () => {
         console.log("Encoded Route String:", encodedRouteString);
         let coordinates: [number, number][] = []
         if (encodedRouteString) {
-            coordinates = decodePolyline(encodedRouteString, 5);
+            coordinates = decodePolyline(encodedRouteString, 6);
         }
+        console.log("Decoded Coordinates:", coordinates);
 
-        return {
-            type: 'Feature',
-            properties: {},
-            geometry: {
-                type: 'LineString',
-                coordinates: coordinates
-            }
-        };
-    }, [selectedRouteId]);
+        return coordinates;
+    }, [allRoutes, selectedRouteId]);
 
     return (
         <div className="flex flex-col bg-[#E0E7FF] w-full h-screen">
@@ -251,7 +245,7 @@ export const RouteAdmin: React.FC = () => {
                                 <span className="font-semibold text-xl">Tuyến 1 - Quận 1</span>
                             </div>
 
-                            <div className="flex-1 rounded-lg overflow-hidden relative">
+                            <div className="flex-1 rounded-lg overflow-hidden relative max-h-2/3">
                                 <Map
                                     {...viewState}
                                     onMove={(evt) => setViewState(evt.viewState)}
@@ -303,7 +297,14 @@ export const RouteAdmin: React.FC = () => {
                                     </Source>
 
 
-                                    <Source id="route-source" type="geojson" data={routeGeoJSON}>
+                                    <Source id="route-source" type="geojson" data={{
+                                        type: "Feature",
+                                        properties: {},
+                                        geometry: {
+                                            type: 'LineString',
+                                            coordinates: routeGeoJSON
+                                        }
+                                    }}>
                                         <Layer
                                             id="route-layer"
                                             type="line"
@@ -330,25 +331,6 @@ export const RouteAdmin: React.FC = () => {
                                     )
                                 }
                             </div>
-
-                            {/* Thông tin xe */}
-                            <div className="flex gap-4 mt-4">
-                                {/* Card thông tin xe */}
-                                <Card className="flex-1 p-4 bg-[#F9FAFB] flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-green-400 rounded-full" />
-                                    <div>
-                                        <p className="font-semibold text-lg">29A-12345</p>
-                                        <p className="text-sm text-gray-600">Xe Bus</p>
-                                    </div>
-                                </Card>
-
-                                {/* Card tài xế */}
-                                <Card className="flex-1 p-4 bg-[#F9FAFB] flex flex-col justify-center text-right">
-                                    <p className="text-sm">Tài xế</p>
-                                    <p className="font-semibold">Nguyễn Văn A</p>
-                                </Card>
-                            </div>
-
 
                             {/* Danh sách điểm đón */}
                             <div className="mt-4 space-y-2 overflow-y-auto max-h-48">

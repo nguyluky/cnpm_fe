@@ -35,7 +35,6 @@ export function decodePolyline(encodedStr: string, precision: number = 5): [numb
         const dLng = (result & 1) ? ~(result >> 1) : (result >> 1);
         lng += dLng;
 
-        // Thêm tọa độ vào mảng kết quả (chia lại cho factor để lấy giá trị thực)
         coordinates.push([lng / factor, lat / factor]);
     }
 
