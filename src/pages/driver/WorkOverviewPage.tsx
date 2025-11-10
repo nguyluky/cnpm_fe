@@ -4,7 +4,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import viLocale from "@fullcalendar/core/locales/vi";
-import { Button } from "../../components/uiItem/button";
+// import { Button } from "../../components/uiItem/button";
 import { CalendarDays } from "lucide-react";
 
 interface Shift {
@@ -58,7 +58,7 @@ export const WorkOverviewPage: React.FC = () => {
           <CalendarDays className="text-purple-600" />
           Lịch làm việc tổng quan
         </h1>
-
+{/* 
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
@@ -72,7 +72,7 @@ export const WorkOverviewPage: React.FC = () => {
           >
             Tuần sau ▶
           </Button>
-        </div>
+        </div> */}
       </div>
 
       {/* Lịch */}
