@@ -169,11 +169,8 @@ export const RouteAdmin: React.FC = () => {
         const encodedRouteString = selectedRoute?.metadata?.encodedPath;
         console.log("Selected Route ID:", selectedRoute);
         console.log("Encoded Route String:", encodedRouteString);
-        let coordinates: [number, number][] = []
-        if (encodedRouteString) {
-            coordinates = decodePolyline(encodedRouteString, 6);
-        }
-        console.log("Decoded Coordinates:", coordinates);
+        let coordinates: ([number, number][])[] = JSON.parse(encodedRouteString || '[[], []]');
+        console.log("Decoded Coordinates:", coordinates[0]);
 
         return coordinates;
     }, [allRoutes, selectedRouteId]);
@@ -302,7 +299,7 @@ export const RouteAdmin: React.FC = () => {
                                         properties: {},
                                         geometry: {
                                             type: 'LineString',
-                                            coordinates: routeGeoJSON
+                                            coordinates: routeGeoJSON[0]
                                         }
                                     }}>
                                         <Layer
@@ -314,6 +311,28 @@ export const RouteAdmin: React.FC = () => {
                                             }}
                                             paint={{
                                                 'line-color': "#6366F1",
+                                                'line-width': 5,
+                                                'line-opacity': 0.8
+                                            }}
+                                        />
+                                    </Source>
+                                    <Source id="route-source-2" type="geojson" data={{
+                                        type: "Feature",
+                                        properties: {},
+                                        geometry: {
+                                            type: 'LineString',
+                                            coordinates: routeGeoJSON[1]
+                                        }
+                                    }}>
+                                        <Layer
+                                            id="route-layer-2"
+                                            type="line"
+                                            layout={{
+                                                'line-join': 'round',
+                                                'line-cap': 'round'
+                                            }}
+                                            paint={{
+                                                'line-color': "#10B981",
                                                 'line-width': 5,
                                                 'line-opacity': 0.8
                                             }}
