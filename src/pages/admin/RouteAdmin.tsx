@@ -8,9 +8,19 @@ import { Route, Clock } from "lucide-react";
 import type { PaginationMetaData, RouteData, StopPointsData } from '../../api/data-contracts.ts';
 import { useApi } from '../../contexts/apiConetxt.tsx';
 import { Pagination } from '../../components/uiPart/Pagination.tsx';
-import { decodePolyline } from '../../utils/polyline.ts';
 import mapboxgl from 'mapbox-gl';
 
+// Hàm helper để ghép địa chỉ
+const getFullAddress = (meta: StopPointsData['meta']) => {
+    const addressParts = [
+        meta.addressNo,
+        meta.street,
+        meta.ward,
+        meta.zone,
+    ].filter(Boolean); // Lọc ra các giá trị rỗng
+
+    return addressParts.join(', ') || 'N/A';
+};
 
 const RouteCardSkeleton = () => {
     return (
@@ -101,6 +111,7 @@ export const RouteAdmin: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [search, setSearch] = useState("");
     const [loadingStopPoints, setLoadingStopPoints] = useState(false);
+    const [viewDirection, setViewDirection] = useState<[boolean, boolean]>([true, true]);
 
     const [viewState, setViewState] = useState({
         latitude: 10.771,
@@ -169,11 +180,8 @@ export const RouteAdmin: React.FC = () => {
         const encodedRouteString = selectedRoute?.metadata?.encodedPath;
         console.log("Selected Route ID:", selectedRoute);
         console.log("Encoded Route String:", encodedRouteString);
-        let coordinates: [number, number][] = []
-        if (encodedRouteString) {
-            coordinates = decodePolyline(encodedRouteString, 6);
-        }
-        console.log("Decoded Coordinates:", coordinates);
+        const coordinates: ([number, number][])[] = JSON.parse(encodedRouteString || '[[], []]') as ([number, number][])[];
+        console.log("Decoded Coordinates:", coordinates[0]);
 
         return coordinates;
     }, [allRoutes, selectedRouteId]);
@@ -242,7 +250,7 @@ export const RouteAdmin: React.FC = () => {
                         <div className="p-5 h-full flex flex-col">
                             <div className="flex items-center gap-2 mb-4">
                                 <MapPin className="w-5 h-5" />
-                                <span className="font-semibold text-xl">Tuyến 1 - Quận 1</span>
+                                <span className="font-semibold text-xl">Tuyến {stopPoints[0]?.name} - {stopPoints[stopPoints.length - 1]?.name}</span>
                             </div>
 
                             <div className="flex-1 rounded-lg overflow-hidden relative max-h-2/3">
@@ -302,7 +310,7 @@ export const RouteAdmin: React.FC = () => {
                                         properties: {},
                                         geometry: {
                                             type: 'LineString',
-                                            coordinates: routeGeoJSON
+                                            coordinates: viewDirection[0] ? routeGeoJSON[0] : []
                                         }
                                     }}>
                                         <Layer
@@ -313,7 +321,31 @@ export const RouteAdmin: React.FC = () => {
                                                 'line-cap': 'round'
                                             }}
                                             paint={{
-                                                'line-color': "#6366F1",
+                                                // mau xanh dương
+                                                'line-color': "#3B82F6",
+                                                'line-width': 5,
+                                                'line-opacity': 0.8
+                                            }}
+                                        />
+                                    </Source>
+                                    <Source id="route-source-2" type="geojson" data={{
+                                        type: "Feature",
+                                        properties: {},
+                                        geometry: {
+                                            type: 'LineString',
+                                            coordinates: viewDirection[1] ? routeGeoJSON[1] : []
+                                        }
+                                    }}>
+                                        <Layer
+                                            id="route-layer-2"
+                                            type="line"
+                                            layout={{
+                                                'line-join': 'round',
+                                                'line-cap': 'round'
+                                            }}
+                                            paint={{
+                                                // mau đỏ 
+                                                'line-color': "#EF4444",
                                                 'line-width': 5,
                                                 'line-opacity': 0.8
                                             }}
@@ -324,21 +356,44 @@ export const RouteAdmin: React.FC = () => {
                                 </Map>
 
                                 {
+                                    // Hiển thị overlay bật tắt hướng đi 
+                                }
+
+                                <div className="absolute bottom-4 right-4 bg-white rounded-md shadow-md p-2 flex flex-col gap-2">
+                                    <label className="flex items-center gap-2">
+                                        <input checked={viewDirection[0]} onChange={(e) => { setViewDirection([e.target.checked, viewDirection[1]]); }} type="checkbox" className="form-checkbox h-4 w-4 gb-blue-600 " />
+                                        <span className="text-sm font-medium text-gray-700">Hướng đi</span>
+                                    </label>
+                                    <label className="flex items-center gap-2">
+                                        <input type="checkbox" className="form-checkbox h-4 w-4 bg-red-600 " checked={viewDirection[1]} onChange={(e) => { setViewDirection([viewDirection[0], e.target.checked]); }} />
+                                        <span className="text-sm font-medium text-gray-700">Hướng về</span>
+                                    </label>
+                                </div>
+
+                                {
                                     loadingStopPoints && (
                                         <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
-                                            <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-16 w-16"></div>
+                                            <span className="loading loading-spinner loading-xl"></span>
                                         </div>
                                     )
                                 }
                             </div>
 
                             {/* Danh sách điểm đón */}
-                            <div className="mt-4 space-y-2 overflow-y-auto max-h-48">
-                                <h4 className="font-semibold text-sm text-gray-700 mb-2 ">Điểm đón (3)</h4>
+                            <div className="mt-4 space-y-2 overflow-y-auto h-1/3">
+                                <h4 className="font-semibold text-sm text-gray-700 mb-2 ">Điểm đón ({
+                                    stopPoints.length
+                                })</h4>
                                 {stopPoints.map((stop, idx) => (
                                     <Card
                                         key={stop.id}
                                         className="p-3 flex items-center gap-3 bg-[#DDEDF4] border border-gray-200"
+                                        onClick={() => {
+                                            mapRef.current?.flyTo({
+                                                center: [stop.location.longitude, stop.location.latitude],
+                                                zoom: 16,
+                                            });
+                                        }}
                                     >
                                         <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
                                             {idx + 1}
@@ -346,16 +401,20 @@ export const RouteAdmin: React.FC = () => {
                                         <div className="flex-1">
                                             <p className="font-medium text-sm">{stop.name}</p>
                                             <p className="text-xs text-gray-500">
-                                                {idx === 0 && "Lê Lợi, Quận 1"}
-                                                {idx === 1 && "Phạm Ngũ Lão, Q1"}
-                                                {idx === 2 && "Lê Thánh Tôn, Q1"}
+                                                {
+                                                    // Hiển thị địa chỉ nếu có, nếu không thì hiển thị kinh độ vĩ độ
+                                                }
+                                                {getFullAddress(stop.meta)}
                                             </p>
                                         </div>
-                                        <p className="text-sm text-gray-600">
-                                            {idx === 0 && "07:00"}
-                                            {idx === 1 && "07:10"}
-                                            {idx === 2 && "07:20"}
-                                        </p>
+                                        {
+                                            // <p className="text-sm text-gray-600">
+                                            //     {idx === 0 && "07:00"}
+                                            //     {idx === 1 && "07:10"}
+                                            //     {idx === 2 && "07:20"}
+                                            // </p>
+
+                                        }
                                     </Card>
                                 ))}
                             </div>

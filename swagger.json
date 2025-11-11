@@ -130,13 +130,23 @@
           "metadata": {
             "type": "object",
             "properties": {
-              "distanceInKm": {
+              "Color": {
+                "type": "string"
+              },
+              "Headway": {
+                "type": "string"
+              },
+              "Distance": {
                 "type": "number"
               },
-              "estimatedTimeInMin": {
-                "type": "number"
+              "encodedPath": {},
+              "OperationTime": {
+                "type": "string"
               }
             },
+            "required": [
+              "encodedPath"
+            ],
             "additionalProperties": false
           }
         },
@@ -1685,13 +1695,23 @@
                         "metadata": {
                           "type": "object",
                           "properties": {
-                            "distanceInKm": {
+                            "Color": {
+                              "type": "string"
+                            },
+                            "Headway": {
+                              "type": "string"
+                            },
+                            "Distance": {
                               "type": "number"
                             },
-                            "estimatedTimeInMin": {
-                              "type": "number"
+                            "encodedPath": {},
+                            "OperationTime": {
+                              "type": "string"
                             }
                           },
+                          "required": [
+                            "encodedPath"
+                          ],
                           "additionalProperties": false
                         },
                         "stopPoints": {
@@ -3485,9 +3505,6 @@
                 "$schema": "https://json-schema.org/draft/2020-12/schema",
                 "type": "object",
                 "properties": {
-                  "sequence": {
-                    "type": "number"
-                  },
                   "name": {
                     "type": "string"
                   },
@@ -3499,7 +3516,6 @@
                   }
                 },
                 "required": [
-                  "sequence",
                   "name",
                   "location",
                   "meta"
@@ -3528,6 +3544,31 @@
                     "message": {
                       "type": "string",
                       "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "location": {
+                          "$ref": "#/components/schemas/GeoLocation"
+                        },
+                        "meta": {
+                          "$ref": "#/components/schemas/StopPointsMeta"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "location",
+                        "meta"
+                      ],
+                      "additionalProperties": false
                     }
                   },
                   "required": []
@@ -3775,17 +3816,17 @@
                   "name": {
                     "type": "string"
                   },
-                  "sequence": {
-                    "type": "number"
-                  },
                   "location": {
                     "$ref": "#/components/schemas/GeoLocation"
+                  },
+                  "meta": {
+                    "$ref": "#/components/schemas/StopPointsMeta"
                   }
                 },
                 "required": [
                   "name",
-                  "sequence",
-                  "location"
+                  "location",
+                  "meta"
                 ],
                 "additionalProperties": false
               }
