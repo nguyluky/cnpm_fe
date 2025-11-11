@@ -65,7 +65,7 @@ export const TripCard: React.FC<TripCardProps> = ({
 
   const getAlertMessage = () => {
     if (!pendingAction) return '';
-    const action = pendingAction.type === "pickUp" ? "Đã đón" : "Đã đánh dấu vắng";
+    const action = pendingAction.type === "pickUp" ? "đã đón" : "đã đánh dấu vắng";
     return `Bạn có xác nhận ${action} ${pendingAction.student.name}?`;
   }
 

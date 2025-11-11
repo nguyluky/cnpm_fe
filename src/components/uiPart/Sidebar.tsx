@@ -50,7 +50,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     const driverMenuItems = [
         { icon: ClipboardList, label: "Tổng quan hôm nay", path: path.DRIVER }, // Đã thay đổi
         { icon: Users, label: "Lịch làm việc", path: path.DRIVER_SCHEDULE }, // Đã thay đổi
-        { icon: Bell, label: "Thông báo", path: "/driver/notifications" }, // Giữ nguyên, không có trong path mới
+        { icon: Bell, label: "Thông báo", path: path.DRIVER_NOTIFICATIONS }, // Đã thay đổi
     ];
 
     const menuItems =
