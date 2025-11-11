@@ -718,8 +718,11 @@ export class Api<
           startLocation: GeoLocation;
           endLocation: GeoLocation;
           metadata: {
-            distanceInKm?: number;
-            estimatedTimeInMin?: number;
+            Color?: string;
+            Headway?: string;
+            Distance?: number;
+            encodedPath: any;
+            OperationTime?: string;
           };
           stopPoints: {
             /**
@@ -1541,7 +1544,6 @@ export class Api<
 
   createANewStoppoint = (
     data: {
-      sequence: number;
       name: string;
       location: GeoLocation;
       meta: StopPointsMeta;
@@ -1558,6 +1560,12 @@ export class Api<
         code?: number;
         /** Human-readable error message */
         message?: string;
+        data?: {
+          id: string;
+          name: string;
+          location: GeoLocation;
+          meta: StopPointsMeta;
+        };
       },
       | {
           /**
@@ -1676,8 +1684,8 @@ export class Api<
     id: string,
     data: {
       name: string;
-      sequence: number;
       location: GeoLocation;
+      meta: StopPointsMeta;
     },
     params: RequestParams = {},
   ) =>
