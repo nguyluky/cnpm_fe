@@ -1,5 +1,7 @@
 import React from 'react';
 import { Card } from '../../components/uiItem/card';
+import { BarcodeScanFrame } from '../../components/uiPart/BarCodeScan'; // Đường dẫn tùy thuộc vào project của bạn
+
 
 interface Notification {
     id: number;
@@ -33,9 +35,12 @@ export const NotificationsPage: React.FC = () => {
                     >
                         <path d="M10.268 21a2 2 0 0 0 3.464 0" />
                         <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" />
-                    </svg>          
+                    </svg>            
                     <h2 className="text-2xl font-semibold mb-2">Thông báo</h2>
                 </Card>
+
+                {/* Component barcode quét thẻ sinh viên */}
+                <BarcodeScanFrame />
 
                 <div className="space-y-4">
                     {notifications.map((notif) => (
