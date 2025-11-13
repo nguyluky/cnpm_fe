@@ -3,6 +3,6 @@
   themes: light --default;
 }
 
-body {
+body, #root {
     min-height: 100vh;
 }

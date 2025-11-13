@@ -619,6 +619,26 @@ export function StopsPointsPage() {
                     interactiveLayerIds={['point']}
                     onMouseEnter={() => setCursor('pointer')}
                     onMouseLeave={() => setCursor('auto')}
+                    onMouseDown={(event) => {
+                        // console.log('Map clicked at: ', event.lngLat);
+                        openModal(<AddStopPointModal editData={{
+                            id: '',
+                            name: '',
+                            location: {
+                                latitude: event.lngLat.lat,
+                                longitude: event.lngLat.lng,
+                            },
+                            meta: {
+                                addressNo: '',
+                                street: '',
+                                ward: '',
+                                zone: '',
+                                status: 'Active',
+                                supportDisability: 'Unknown',
+                            }
+                        }} onSubmit={async () => {}}/>)
+                        // event.point
+                    }}
                     cursor={cursor}
                 >
                     <Source id="my-data" type="geojson" data={{
