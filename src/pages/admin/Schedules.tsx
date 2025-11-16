@@ -6,6 +6,7 @@ import { Clock } from "lucide-react";
 
 export const Schedules = () => {
   const [selectedDate, setSelectedDate] = useState("10/10/2025");
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const schedules = [
     {
@@ -44,9 +45,97 @@ export const Schedules = () => {
         </div>
 
         {/* Nút tạo lịch */}
-        <Button variant="default" className="bg-indigo-500 text-white flex items-center w-50 h-10">
-            <Plus className="mr-2" size={18} /> Tạo lịch mới
+        <Button
+          onClick={() => setIsCreateModalOpen(true)}
+          variant="default"
+          className="bg-indigo-600 text-white flex items-center h-10 px-4 rounded-lg hover:bg-indigo-700"
+        >
+          <Plus className="mr-2" size={18} /> Tạo lịch mới
         </Button>
+        {/* Modal Tạo lịch trình mới */}
+{isCreateModalOpen && (
+  <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl p-6">
+      <h3 className="text-lg font-semibold mb-6">Tạo lịch trình mới</h3>
+
+      <div className="grid grid-cols-2 gap-6">
+        {/* Cột trái */}
+        <div className="space-y-4">
+          {/* Xe Bus */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Xe Bus
+            </label>
+            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none appearance-none bg-white">
+              <option>Chọn xe Bus</option>
+              <option>29A-12345</option>
+              <option>29B-67890</option>
+            </select>
+          </div>
+
+          {/* Tuyến đường */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Tuyến đường
+            </label>
+            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none appearance-none bg-white">
+              <option>Chọn tuyến</option>
+              <option>Tuyến 1 - Quận 1</option>
+              <option>Tuyến 2 - Quận 3</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Cột phải */}
+        <div className="space-y-4">
+          {/* Tài xế */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Tài xế
+            </label>
+            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none appearance-none bg-white">
+              <option>Chọn tài xế</option>
+              <option>Nguyễn Văn A</option>
+              <option>Nguyễn Văn B</option>
+            </select>
+          </div>
+
+          {/* Ca làm */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Ca làm
+            </label>
+            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none appearance-none bg-white">
+              <option>Chọn ca</option>
+              <option>Ca sáng (06:45 - 08:00)</option>
+              <option>Ca chiều (16:45 - 18:00)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Nút hành động */}
+      <div className="flex justify-end gap-3 mt-8">
+        <Button
+          variant="outline"
+          onClick={() => setIsCreateModalOpen(false)}
+          className="px-6 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+        >
+          Hủy
+        </Button>
+        <Button
+          onClick={() => {
+            // Xử lý tạo lịch ở đây (gọi API, thêm vào danh sách, v.v.)
+            setIsCreateModalOpen(false);
+          }}
+          className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+        >
+          Tạo lịch
+        </Button>
+      </div>
+    </div>
+  </div>
+)}
         </div>
 
 
