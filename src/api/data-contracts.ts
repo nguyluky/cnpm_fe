@@ -49,8 +49,11 @@ export interface RouteData {
   startLocation: GeoLocation;
   endLocation: GeoLocation;
   metadata: {
-    distanceInKm?: number;
-    estimatedTimeInMin?: number;
+    Color?: string;
+    Headway?: string;
+    Distance?: number;
+    encodedPath: any;
+    OperationTime?: string;
   };
 }
 
