@@ -18,6 +18,7 @@ import { NotFoundPage } from "../pages/404Page"
 // import { AddSchedulePage } from "../pages/admin/test_ui1"
 import ScheduleAdminTable from "../pages/admin/test_ui"
 import { DriverLayout } from "../layouts/DriverLayout"
+import { NotificationsPage } from "../pages/driver/NotificationsPage"
 
 export const path = {
     INDEX: "/",
@@ -37,6 +38,7 @@ export const path = {
 
     DRIVER: "/driver",
     DRIVER_SCHEDULE: "/driver/schedule",
+    DRIVER_NOTIFICATIONS: "/driver/notifications",
 }
 
 
@@ -113,6 +115,10 @@ export const router = createBrowserRouter([
                     {
                         path: path.DRIVER_SCHEDULE,
                         element: <WorkOverviewPage />
+                    },
+                    {
+                        path: path.DRIVER_NOTIFICATIONS,
+                        element: <NotificationsPage />
                     }
                 ]
             },
