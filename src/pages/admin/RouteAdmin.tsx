@@ -112,6 +112,8 @@ export const RouteAdmin: React.FC = () => {
     const [search, setSearch] = useState("");
     const [loadingStopPoints, setLoadingStopPoints] = useState(false);
     const [viewDirection, setViewDirection] = useState<[boolean, boolean]>([true, true]);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    
 
     const [viewState, setViewState] = useState({
         latitude: 10.771,
@@ -193,9 +195,12 @@ export const RouteAdmin: React.FC = () => {
                 <Card className="xl:w-96 w-full h-fit xl:h-full p-5 flex flex-col gap-4 overflow-hidden">
                     <div className="flex justify-between items-center">
                         <h2 className="text-lg font-semibold">Quản lý tuyến đường</h2>
-                        <Button className="bg-[#6366F1] text-white text-sm px-4 py-2 rounded-lg">
+                          <Button
+                            onClick={() => setIsCreateModalOpen(true)}
+                            className="bg-[#6366F1] text-white text-sm px-4 py-2 rounded-lg hover:bg-indigo-700"
+                          >
                             + Tạo tuyến mới
-                        </Button>
+                          </Button>
                     </div>
 
                     {
@@ -422,6 +427,98 @@ export const RouteAdmin: React.FC = () => {
                     </Card>
                 </div>
             </div>
+                      {/* Modal Tạo tuyến đường mới */}
+          {isCreateModalOpen && (
+            <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <Card className="w-full max-w-md bg-white rounded-xl shadow-xl">
+                <div className="p-6">
+                  <h3 className="text-lg font-semibold mb-4">Tạo tuyến đường mới</h3>
+
+                  <div className="space-y-4">
+                    {/* Tên tuyến */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Tên tuyến
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Tuyến 3 - Quận 5"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                      />
+                    </div>
+
+                    {/* Mô tả */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Mô tả
+                      </label>
+                      <textarea
+                        placeholder="Mô tả tuyến đường"
+                        rows={3}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-none"
+                      />
+                    </div>
+
+                    <div className="flex gap-4">
+                      {/* Khoảng cách */}
+                      <div className="flex-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Khoảng cách
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="text"
+                            defaultValue="10"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg pr-12 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                          />
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">
+                            km
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Thời gian dự kiến */}
+                      <div className="flex-1">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Thời gian dự kiến
+                        </label>
+                        <div className="relative">
+                          <input
+                            type="text"
+                            defaultValue="30"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg pr-16 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                          />
+                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">
+                            phút
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Nút hành động */}
+                  <div className="flex justify-end gap-3 mt-6">
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsCreateModalOpen(false)}
+                      className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+                    >
+                      Hủy
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        // Xử lý tạo tuyến ở đây
+                        setIsCreateModalOpen(false);
+                      }}
+                      className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                    >
+                      Tạo tuyến
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          )}
         </div>
     );
 }
