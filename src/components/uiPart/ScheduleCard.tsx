@@ -1,7 +1,7 @@
 import React from 'react';
 // import { MapPin } from 'lucide-react';
 import { Card } from '../uiItem/card';
-import { Button } from '../uiItem/button';
+// import { Button } from '../uiItem/button';
 import { Avatar, AvatarFallback } from '../uiItem/avatar';
 // import { Badge } from '../../../components/ui/badge';
 
@@ -29,8 +29,8 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
   route,
   school,
   drivers,
-  onStart,
-  onAbsent
+  // onStart,d
+  // onAbsent
 }) => {
   const bgColor = shiftType === 'morning' ? 'bg-amber-50' : 'bg-blue-50';
   const borderColor = shiftType === 'morning' ? 'border-amber-200' : 'border-blue-200';
@@ -91,7 +91,7 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              {/* <div className="flex items-center gap-2">
                 <Button
                   size="sm"
                   className="bg-emerald-500 hover:bg-emerald-600 text-white"
@@ -107,7 +107,7 @@ export const ScheduleCard: React.FC<ScheduleCardProps> = ({
                 >
                   Vắng
                 </Button>
-              </div>
+              </div> */}
             </div>
           ))}
         </div>

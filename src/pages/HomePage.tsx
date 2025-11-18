@@ -5,11 +5,78 @@ import busIcon from "../assets/vector_bus.png";
 import parentIcon from "../assets/vector_parent.png";
 import { useApi } from "../contexts/apiConetxt";
 import { path } from "../router";
+import { Toast } from "../components/uiPart/ToastContainer";
 
 // HomePage.tsx
+//
+const toast = Toast({
+    defultDuration: 3000,
+    position: 'top-right',
+    customToasts: {
+        success: ({ message }: { message: string }) => (
+            <div
+                id="toast-simple"
+                className="flex items-center w-full max-w-sm p-4 text-body bg-neutral-primary-soft rounded-base shadow-xs border border-default"
+                role="alert"
+            >
+                <svg
+                    className="w-5 h-5 text-fg-brand"
+                    aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width={24}
+                    height={24}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="m12 18-7 3 7-18 7 18-7-3Zm0 0v-5"
+                    />
+                </svg>
+                <div className="ms-2.5 text-sm border-s border-default ps-3.5">
+                    Message sent successfully.
+                </div>
+                <button
+                    type="button"
+                    className="ms-auto flex items-center justify-center text-body hover:text-heading bg-transparent box-border border border-transparent hover:bg-neutral-secondary-medium focus:ring-4 focus:ring-neutral-tertiary font-medium leading-5 rounded text-sm h-8 w-8 focus:outline-none"
+                    data-dismiss-target="#toast-simple"
+                    aria-label="Close"
+                >
+                    <span className="sr-only">Close</span>
+                    <svg
+                        className="w-5 h-5"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width={24}
+                        height={24}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke="currentColor"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18 17.94 6M18 18 6.06 6"
+                        />
+                    </svg>
+                </button>
+            </div>
+
+        ),
+        error: ({ message }: { message: string }) => (
+            <div className="bg-red-500 text-white p-4 rounded shadow">
+                {message}
+            </div>
+        ),
+    },
+});
 
 export function HomePage() {
-    const {api} = useApi();
+    const { api } = useApi();
     const navigate = useNavigate();
     const roles = [
         {
@@ -62,7 +129,7 @@ export function HomePage() {
                         //     alert("Bạn không có quyền truy cập vào khu vực này.");
                         //     return;
                         // }
-                        
+
                         navigate(roles[i].path);
 
 
@@ -75,6 +142,13 @@ export function HomePage() {
 
     return (
         <div className="bg-[#E0E7FF] w-full min-h-screen mx-auto px-4 py-16">
+            <button onClick={() => {
+                console.log("Toast success clicked");
+                toast.success({ message: "Đăng nhập thành công!" });
+            }}>Test Toast Success</button>
+            <button onClick={() => {
+                toast.error({ message: "Đăng nhập thất bại!" });
+            }}>Test Toast Error</button>
 
             <div className="align-items-center text-center space-y-3">
 

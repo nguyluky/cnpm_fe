@@ -1,6 +1,27 @@
 import { QrCode } from "lucide-react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { BarcodeDetectorPolyfill } from '@undecaf/barcode-detector-polyfill'
+import { BrowserMultiFormatReader, BarcodeFormat } from '@zxing/browser';
+import { DecodeHintType } from '@zxing/library';
+
+function preprocessFrame(video: HTMLVideoElement, canvas: HTMLCanvasElement) {
+    const ctx = canvas.getContext("2d")!;
+
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // tăng contrast nhẹ
+    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imgData.data;
+    const factor = 1.2; // contrast
+
+    for (let i = 0; i < data.length; i += 4) {
+        data[i] = (data[i] - 128) * factor + 128;
+        data[i + 1] = (data[i + 1] - 128) * factor + 128;
+        data[i + 2] = (data[i + 2] - 128) * factor + 128;
+    }
+
+    ctx.putImageData(imgData, 0, 0);
+    return canvas;
+}
 
 function InitPage({ onOk }: { onOk: () => void }) {
     // ... (Giữ nguyên InitPage)
@@ -23,11 +44,26 @@ function InitPage({ onOk }: { onOk: () => void }) {
     </div>
 }
 
+function sortPointsClockwise(points: { x: number; y: number; }[]) {
+    // Tính tâm polygon
+    const cx = (points[0].x + points[1].x + points[2].x + points[3].x) / 4;
+    const cy = (points[0].y + points[1].y + points[2].y + points[3].y) / 4;
+
+    return points
+        .map(p => ({
+            ...p,
+            angle: Math.atan2(p.y - cy, p.x - cx)
+        }))
+        .sort((a, b) => a.angle - b.angle);
+}
+
+
 export const QRRollCall: React.FC = () => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const highlightCanvasRef = useRef<HTMLCanvasElement>(null);
     const offscreenCanvasRef = useRef<HTMLCanvasElement>(null);
     const animationFrameRef = useRef<number | null>(null);
+    const lastDetectedRef = useRef<string | null>(null);
 
     const [barcodeValue, setBarcodeValue] = useState('Đang chờ...');
     const [readTime, setReadTime] = useState('N/A');
@@ -37,78 +73,32 @@ export const QRRollCall: React.FC = () => {
     });
 
     // Hàm vẽ khung Highlight (Giữ nguyên)
-    const drawHighlightBox = useCallback((box, highlightCtx) => {
+    const drawHighlightBox = useCallback((points: { x: number; y: number; }[], highlightCtx: CanvasRenderingContext2D) => {
         if (!highlightCtx) return;
 
-        highlightCtx.clearRect(0, 0, highlightCtx.canvas.width, highlightCtx.canvas.height);
+        points = sortPointsClockwise(points);
+        console.log('Drawing highlight box with points:', points);
 
-        highlightCtx.beginPath();
-        highlightCtx.lineWidth = 4;
-        highlightCtx.strokeStyle = 'rgba(255, 215, 0, 0.8)'; // màu vàng với độ trong suốt
-        highlightCtx.fillStyle = 'rgba(255, 215, 0, 0.3)';
+        const ctx = highlightCtx;
 
-        // Vẽ hình chữ nhật xung quanh bounding box
-        highlightCtx.fillRect(box.x, box.y, box.width, box.height);
+        ctx.clearRect(0, 0, highlightCanvasRef.current!.width, highlightCanvasRef.current!.height);
 
-        highlightCtx.stroke();
-        highlightCtx.closePath();
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        for (let i = 1; i < points.length; i++) {
+            ctx.lineTo(points[i].x, points[i].y);
+        }
+        ctx.closePath();
+
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = "#00ff99";
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = "#00ff99";
+        ctx.stroke();
     }, []);
 
     // Khởi tạo camera và detector
     useLayoutEffect(() => {
-
-        const scanLoop = async (detector: BarcodeDetectorPolyfill) => {
-            const video = videoRef.current;
-            const offscreenCanvas = offscreenCanvasRef.current;
-            const highlightCanvas = highlightCanvasRef.current;
-
-            if (
-                video &&
-                offscreenCanvas &&
-                highlightCanvas &&
-                video.readyState === video.HAVE_ENOUGH_DATA
-            ) {
-                const offscreenCtx = offscreenCanvas.getContext('2d')!;
-                const highlightCtx = highlightCanvas.getContext('2d')!;
-
-                // 1. Clear Canvas hiển thị
-                highlightCtx.clearRect(0, 0, highlightCanvas.width, highlightCanvas.height);
-
-                // 2. Vẽ khung hình hiện tại từ video sang canvas ẩn
-                offscreenCtx.drawImage(video, 0, 0, offscreenCanvas.width, offscreenCanvas.height);
-
-                const startTime = performance.now();
-
-                try {
-                    // 3. Thực hiện quét trên Canvas ẩn
-                    const barcodes = await detector.detect(offscreenCanvas);
-
-                    const endTime = performance.now();
-                    const timeTaken = (endTime - startTime).toFixed(2);
-
-                    if (barcodes.length > 0) {
-                        const firstBarcode = barcodes[0];
-
-                        // Cập nhật kết quả & thời gian
-                        setBarcodeValue(firstBarcode.rawValue);
-                        setReadTime(`${timeTaken} ms`);
-
-                        // 4. Vẽ khung Highlight lên Canvas hiển thị
-                        drawHighlightBox(firstBarcode.boundingBox, highlightCtx);
-                        console.log('Mã vạch phát hiện:', firstBarcode.rawValue);
-                    } else {
-                        setBarcodeValue('Không tìm thấy...');
-                        setReadTime(`N/A (${timeTaken} ms)`);
-                    }
-                } catch (e) {
-                    console.error('Lỗi khi phát hiện mã vạch:', e);
-                }
-            }
-
-            // 5. Tiếp tục vòng lặp
-            animationFrameRef.current = requestAnimationFrame(() => scanLoop(detector));
-        }
-
 
         const initCameraAndDetector = async () => {
             const video = videoRef.current!;
@@ -116,37 +106,46 @@ export const QRRollCall: React.FC = () => {
             const offscreenCanvas = offscreenCanvasRef.current!;
 
             try {
-                const detector = new BarcodeDetectorPolyfill({
-                    formats: ['qr_code', 'ean_13', 'code_128', 'upc_a', 'code_39'],
-                });
+                const detector = new BrowserMultiFormatReader();
 
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'environment' },
-                    audio: false,
-                });
-
-                video.srcObject = stream;
-
-                await new Promise((resolve) => {
-                    video.onloadedmetadata = () => {
-                        // Thiết lập kích thước Canvas hiển thị và Canvas ẩn khớp với kích thước video
-                        highlightCanvas.width = video.videoWidth;
-                        highlightCanvas.height = video.videoHeight;
-                        offscreenCanvas.width = video.videoWidth;
-                        offscreenCanvas.height = video.videoHeight;
-
-                        // Quan trọng: Đặt kích thước hiển thị của canvas khớp với kích thước video
-                        // Đây là nơi cần điều chỉnh để canvas highlight hiển thị đúng khi video full screen
-                        // Chúng ta sẽ giải quyết việc này bằng CSS ở phần render.
-
-                        resolve(void 0);
-                    };
-                });
-
-                // Bắt đầu vòng lặp quét
-                animationFrameRef.current = requestAnimationFrame(() => scanLoop(detector));
                 setApiStatus({
                     text: 'Đang quét mã QR...',
+                    isError: false,
+                });
+
+                const hints = new Map();
+                hints.set(DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.CODE_39, BarcodeFormat.CODE_128, BarcodeFormat.QR_CODE]);
+                hints.set(DecodeHintType.TRY_HARDER, true);
+                hints.set(DecodeHintType.ASSUME_CODE_39_CHECK_DIGIT, false);
+                hints.set(DecodeHintType.ENABLE_CODE_39_EXTENDED_MODE, true);
+
+                detector.setHints(hints);
+
+                detector.decodeFromConstraints(
+                    { video: { facingMode: 'environment' }, audio: false },
+                    video,
+                    (result, error) => {
+                        console.log('Scan callback:', { result, error });
+                        const highlightCtx = highlightCanvas.getContext('2d')!;
+
+                        if (result) {
+                            setBarcodeValue(result.getText());
+                            setReadTime('N/A');
+
+                            // Vẽ khung Highlight
+                            const resultPoints = result.getResultPoints();
+                            drawHighlightBox(resultPoints.map(pt => ({ x: pt.getX(), y: pt.getY() })), highlightCtx);
+
+                            console.log('Mã vạch phát hiện:', result.getText());
+                            lastDetectedRef.current = result.getText();
+                        } else if (error) {
+                            // console.error('Lỗi khi quét mã vạch:', error);
+                        }
+                    }
+                );
+
+                setApiStatus({
+                    text: 'Quét mã QR...',
                     isError: false,
                 });
 
@@ -195,24 +194,19 @@ export const QRRollCall: React.FC = () => {
 
                 <canvas
                     ref={highlightCanvasRef}
-                    // Các class mới quan trọng:
-                    // absolute inset-0: Phủ lên video
-                    // w-full h-full: Đảm bảo Canvas hiển thị có cùng kích thước hiển thị với Video
-                    // object-cover: Rất quan trọng để Canvas Highlight co giãn và cắt (crop) 
-                    // theo cùng một cách với Video, giúp khung Highlight vẽ đúng vị trí.
                     className="pointer-events-none absolute inset-0 w-full h-full object-cover"
                 ></canvas>
 
                 {/* Canvas ẩn không cần thay đổi, vì nó không hiển thị */}
                 <canvas
                     ref={offscreenCanvasRef}
-                    className="absolute top-0 left-0 hidden" // Thêm 'hidden' để ẩn hoàn toàn
+                    className="absolute top-0 left-0" // Thêm 'hidden' để ẩn hoàn toàn
                 ></canvas>
 
                 {
                     // mask 
                 }
-                <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+                <div className="hidden absolute top-0 left-0 w-full h-full pointer-events-none">
                     <svg width="100%" height="100%">
                         <mask id="holeMask">
                             <rect width="100%" height="100%" fill="white" />

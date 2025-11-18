@@ -6,3 +6,46 @@
 body, #root {
     min-height: 100vh;
 }
+
+
+/* Toast enter animation */
+@keyframes toast-enter {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+    max-height: 0;
+    margin-bottom: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+    max-height: 500px;
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Toast exit animation */
+@keyframes toast-exit {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+    max-height: 500px;
+    margin-bottom: 0.5rem;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+    max-height: 0;
+    margin-bottom: 0;
+  }
+}
+
+.animate-toast-enter {
+  animation: toast-enter 0.3s ease-out forwards;
+  overflow: hidden;
+}
+
+.animate-toast-exit {
+  animation: toast-exit 0.3s ease-in forwards;
+  overflow: hidden;
+}

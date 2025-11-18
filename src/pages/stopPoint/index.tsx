@@ -294,12 +294,13 @@ function ModalConfirmDelete({
 
 interface StopPointsTableProps {
     stopPoints: StopPointsData[];
-    setViewState?: (viewState: { zoom: number; latitude: number; longitude: number }) => void;
-    updateStopPoint?: (id: string, data: Omit<StopPointsData, 'id' | 'meta'> & { meta: StopPointsData['meta'] }) => void;
+    focusOnStopPoint?: (data: StopPointsData) => void;
+    selectedStopPoints?: string[];
+    updateStopPoint?: (id: string, data: Omit<StopPointsData, 'id' | 'meta'> & { meta: StopPointsData['meta'] }) => Promise<void>;
     deleteStopPoint?: (id: string) => Promise<void>;
 }
 
-const StopPointsStripedTable: React.FC<StopPointsTableProps> = ({ stopPoints, setViewState, updateStopPoint, deleteStopPoint }) => {
+const StopPointsStripedTable: React.FC<StopPointsTableProps> = ({ stopPoints, focusOnStopPoint, updateStopPoint, deleteStopPoint }) => {
     const { openModal } = useModal();
 
     // Hàm helper để ghép địa chỉ
@@ -365,10 +366,8 @@ const StopPointsStripedTable: React.FC<StopPointsTableProps> = ({ stopPoints, se
                             {/* Cột 5: Actions (Thường) */}
                             <td className="px-6 py-4 flex space-x-4">
                                 <button className="text-blue-600 hover:underline" onClick={() => {
-                                    openModal(<AddStopPointModal editData={point} onSubmit={(data) => {
-                                        if (updateStopPoint) {
-                                            updateStopPoint(point.id, data);
-                                        }
+                                    openModal(<AddStopPointModal editData={point} onSubmit={ async (e) => {
+                                        if (updateStopPoint) await updateStopPoint(point.id, e);
                                     }} />);
                                 }}>Edit</button>
                                 <button className="text-red-600 hover:underline" onClick={() => {
@@ -377,13 +376,7 @@ const StopPointsStripedTable: React.FC<StopPointsTableProps> = ({ stopPoints, se
                                     }} />);
                                 }}>Delete</button>
                                 <button className="text-green-600 hover:underline" onClick={() => {
-                                    if (setViewState) {
-                                        setViewState({
-                                            zoom: 16,
-                                            latitude: point.location.latitude,
-                                            longitude: point.location.longitude,
-                                        });
-                                    }
+                                    if (focusOnStopPoint) focusOnStopPoint(point);
                                 }}>View</button>
                             </td>
                         </tr>
@@ -474,7 +467,6 @@ export function StopsPointsPage() {
 
     const createStopPoint = async (fromData: Omit<StopPointsData, 'id' | 'meta'> & { meta: StopPointsData['meta'] }) => {
         await api.createANewStoppoint({
-            sequence: 0,
             name: fromData.name,
             location: fromData.location,
             meta: fromData.meta,
@@ -494,7 +486,7 @@ export function StopsPointsPage() {
         await api.updateAStoppoint(id, {
             name: formData.name,
             location: formData.location,
-            sequence: 0
+            meta: formData.meta,
         }).then((response) => {
             if (response && response.data) {
                 // Cập nhật điểm trong danh sách
@@ -601,7 +593,17 @@ export function StopsPointsPage() {
                             <p> Loading stop points...</p>
                         </div>
                     ) :
-                        <StopPointsStripedTable stopPoints={pointsToRender} setViewState={setViewState} deleteStopPoint={deleteStopPoint} />
+                        <StopPointsStripedTable stopPoints={pointsToRender} focusOnStopPoint={(data) => {
+                            // Di chuyển map đến điểm được chọn
+                            mapRef.current?.flyTo({
+                                center: [data.location.longitude, data.location.latitude],
+                                zoom: 16,
+                            });
+
+                            // Hiển thị popup
+                            // setPopupInfo(data);
+                            setSelectedStopPoint([data.id]);
+                        }} deleteStopPoint={deleteStopPoint} updateStopPoint={ updateStopPoint } />
                 }
 
             </div>
@@ -680,3 +682,4 @@ export function StopsPointsPage() {
         </div >
     );
 }
+    
