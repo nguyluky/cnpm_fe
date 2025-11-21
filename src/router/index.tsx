@@ -18,7 +18,7 @@ import { NotFoundPage } from "../pages/404Page"
 // import { AddSchedulePage } from "../pages/admin/test_ui1"
 import ScheduleAdminTable from "../pages/admin/test_ui"
 import { DriverLayout } from "../layouts/DriverLayout"
-import { NotificationsPage } from "../pages/driver/NotificationsPage"
+import NotificationsPage from "../pages/driver/NotificationsPage"
 
 export const path = {
     INDEX: "/",
