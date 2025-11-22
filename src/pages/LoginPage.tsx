@@ -28,6 +28,17 @@ export function LoginPage() {
 
                 if (response.status === 200) {
                     api.setSecurityData(response.data.data!)
+                    const role = response.data.data!.roles;
+                    if (role.length === 1) {
+                        const userRole = role[0];
+                        if (userRole === 'admin') {
+                            navigate(path.ADMIN);
+                        } else if (userRole === 'driver') {
+                            navigate(path.DRIVER);
+                        } else if (userRole === 'parent') {
+                            navigate(path.PARENT);
+                        }
+                    }
                     navigate(path.INDEX);
                 }
             }
