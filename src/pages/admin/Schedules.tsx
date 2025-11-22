@@ -3,11 +3,38 @@ import { Button } from "../../components/uiItem/button";
 import { Plus } from "lucide-react";
 import { Calendar } from "lucide-react";
 import { Clock } from "lucide-react";
+import Select from 'react-select';
+import { vi } from 'date-fns/locale'; // Hiển thị tiếng Việt: Thứ 2, Tháng 1,...
+import { format } from 'date-fns';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 export const Schedules = () => {
-  const [selectedDate, setSelectedDate] = useState("10/10/2025");
+  // const [selectedDate, setSelectedDate] = useState("10/10/2025");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date()); // Mặc định hôm nay
+  // Format ngày đẹp: "Thứ 6, 22/11/2025"
+    const formatDateDisplay = (date: Date) => {
+      return format(date, 'EEEE, dd/MM/yyyy', { locale: vi });
+    };
+  const busOptions = [
+  { value: 'bus_001', label: '29A-12345 - Trần Văn A' },
+  { value: 'bus_002', label: '29B-67890 - Nguyễn Thị B' },
+  // ... hàng trăm xe khác
+  ];
 
+const routeOptions = [
+  { value: 'route_01', label: 'Tuyến 01 - Bến Thành → Chợ Lớn' },
+  { value: 'route_02', label: 'Tuyến 52 - Bến Xe Miền Tây → Đại học Quốc Gia' },
+  // ...
+  ];
+
+const driverOptions = [
+  { value: 'driver_001', label: 'Nguyễn Văn An (A12345)' },
+  { value: 'driver_002', label: 'Trần Thị Bé (B67890)' },
+  // ...
+  ];
+  
   const schedules = [
     {
       time: "Ca sáng (06:45 - 08:00)",
@@ -52,111 +79,204 @@ export const Schedules = () => {
         >
           <Plus className="mr-2" size={18} /> Tạo lịch mới
         </Button>
-        {/* Modal Tạo lịch trình mới */}
-{isCreateModalOpen && (
-  <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50 p-4">
-    <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl p-6">
-      <h3 className="text-lg font-semibold mb-6">Tạo lịch trình mới</h3>
+  {isCreateModalOpen && (
+  <div className="fixed inset-0 backdrop-blur-md bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+    <div className="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-screen overflow-y-auto p-8">
+      <h3 className="text-2xl font-bold text-gray-800 mb-8">Tạo lịch trình mới</h3>
 
-      <div className="grid grid-cols-2 gap-6">
-        {/* Cột trái */}
-        <div className="space-y-4">
-          {/* Xe Bus */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Xe Bus
-            </label>
-            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none appearance-none bg-white">
-              <option>Chọn xe Bus</option>
-              <option>29A-12345</option>
-              <option>29B-67890</option>
-            </select>
+      <form onSubmit={(e) => { e.preventDefault(); /* handle submit */ }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Cột trái */}
+          <div className="space-y-6">
+            {/* Xe buýt - Tìm kiếm */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Xe buýt <span className="text-red-500">*</span>
+              </label>
+              <Select
+                options={busOptions}
+                placeholder="Tìm kiếm biển số hoặc tài xế phụ..."
+                isSearchable
+                required
+                className="text-sm"
+                classNamePrefix="react-select"
+                noOptionsMessage={() => "Không tìm thấy xe buýt"}
+                styles={{
+                  control: (base) => ({
+                    ...base,
+                    borderColor: '#d1d5db',
+                    borderRadius: '0.5rem',
+                    padding: '0.25rem',
+                    '&:hover': { borderColor: '#818cf8' },
+                  }),
+                }}
+              />
+            </div>
+
+            {/* Tuyến đường - Tìm kiếm */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Tuyến đường <span className="text-red-500">*</span>
+              </label>
+              <Select
+                options={routeOptions}
+                placeholder="Nhập tên tuyến, số tuyến..."
+                isSearchable
+                required
+                className="text-sm"
+                classNamePrefix="react-select"
+                noOptionsMessage={() => "Không tìm thấy tuyến đường"}
+              />
+            </div>
+
+            {/* Tài xế - Tìm kiếm */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Tài xế <span className="text-red-500">*</span>
+              </label>
+              <Select
+                options={driverOptions}
+                placeholder="Nhập tên hoặc mã tài xế..."
+                isSearchable
+                required
+                className="text-sm"
+                classNamePrefix="react-select"
+                noOptionsMessage={() => "Không tìm thấy tài xế"}
+              />
+            </div>
+
+            {/* Ca làm việc */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Ca làm việc <span className="text-red-500">*</span>
+              </label>
+              <select
+                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+              >
+                <option value="">Chọn ca</option>
+                <option value="MORNING">Ca sáng</option>
+                <option value="AFTERNOON">Ca chiều</option>
+              </select>
+            </div>
+
+            {/* Giờ bắt đầu */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Giờ bắt đầu <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="time"
+                required
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+              />
+            </div>
           </div>
 
-          {/* Tuyến đường */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Tuyến đường
-            </label>
-            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none appearance-none bg-white">
-              <option>Chọn tuyến</option>
-              <option>Tuyến 1 - Quận 1</option>
-              <option>Tuyến 2 - Quận 3</option>
-            </select>
+          {/* Cột phải - giữ nguyên như cũ */}
+          <div className="space-y-6">
+            {/* Các ngày trong tuần */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-3">
+                Các thứ trong tuần <span className="text-red-500">*</span>
+              </label>
+              <div className="grid grid-cols-4 gap-3">
+                {['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'].map((day, idx) => (
+                  <label key={idx} className="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" value={idx + 1} className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500" />
+                    <span className="text-sm font-medium">{day}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Các trường còn lại giữ nguyên */}
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Ngày bắt đầu <span className="text-red-500">*</span></label>
+              <input type="date" required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Ngày kết thúc (tùy chọn)</label>
+              <input type="date" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none" />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Trạng thái</label>
+              <select defaultValue="ACTIVE" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none">
+                <option value="ACTIVE">Hoạt động</option>
+                <option value="INACTIVE">Tạm dừng</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Ghi chú bổ sung</label>
+              <textarea rows={3} placeholder="Lịch đặc biệt, xe thay thế,..." className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-none" />
+            </div>
           </div>
         </div>
 
-        {/* Cột phải */}
-        <div className="space-y-4">
-          {/* Tài xế */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Tài xế
-            </label>
-            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none appearance-none bg-white">
-              <option>Chọn tài xế</option>
-              <option>Nguyễn Văn A</option>
-              <option>Nguyễn Văn B</option>
-            </select>
-          </div>
-
-          {/* Ca làm */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Ca làm
-            </label>
-            <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none appearance-none bg-white">
-              <option>Chọn ca</option>
-              <option>Ca sáng (06:45 - 08:00)</option>
-              <option>Ca chiều (16:45 - 18:00)</option>
-            </select>
-          </div>
+        <div className="flex justify-end gap-4 mt-10">
+          <button type="button" onClick={() => setIsCreateModalOpen(false)} className="px-8 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium">
+            Hủy
+          </button>
+          <button type="submit" className="px-8 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium shadow-lg">
+            Tạo lịch trình
+          </button>
         </div>
-      </div>
-
-      {/* Nút hành động */}
-      <div className="flex justify-end gap-3 mt-8">
-        <Button
-          variant="outline"
-          onClick={() => setIsCreateModalOpen(false)}
-          className="px-6 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
-        >
-          Hủy
-        </Button>
-        <Button
-          onClick={() => {
-            // Xử lý tạo lịch ở đây (gọi API, thêm vào danh sách, v.v.)
-            setIsCreateModalOpen(false);
-          }}
-          className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-        >
-          Tạo lịch
-        </Button>
-      </div>
+      </form>
     </div>
   </div>
 )}
         </div>
 
 
-      {/* Schedule Section */}
-      <div className="bg-white rounded-lg shadow px-8 border border-blue-200 text-sm">
-        <div className="flex justify-between items-center mb-4">
-         <span className="text-gray-600 text-sm font-semibold">Lịch trình ngày</span>
-            <div className="relative">
-            <input
-                type="text"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-                className="h-11 w-32 border rounded-lg pl-3 pr-10 mt-4"
-                placeholder="Chọn ngày"
-            />
-            <Calendar
-                size={18}
-                className="absolute right-3 top-1/2"
-            />
-            </div>
+{/* Schedule Section */}
+    <div className="bg-white rounded-lg shadow px-8 py-6 border border-blue-200">
+      <div className="flex justify-between items-center mb-6">
+        <span className="text-gray-700 text-base font-semibold">
+          Lịch trình ngày
+        </span>
+
+        <div className="relative">
+          <DatePicker
+            selected={selectedDate}
+            onChange={(date) => setSelectedDate(date as Date)}
+            dateFormat="dd/MM/yyyy"
+            locale={vi}
+            customInput={
+              <div className="relative cursor-pointer">
+                <input
+                  type="text"
+                  readOnly
+                  value={formatDateDisplay(selectedDate)}
+                  className="h-12 w-64 px-4 pr-12 border border-gray-300 rounded-lg 
+                           bg-white text-gray-800 font-medium text-sm
+                           hover:border-indigo-400 focus:border-indigo-500 
+                           focus:ring-2 focus:ring-indigo-100 outline-none
+                           cursor-pointer transition-all"
+                  placeholder="Chọn ngày"
+                />
+                <Calendar 
+                  size={20} 
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" 
+                />
+              </div>
+            }
+            popperClassName="z-50"
+            wrapperClassName="w-full"
+          />
         </div>
+      </div>
+
+      {/* Phần hiển thị danh sách lịch trình theo ngày sẽ ở đây
+      <div className="text-sm text-gray-600">
+        Đang hiển thị lịch trình của: <span className="font-semibold text-indigo-600">
+          {formatDateDisplay(selectedDate)}
+        </span>
+      </div> */}
+
+    
 
 {schedules.map((shift, index) => (
   <div key={index} className="mb-4">
