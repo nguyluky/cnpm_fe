@@ -86,26 +86,31 @@ export const Parent = () => {
 
       <div className="bg-white rounded-lg shadow p-4 border border-blue-200 text-sm">
         <h2 className="text-xl font-semibold mb-4">Quản lý phụ huynh ({parents.length})</h2>
-        <table className="w-full text-left leading-relaxed">
+        <table className="w-full text-left leading-relaxed table-fixed">
+          <colgroup>
+            <col style={{ width: '30%' }} />
+            <col style={{ width: '12%' }} />
+            <col style={{ width: '22%' }} />
+            <col style={{ width: '18%' }} />
+            <col style={{ width: '18%' }} />
+          </colgroup>
           <thead>
             <tr className="border-b">
               <th className="py-2 px-4 text-[#95999F]">Họ tên</th>
               <th className="py-2 px-4 text-[#95999F]">SĐT</th>
               <th className="py-2 px-4 text-[#95999F]">Email</th>
               <th className="py-2 px-4 text-[#95999F]">Địa chỉ</th>
-              <th className="py-2 px-4 text-[#95999F]">Số con</th>
-              <th className="py-2 px-4 text-[#95999F]">Thao tác</th>
+              <th className="py-2 px-4 text-[#95999F] text-center">Thao tác</th>
             </tr>
           </thead>
           <tbody>
             {displayed.map((p) => (
               <tr key={p.id} className="border-b">
-                <td className="py-2 px-4 font-medium">{p.name}</td>
-                <td className="py-2 px-4">{p.phone}</td>
-                <td className="py-2 px-4">{p.email}</td>
-                <td className="py-2 px-4">{p.address}</td>
-                <td className="py-2 px-4">{p.children.length}</td>
-                <td className="py-2 px-4 flex gap-2">
+                <td className="py-2 px-4 font-medium truncate">{p.name}</td>
+                <td className="py-2 px-4 truncate">{p.phone}</td>
+                <td className="py-2 px-4 truncate">{p.email}</td>
+                <td className="py-2 px-4 truncate">{p.address}</td>
+                <td className="py-2 px-4 flex gap-2 justify-center">
                   <Button onClick={() => setShowChildren(p)} className="bg-sky-600 text-white">
                     <Eye size={16} />
                   </Button>
@@ -214,7 +219,7 @@ export const Parent = () => {
             ) : (
               <ul className="space-y-2">
                 {showChildren.children.map((c) => (
-                  <li key={c.id} className="p-2 border rounded">{c.name} — {c.className}</li>
+                  <li key={c.id} className="p-2 border rounded">ID: <span className="font-mono">{c.id}</span> — {c.name} — {c.className}</li>
                 ))}
               </ul>
             )}

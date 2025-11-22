@@ -1,6 +1,17 @@
 import { useState } from "react";
 import { Button } from "../../components/uiItem/button";
-import { Search, Plus, Pen, Delete } from "lucide-react";
+import { Search, Plus, Pen, Delete, Eye } from "lucide-react";
+
+type Student = {
+  id: string;
+  name: string;
+  class: string;
+  driver: string;
+  phone: string;
+  pickupPoint: string;
+  bus: string;
+  status: string;
+};
 
 export const Student = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -10,27 +21,27 @@ export const Student = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 10;
 
-  const students = [
-    { name: "Nguyễn Minh Khang", class: "6A", driver: "Nguyễn Văn X", phone: "0901234001", pickupPoint: "Bến xe Bến Thành", bus: "29A-12345", status: "Hoạt động" },
-    { name: "Lê Thị Mai", class: "6A", driver: "Nguyễn Văn X", phone: "0901234002", pickupPoint: "Công viên 23/9", bus: "29A-12345", status: "Hoạt động" },
-    { name: "Trần Văn Nam", class: "6A", driver: "Nguyễn Văn Y", phone: "0901234003", pickupPoint: "Chợ Bến Thành", bus: "29B-67890", status: "Hoạt động" },
-    { name: "Phạm Thị Hồng", class: "7B", driver: "Trần Văn B", phone: "0901234004", pickupPoint: "Trường THCS ABC", bus: "29A-12345", status: "Hoạt động" },
-    { name: "Võ Hoàng Long", class: "7B", driver: "Lê Văn C", phone: "0901234005", pickupPoint: "Công viên Tao Đàn", bus: "29B-67890", status: "Tạm dừng" },
-    { name: "Ngô Thị Lan", class: "8C", driver: "Phan Văn D", phone: "0901234006", pickupPoint: "Cầu Ánh Sao", bus: "30C-11111", status: "Hoạt động" },
-    { name: "Đỗ Minh Tú", class: "6B", driver: "Nguyễn Văn X", phone: "0901234007", pickupPoint: "Bến xe Miền Đông", bus: "29A-12345", status: "Hoạt động" },
-    { name: "Lương Thùy Chi", class: "6C", driver: "Trần Văn B", phone: "0901234008", pickupPoint: "Chợ Tân Định", bus: "29B-67890", status: "Hoạt động" },
-    { name: "Hà Quốc Đại", class: "7A", driver: "Lê Văn C", phone: "0901234009", pickupPoint: "Công viên 23/9", bus: "30C-11111", status: "Hoạt động" },
-    { name: "Bùi Thuỳ Dung", class: "7C", driver: "Phan Văn D", phone: "0901234010", pickupPoint: "Trường THPT XYZ", bus: "29A-12345", status: "Hoạt động" },
-    { name: "Trịnh Bá Sơn", class: "8A", driver: "Nguyễn Văn Z", phone: "0901234011", pickupPoint: "Bến xe Bến Thành", bus: "29B-67890", status: "Hoạt động" },
-    { name: "Nguyễn Thị Hạnh", class: "8B", driver: "Nguyễn Văn X", phone: "0901234012", pickupPoint: "Công viên Tao Đàn", bus: "30C-11111", status: "Tạm dừng" },
-    { name: "Lê Văn Phúc", class: "6A", driver: "Trần Văn B", phone: "0901234013", pickupPoint: "Chợ Bến Thành", bus: "29A-12345", status: "Hoạt động" },
-    { name: "Phan Mỹ Linh", class: "6B", driver: "Lê Văn C", phone: "0901234014", pickupPoint: "Cầu Ánh Sao", bus: "29B-67890", status: "Hoạt động" },
-    { name: "Vũ Ngọc Ánh", class: "7B", driver: "Phan Văn D", phone: "0901234015", pickupPoint: "Trường THCS ABC", bus: "30C-11111", status: "Hoạt động" },
-    { name: "Hoàng Minh Đức", class: "8C", driver: "Nguyễn Văn Z", phone: "0901234016", pickupPoint: "Bến xe Miền Đông", bus: "29A-12345", status: "Hoạt động" },
-    { name: "Đặng Thị Phương", class: "7A", driver: "Nguyễn Văn X", phone: "0901234017", pickupPoint: "Chợ Tân Định", bus: "29B-67890", status: "Hoạt động" },
-    { name: "Mai Quốc Huy", class: "6C", driver: "Lê Văn C", phone: "0901234018", pickupPoint: "Trường THPT XYZ", bus: "30C-11111", status: "Hoạt động" },
-    { name: "Trần Thùy Vy", class: "8B", driver: "Phan Văn D", phone: "0901234019", pickupPoint: "Bến xe Bến Thành", bus: "29A-12345", status: "Hoạt động" },
-    { name: "Nguyễn Khánh Duy", class: "7C", driver: "Nguyễn Văn Z", phone: "0901234020", pickupPoint: "Cầu Ánh Sao", bus: "29B-67890", status: "Tạm dừng" },
+  const students: Student[] = [
+    { id: 'S001', name: "Nguyễn Minh Khang", class: "6A", driver: "Nguyễn Văn X", phone: "0901234001", pickupPoint: "Bến xe Bến Thành", bus: "29A-12345", status: "Hoạt động" },
+    { id: 'S002', name: "Lê Thị Mai", class: "6A", driver: "Nguyễn Văn X", phone: "0901234002", pickupPoint: "Công viên 23/9", bus: "29A-12345", status: "Hoạt động" },
+    { id: 'S003', name: "Trần Văn Nam", class: "6A", driver: "Nguyễn Văn Y", phone: "0901234003", pickupPoint: "Chợ Bến Thành", bus: "29B-67890", status: "Hoạt động" },
+    { id: 'S004', name: "Phạm Thị Hồng", class: "7B", driver: "Trần Văn B", phone: "0901234004", pickupPoint: "Trường THCS ABC", bus: "29A-12345", status: "Hoạt động" },
+    { id: 'S005', name: "Võ Hoàng Long", class: "7B", driver: "Lê Văn C", phone: "0901234005", pickupPoint: "Công viên Tao Đàn", bus: "29B-67890", status: "Tạm dừng" },
+    { id: 'S006', name: "Ngô Thị Lan", class: "8C", driver: "Phan Văn D", phone: "0901234006", pickupPoint: "Cầu Ánh Sao", bus: "30C-11111", status: "Hoạt động" },
+    { id: 'S007', name: "Đỗ Minh Tú", class: "6B", driver: "Nguyễn Văn X", phone: "0901234007", pickupPoint: "Bến xe Miền Đông", bus: "29A-12345", status: "Hoạt động" },
+    { id: 'S008', name: "Lương Thùy Chi", class: "6C", driver: "Trần Văn B", phone: "0901234008", pickupPoint: "Chợ Tân Định", bus: "29B-67890", status: "Hoạt động" },
+    { id: 'S009', name: "Hà Quốc Đại", class: "7A", driver: "Lê Văn C", phone: "0901234009", pickupPoint: "Công viên 23/9", bus: "30C-11111", status: "Hoạt động" },
+    { id: 'S010', name: "Bùi Thuỳ Dung", class: "7C", driver: "Phan Văn D", phone: "0901234010", pickupPoint: "Trường THPT XYZ", bus: "29A-12345", status: "Hoạt động" },
+    { id: 'S011', name: "Trịnh Bá Sơn", class: "8A", driver: "Nguyễn Văn Z", phone: "0901234011", pickupPoint: "Bến xe Bến Thành", bus: "29B-67890", status: "Hoạt động" },
+    { id: 'S012', name: "Nguyễn Thị Hạnh", class: "8B", driver: "Nguyễn Văn X", phone: "0901234012", pickupPoint: "Công viên Tao Đàn", bus: "30C-11111", status: "Tạm dừng" },
+    { id: 'S013', name: "Lê Văn Phúc", class: "6A", driver: "Trần Văn B", phone: "0901234013", pickupPoint: "Chợ Bến Thành", bus: "29A-12345", status: "Hoạt động" },
+    { id: 'S014', name: "Phan Mỹ Linh", class: "6B", driver: "Lê Văn C", phone: "0901234014", pickupPoint: "Cầu Ánh Sao", bus: "29B-67890", status: "Hoạt động" },
+    { id: 'S015', name: "Vũ Ngọc Ánh", class: "7B", driver: "Phan Văn D", phone: "0901234015", pickupPoint: "Trường THCS ABC", bus: "30C-11111", status: "Hoạt động" },
+    { id: 'S016', name: "Hoàng Minh Đức", class: "8C", driver: "Nguyễn Văn Z", phone: "0901234016", pickupPoint: "Bến xe Miền Đông", bus: "29A-12345", status: "Hoạt động" },
+    { id: 'S017', name: "Đặng Thị Phương", class: "7A", driver: "Nguyễn Văn X", phone: "0901234017", pickupPoint: "Chợ Tân Định", bus: "29B-67890", status: "Hoạt động" },
+    { id: 'S018', name: "Mai Quốc Huy", class: "6C", driver: "Lê Văn C", phone: "0901234018", pickupPoint: "Trường THPT XYZ", bus: "30C-11111", status: "Hoạt động" },
+    { id: 'S019', name: "Trần Thùy Vy", class: "8B", driver: "Phan Văn D", phone: "0901234019", pickupPoint: "Bến xe Bến Thành", bus: "29A-12345", status: "Hoạt động" },
+    { id: 'S020', name: "Nguyễn Khánh Duy", class: "7C", driver: "Nguyễn Văn Z", phone: "0901234020", pickupPoint: "Cầu Ánh Sao", bus: "29B-67890", status: "Tạm dừng" },
   ];
 
   const totalPages = Math.max(1, Math.ceil(students.length / itemsPerPage));
@@ -210,27 +221,21 @@ export const Student = () => {
                 </td>
 
                 <td className="py-2 px-4 flex space-x-4 justify-end">
-                     <Button variant="default" 
+                  <Button variant="default" 
                       className="bg-gray-700  border"
                       onClick={() => editShowForm(true)}>
-                    
                      <Pen className="mr-2" size={18} />
-                      <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-                    
                   </Button>
                   <Button variant="default" 
                      className="bg-gray-700  border"
                      onClick={() => deleteShowForm(true)}>
-                    
                      <Delete className="mr-2" size={18} />
-                      <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-                    
                   </Button>
                 </td>
               </tr>
             ))}
-                  {editForm && (
-                      <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-40">
+            {editForm && (
+              <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-40">
                 <div className="bg-white p-6 rounded-xl shadow-lg w-[600px] animate-scale-in">
 
                   <h2 className="text-xl font-semibold mb-4">
