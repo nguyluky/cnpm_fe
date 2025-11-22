@@ -13,6 +13,7 @@
 import type {
   AnyObject,
   BusData,
+  BusInfo,
   GeoLocation,
   PaginationMetaData,
   RouteData,
@@ -1365,18 +1366,15 @@ export class Api<
         /** Human-readable error message */
         message?: string;
         data?: {
-          id: string;
-          route: RouteData;
-          bus: BusData;
-          students: {
-            /**
-             * @format uuid
-             * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$
-             */
-            id: string;
-            name: string;
-            stopPoint?: StopPointsData;
+          data: {
+            scheduleId: string;
+            tripId: string;
+            date: string;
+            static: "PLANNED" | "ONGOING" | "COMPLETED" | "CANCELLED";
+            type: "DISPATH" | "RETURN";
+            startTime: string;
           }[];
+          total: number;
         };
       },
       | {
@@ -1405,6 +1403,587 @@ export class Api<
       path: `/api/drivers/schedules/today`,
       method: "GET",
       secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags DriverController
+ * @name GetDriverSchedules
+ * @summary get driver schedules
+ * @request GET:/api/drivers/schedules
+ * @secure*/
+
+  /**
+   */
+
+  getDriverSchedules = (params: RequestParams = {}) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          data: {
+            id: string;
+            route: {
+              id: string;
+              name: string;
+            };
+            bus: BusInfo;
+            type: "MORNING" | "AFTERNOON";
+            daysOfWeek: number[];
+            /** ISO 8601 date string */
+            startDate: string;
+          }[];
+        };
+      },
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
+    >({
+      path: `/api/drivers/schedules`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags DriverController
+ * @name GetTripById
+ * @summary Get trip by ID
+ * @request GET:/api/drivers/trip/{id}
+ * @secure*/
+
+  /**
+   */
+
+  getTripById = (id: string, params: RequestParams = {}) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          id: string;
+          status: "PLANNED" | "ONGOING" | "COMPLETED" | "CANCELLED";
+          rotute: {
+            id: string;
+            name: string;
+            path: any[];
+          };
+          bus: BusInfo;
+          stops: {
+            id: string;
+            name: string;
+            location: number[];
+            sequence: number;
+            status: "PENDING" | "ARRIVED" | "DONE" | "SKIPPED";
+          }[];
+        };
+      },
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
+    >({
+      path: `/api/drivers/trip/${id}`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags DriverController
+ * @name StartTrip
+ * @summary Start trip
+ * @request POST:/api/drivers/trip/{id}/start
+ * @secure*/
+
+  /**
+   */
+
+  startTrip = (id: string, params: RequestParams = {}) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          tripId: string;
+          status: string;
+          /**
+           * @format date-time
+           * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+           */
+          startedAt: string;
+        };
+      },
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
+    >({
+      path: `/api/drivers/trip/${id}/start`,
+      method: "POST",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags DriverController
+ * @name MarkStoppointAsArrived
+ * @summary Mark stoppoint as arrived
+ * @request POST:/api/drivers/trip/{tripId}/stoppoint/{spId}/arrive
+ * @secure*/
+
+  /**
+   */
+
+  markStoppointAsArrived = (
+    tripId: string,
+    spId: string,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          stopId: string;
+          status: string;
+          arrivedAt: string;
+        };
+      },
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
+    >({
+      path: `/api/drivers/trip/${tripId}/stoppoint/${spId}/arrive`,
+      method: "POST",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags DriverController
+ * @name MarkStoppointAsDeparted
+ * @summary Mark stoppoint as departed
+ * @request POST:/api/drivers/trip/{tripId}/stoppoint/{spId}/depart
+ * @secure*/
+
+  /**
+   */
+
+  markStoppointAsDeparted = (
+    tripId: string,
+    spId: string,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          stopId: string;
+          status: string;
+          departedAt: string;
+        };
+      },
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
+    >({
+      path: `/api/drivers/trip/${tripId}/stoppoint/${spId}/depart`,
+      method: "POST",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags DriverController
+ * @name EndStoppoint
+ * @summary End stoppoint
+ * @request GET:/api/drivers/trip/{tripId}/end
+ * @secure*/
+
+  /**
+   */
+
+  endStoppoint = (tripId: string, params: RequestParams = {}) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          tripId: string;
+          status: string;
+          startAt: string;
+          endAt: string;
+        };
+      },
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
+    >({
+      path: `/api/drivers/trip/${tripId}/end`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags DriverController
+ * @name PickupStudent
+ * @summary Pickup student
+ * @request POST:/api/drivers/trip/{tripId}/students/{studentId}/pickup
+ * @secure*/
+
+  /**
+   */
+
+  pickupStudent = (
+    tripId: string,
+    studentId: string,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          studentId: string;
+          status: string;
+          pickedAt: string;
+        };
+      },
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
+    >({
+      path: `/api/drivers/trip/${tripId}/students/${studentId}/pickup`,
+      method: "POST",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags DriverController
+ * @name DropoffStudent
+ * @summary Dropoff student
+ * @request POST:/api/drivers/
+ * @secure*/
+
+  /**
+   */
+
+  dropoffStudent = (
+    tripId: string,
+    studentId: string,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          studentId: string;
+          status: string;
+          droppedAt: string;
+        };
+      },
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
+    >({
+      path: `/api/drivers/`,
+      method: "POST",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags DriverController
+ * @name UpdateTripLocation
+ * @summary Update trip location
+ * @request POST:/api/drivers/trip/{tripId}/location
+ * @secure*/
+
+  /**
+   */
+
+  updateTripLocation = (
+    tripId: string,
+    data: {
+      latitude: number;
+      longitude: number;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          /** @default true */
+          ok: boolean;
+        };
+      },
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
+    >({
+      path: `/api/drivers/trip/${tripId}/location`,
+      method: "POST",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
       format: "json",
       ...params,
     });

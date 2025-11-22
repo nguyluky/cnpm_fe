@@ -9,10 +9,6 @@
     {
       "url": "http://localhost:3000",
       "description": "Local development server"
-    },
-    {
-      "url": "https://api.nguyluky.site",
-      "description": "Production server"
     }
   ],
   "components": {
@@ -182,6 +178,24 @@
         ],
         "additionalProperties": false,
         "id": "TimeTable"
+      },
+      "BusInfo": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "licensePlate": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "licensePlate"
+        ],
+        "additionalProperties": false,
+        "id": "BusInfo"
       },
       "StopPointsData": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -3113,7 +3127,327 @@
         "summary": "Get today's schedules",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "scheduleId": {
+                                "type": "string"
+                              },
+                              "tripId": {
+                                "type": "string"
+                              },
+                              "date": {
+                                "type": "string"
+                              },
+                              "static": {
+                                "type": "string",
+                                "enum": [
+                                  "PLANNED",
+                                  "ONGOING",
+                                  "COMPLETED",
+                                  "CANCELLED"
+                                ]
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "DISPATH",
+                                  "RETURN"
+                                ]
+                              },
+                              "startTime": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "scheduleId",
+                              "tripId",
+                              "date",
+                              "static",
+                              "type",
+                              "startTime"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "total": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "data",
+                        "total"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/drivers/schedules": {
+      "get": {
+        "tags": [
+          "DriverController"
+        ],
+        "summary": "get driver schedules",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "route": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "name"
+                                ],
+                                "additionalProperties": false
+                              },
+                              "bus": {
+                                "$ref": "#/components/schemas/BusInfo"
+                              },
+                              "type": {
+                                "type": "string",
+                                "enum": [
+                                  "MORNING",
+                                  "AFTERNOON"
+                                ]
+                              },
+                              "daysOfWeek": {
+                                "type": "array",
+                                "items": {
+                                  "type": "number"
+                                }
+                              },
+                              "startDate": {
+                                "description": "ISO 8601 date string",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "route",
+                              "bus",
+                              "type",
+                              "daysOfWeek",
+                              "startDate"
+                            ],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": [
+                        "data"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/drivers/trip/{id}": {
+      "get": {
+        "tags": [
+          "DriverController"
+        ],
+        "summary": "Get trip by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
@@ -3137,32 +3471,75 @@
                         "id": {
                           "type": "string"
                         },
-                        "route": {
-                          "$ref": "#/components/schemas/RouteData"
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "PLANNED",
+                            "ONGOING",
+                            "COMPLETED",
+                            "CANCELLED"
+                          ]
+                        },
+                        "rotute": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "path": {
+                              "type": "array",
+                              "items": {}
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name",
+                            "path"
+                          ],
+                          "additionalProperties": false
                         },
                         "bus": {
-                          "$ref": "#/components/schemas/BusData"
+                          "$ref": "#/components/schemas/BusInfo"
                         },
-                        "students": {
+                        "stops": {
                           "type": "array",
                           "items": {
                             "type": "object",
                             "properties": {
                               "id": {
-                                "type": "string",
-                                "format": "uuid",
-                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+                                "type": "string"
                               },
                               "name": {
                                 "type": "string"
                               },
-                              "stopPoint": {
-                                "$ref": "#/components/schemas/StopPointsData"
+                              "location": {
+                                "type": "array",
+                                "items": {
+                                  "type": "number"
+                                }
+                              },
+                              "sequence": {
+                                "type": "number"
+                              },
+                              "status": {
+                                "type": "string",
+                                "enum": [
+                                  "PENDING",
+                                  "ARRIVED",
+                                  "DONE",
+                                  "SKIPPED"
+                                ]
                               }
                             },
                             "required": [
                               "id",
-                              "name"
+                              "name",
+                              "location",
+                              "sequence",
+                              "status"
                             ],
                             "additionalProperties": false
                           }
@@ -3170,9 +3547,966 @@
                       },
                       "required": [
                         "id",
-                        "route",
+                        "status",
+                        "rotute",
                         "bus",
-                        "students"
+                        "stops"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/drivers/trip/{id}/start": {
+      "post": {
+        "tags": [
+          "DriverController"
+        ],
+        "summary": "Start trip",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "tripId": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "startedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                        }
+                      },
+                      "required": [
+                        "tripId",
+                        "status",
+                        "startedAt"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/drivers/trip/{tripId}/stoppoint/{spId}/arrive": {
+      "post": {
+        "tags": [
+          "DriverController"
+        ],
+        "summary": "Mark stoppoint as arrived",
+        "parameters": [
+          {
+            "name": "tripId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string"
+            }
+          },
+          {
+            "name": "spId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "stopId": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "arrivedAt": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "stopId",
+                        "status",
+                        "arrivedAt"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/drivers/trip/{tripId}/stoppoint/{spId}/depart": {
+      "post": {
+        "tags": [
+          "DriverController"
+        ],
+        "summary": "Mark stoppoint as departed",
+        "parameters": [
+          {
+            "name": "tripId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string"
+            }
+          },
+          {
+            "name": "spId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "stopId": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "departedAt": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "stopId",
+                        "status",
+                        "departedAt"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/drivers/trip/{tripId}/end": {
+      "get": {
+        "tags": [
+          "DriverController"
+        ],
+        "summary": "End stoppoint",
+        "parameters": [
+          {
+            "name": "tripId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "tripId": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "startAt": {
+                          "type": "string"
+                        },
+                        "endAt": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "tripId",
+                        "status",
+                        "startAt",
+                        "endAt"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/drivers/trip/{tripId}/students/{studentId}/pickup": {
+      "post": {
+        "tags": [
+          "DriverController"
+        ],
+        "summary": "Pickup student",
+        "parameters": [
+          {
+            "name": "tripId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string"
+            }
+          },
+          {
+            "name": "studentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "studentId": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "pickedAt": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "studentId",
+                        "status",
+                        "pickedAt"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/drivers/": {
+      "post": {
+        "tags": [
+          "DriverController"
+        ],
+        "summary": "Dropoff student",
+        "parameters": [
+          {
+            "name": "tripId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string"
+            }
+          },
+          {
+            "name": "studentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "studentId": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "droppedAt": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "studentId",
+                        "status",
+                        "droppedAt"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/drivers/trip/{tripId}/location": {
+      "post": {
+        "tags": [
+          "DriverController"
+        ],
+        "summary": "Update trip location",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "type": "object",
+                "properties": {
+                  "latitude": {
+                    "type": "number"
+                  },
+                  "longitude": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "latitude",
+                  "longitude"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": true
+        },
+        "parameters": [
+          {
+            "name": "tripId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "ok": {
+                          "default": true,
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "ok"
                       ],
                       "additionalProperties": false
                     }
