@@ -252,6 +252,55 @@ export class Api<
 
  * No description
  *
+ * @tags AuthController
+ * @name AuthAdminChangePasswordCreate
+ * @request POST:/api/auth/admin/change-password*/
+
+  /**
+   */
+
+  authAdminChangePasswordCreate = (
+    data: {
+      email: string;
+      password: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+      },
+      {
+        /**
+         * HTTP status code of the error
+         * @min 400
+         * @max 599
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        /** Error class name */
+        name?: string;
+      }
+    >({
+      path: `/api/auth/admin/change-password`,
+      method: "POST",
+      body: data,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
  * @tags BusesController
  * @name GetAllBuses
  * @summary Get all buses
@@ -1505,6 +1554,7 @@ export class Api<
             id: string;
             name: string;
             path: any[];
+            startTime: string;
           };
           bus: BusInfo;
           stops: {
@@ -1739,15 +1789,15 @@ export class Api<
  * No description
  *
  * @tags DriverController
- * @name EndStoppoint
- * @summary End stoppoint
+ * @name EndTrip
+ * @summary End trip
  * @request GET:/api/drivers/trip/{tripId}/end
  * @secure*/
 
   /**
    */
 
-  endStoppoint = (tripId: string, params: RequestParams = {}) =>
+  endTrip = (tripId: string, params: RequestParams = {}) =>
     this.request<
       {
         /**

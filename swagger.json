@@ -729,6 +729,92 @@
         }
       }
     },
+    "/api/auth/admin/change-password": {
+      "post": {
+        "tags": [
+          "AuthController"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email",
+                  "password"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/buses/": {
       "get": {
         "tags": [
@@ -3492,12 +3578,16 @@
                             "path": {
                               "type": "array",
                               "items": {}
+                            },
+                            "startTime": {
+                              "type": "string"
                             }
                           },
                           "required": [
                             "id",
                             "name",
-                            "path"
+                            "path",
+                            "startTime"
                           ],
                           "additionalProperties": false
                         },
@@ -4047,7 +4137,7 @@
         "tags": [
           "DriverController"
         ],
-        "summary": "End stoppoint",
+        "summary": "End trip",
         "parameters": [
           {
             "name": "tripId",
