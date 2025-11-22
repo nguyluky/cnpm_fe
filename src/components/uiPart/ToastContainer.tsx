@@ -84,7 +84,6 @@ export function ToastContainer(): JSX.Element {
 
     return (
         <div className="fixed z-50 flex flex-col items-end p-4 pointer-events-none top-0 right-0 w-full">
-            <div className="w-fit">hello</div>
             {toasts.map((toast) => {
                 const keyId = toast.id + "item";
                 return (

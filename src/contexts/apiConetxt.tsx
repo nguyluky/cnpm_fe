@@ -25,7 +25,7 @@ export const ApiProvider = ({ children }: {
 }) => {
     const navigate = useNavigate();
     const api = useState(() => new Api<SecurityData>({
-        baseUrl: 'https://api.nguyluky.site',
+        baseUrl: 'http://localhost:3000',
         securityWorker: (securityData) => {
             if (securityData && securityData.accessToken) {
                 return {
