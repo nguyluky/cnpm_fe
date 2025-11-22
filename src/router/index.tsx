@@ -16,13 +16,14 @@ import { StopsPointsPage } from "../pages/stopPoint"
 import { DriverLayout } from "../layouts/DriverLayout"
 import { RootLayout } from "../layouts/RootLayout"
 import ScheduleAdminTable from "../pages/admin/test_ui"
-import DriverHome from "../pages/driver/Home"
+import { DriverHome } from "../pages/driver/Home"
 // import DriverNotifications from "../pages/driver/Notifications"
 import QRRollCall from "../pages/driver/QRRollCall"
 import DriverSchedule from "../pages/driver/Schedule"
 import { MapDriver } from "../pages/driver/Map"
 
 import NotificationsPage from "../pages/driver/NotificationsPage"
+import { Home } from "lucide-react"
 
 export const path = {
     INDEX: "/",
@@ -114,19 +115,19 @@ export const router = createBrowserRouter([
                 path: path.DRIVER,
                 element: <DriverLayout />,
                 children: [
-                    // {
-                    //     index: true,
-                    //     element: <DriverHome />
-                    // },
-                    // {
-                    //     path: path.DRIVER_SCHEDULE,
-                    //     element: <DriverSchedule />
-                    // },
-                    // {
-                    //     path: path.DRIVER_QR_ROLL_CALL,
-                    //     element: <QRRollCall />
-                    // },
-                    // ... other driver routes
+                    {
+                        index: true,
+                        element: <DriverHome />
+                    },
+                    {
+                        path: path.DRIVER_SCHEDULE,
+                        element: <DriverSchedule />
+                    },
+                    {
+                        path: path.DRIVER_QR_ROLL_CALL,
+                        element: <QRRollCall />
+                    },
+                    
 
                 ]
             },

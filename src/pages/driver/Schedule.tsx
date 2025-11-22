@@ -68,7 +68,7 @@
 //         <Card className="p-8 text-center">
 //           <div className="text-gray-500">
 //             <p className="text-lg mb-2">Chưa có lịch trình nào</p>
-//             <p className="text-sm">Vui lòng liên hệ quản lý để được phân công lịch trình</p>
+//             <p className="text-sm">Vui lòng liêjn hệ quản lý để được phân công lịch trình</p>
 //           </div>
 //         </Card>
 //       )}
@@ -78,6 +78,6 @@
 
 export default function HomePage() {
     return (
-<div> hello</div>
+<div> helaaaaaalo</div>
     );
 }
