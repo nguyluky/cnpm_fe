@@ -66,6 +66,11 @@ export interface TimeTable {
   departureTime: string;
 }
 
+export interface BusInfo {
+  id: string;
+  licensePlate: string;
+}
+
 export interface StopPointsData {
   /**
    * @format uuid

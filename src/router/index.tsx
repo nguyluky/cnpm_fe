@@ -1,25 +1,28 @@
 import { createBrowserRouter } from "react-router-dom"
+import { AdminLayout } from "../layouts/AdminLayout"
+import { ParentLayout } from "../layouts/ParentLayout"
+import { NotFoundPage } from "../pages/404Page"
+import { Buss } from "../pages/admin/Buss"
+import { Overview } from "../pages/admin/Overview"
+import { RouteAdmin } from "../pages/admin/RouteAdmin"
+import { Schedules } from "../pages/admin/Schedules"
 import { HomePage } from "../pages/HomePage"
 import { LoginPage } from "../pages/LoginPage"
-import { ParentLayout } from "../layouts/ParentLayout"
 import { BusLocationPage } from "../pages/parent/busLocationPage"
 import { NotiPage } from "../pages/parent/notiPage"
-import { AdminLayout } from "../layouts/AdminLayout"
-import { Overview } from "../pages/admin/Overview"
-import { Buss } from "../pages/admin/Buss"
-import { StopsPointsPage } from "../pages/stopPoint"
 import { StudentPage } from "../pages/parent/studentPage"
-import { Schedules } from "../pages/admin/Schedules"
-import { RouteAdmin } from "../pages/admin/RouteAdmin"
-import { WorkOverviewPage } from "../pages/driver/WorkOverviewPage"
-import { RootLayout } from "../layouts/RootLayout"
-import { WorkSchedulePage } from "../pages/driver/WorkSchedulePage"
-import { NotFoundPage } from "../pages/404Page"
+import { StopsPointsPage } from "../pages/stopPoint"
 // import { AddSchedulePage } from "../pages/admin/test_ui1"
-import ScheduleAdminTable from "../pages/admin/test_ui"
 import { DriverLayout } from "../layouts/DriverLayout"
-import { NotificationsPage } from "../pages/driver/NotificationsPage"
-import { QRRollCall } from "../pages/driver/QRRollCall"
+import { RootLayout } from "../layouts/RootLayout"
+import ScheduleAdminTable from "../pages/admin/test_ui"
+import DriverHome from "../pages/driver/Home"
+// import DriverNotifications from "../pages/driver/Notifications"
+import QRRollCall from "../pages/driver/QRRollCall"
+import DriverSchedule from "../pages/driver/Schedule"
+import { MapDriver } from "../pages/driver/Map"
+
+import NotificationsPage from "../pages/driver/NotificationsPage"
 
 export const path = {
     INDEX: "/",
@@ -41,6 +44,7 @@ export const path = {
     DRIVER_SCHEDULE: "/driver/schedule",
     DRIVER_QR_ROLL_CALL: "/driver/qr-roll-call",
     DRIVER_NOTIFICATIONS: "/driver/notifications",
+    DRIVER_TRIP: "/driver/trip/:id",
 }
 
 
@@ -110,23 +114,25 @@ export const router = createBrowserRouter([
                 path: path.DRIVER,
                 element: <DriverLayout />,
                 children: [
-                    {
-                        index: true,
-                        element: <WorkSchedulePage />
-                    },
-                    {
-                        path: path.DRIVER_SCHEDULE,
-                        element: <WorkOverviewPage />
-                    },
-                    {
-                        path: path.DRIVER_NOTIFICATIONS,
-                        element: <NotificationsPage />
-                    }
+                    // {
+                    //     index: true,
+                    //     element: <DriverHome />
+                    // },
+                    // {
+                    //     path: path.DRIVER_SCHEDULE,
+                    //     element: <DriverSchedule />
+                    // },
+                    // {
+                    //     path: path.DRIVER_QR_ROLL_CALL,
+                    //     element: <QRRollCall />
+                    // },
+                    // ... other driver routes
+
                 ]
             },
             {
-                path: path.DRIVER_QR_ROLL_CALL,
-                element: <QRRollCall />
+                path: path.DRIVER_TRIP,
+                element: <MapDriver />
             },
             {
                 path: "/test",
@@ -135,6 +141,10 @@ export const router = createBrowserRouter([
             {
                 path: "*",
                 element: <NotFoundPage />
+            },
+            {
+                path: path.DRIVER_NOTIFICATIONS,
+                element: <NotificationsPage />
             }
         ]
     }
