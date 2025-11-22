@@ -141,6 +141,10 @@ export const router = createBrowserRouter([
             {
                 path: "*",
                 element: <NotFoundPage />
+            },
+            {
+                path: path.DRIVER_NOTIFICATIONS,
+                element: <NotificationsPage />
             }
         ]
     }

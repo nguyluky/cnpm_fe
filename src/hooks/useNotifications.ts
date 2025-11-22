@@ -48,8 +48,10 @@ export function useNotifications(onNotification: (data: RawNotification) => void
       return;
     }
 
+    console.log('[notifications] Using token');
+
     // Establish socket (force websocket transport to skip polling branch)
-    const socket = io('http://localhost:3000/notifications', {
+    const socket = io('http://localhost:3000/', {
       auth: { token },
       transports: ['websocket'],      // critical to bypass polling + xhr path
       reconnectionAttempts: 5,
