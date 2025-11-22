@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "../uiItem/avatar"; // Sửa đường dẫn nếu alias `@` chưa được cấu hình
+import { Avatar, AvatarFallback } from "../uiItem/avatar"; // Sửa đường dẫn nếu alias `@` chưa được cấu hình
 import { NavLink } from "react-router-dom";
 import {
     LayoutDashboard,
@@ -13,7 +13,7 @@ import {
     User,
     ClipboardList,
 } from "lucide-react";
-import { Button } from "../uiItem/button"; // Sửa đường dẫn nếu alias `@` chưa được cấu hình
+// Button not used in sidebar
 import { LogOutConfirmation } from "./LogOutConfirmation";
 import { path } from "../../router";
 import { useModal } from "../../contexts/modalContext";
@@ -35,6 +35,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         { icon: LayoutDashboard, label: "Tổng quan", path: path.ADMIN_OVERVIEW }, // Đã thay đổi
         { icon: Bus, label: "Quản lý xe buýt", path: path.ADMIN_BUSES },
         { icon: Users, label: "Học sinh", path: path.ADMIN_STUDENTS },
+        { icon: User, label: "Phụ huynh", path: path.ADMIN_PARENTS },
         { icon: Route, label: "Tuyến đường", path: path.ADMIN_ROUTES },
         { icon: ClipboardList, label: "Điểm dừng", path: path.ADMIN_STOPS_POINTS }, // Đã thay đổi
         { icon: Calendar, label: "Lịch trình", path: path.ADMIN_SCHEDULES }, // Đã thay đổi
