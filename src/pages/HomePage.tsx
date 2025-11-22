@@ -80,7 +80,7 @@ export function HomePage() {
     const { api } = useApi();
     const navigate = useNavigate();
     useEffect(() => {
-        if (!api.getSecurityData()) {
+        if (!localStorage.getItem('securityData')) {
             navigate(path.LOGIN);
         }
     }, []);
