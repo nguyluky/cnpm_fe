@@ -15,9 +15,9 @@ export const LogOutConfirmation: React.FC<LogoutConfirmationProps> = () => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        api.setSecurityData(null);
+        api.api.setSecurityData(null);
         onClose();
-        navigate('/');
+        navigate('/login');
     };
 
     return (
