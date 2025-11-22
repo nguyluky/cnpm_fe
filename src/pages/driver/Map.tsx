@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { MapPin } from "lucide-react";
 import type { Marker as MarkeRef } from "mapbox-gl";
 import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
@@ -31,34 +32,26 @@ function splitRouteByPosition(coordinates: [number, number][], userLngLat: [numb
     return { completed, remaining };
 }
 
-// const tripInfo: {
-//     id: string;
-//     status: "PLANNED" | "ONGOING" | "COMPLETED" | "CANCELLED";
-//     rotute: {
-//         id: string;
-//         name: string;
-//         path: any[];
-//         startTime: string;
-//     };
-//     bus: BusInfo;
-//     stops: {
-//         id: string;
-//         name: string;
-//         location: number[];
-//         sequence: number;
-//         status: "PENDING" | "ARRIVED" | "DONE" | "SKIPPED";
-//     }[];
-// } | undefined
+function snapToRoute(coordinates: [number, number][], userLngLat: [number, number]) {
+    const line = turf.lineString(coordinates);
+    const userPoint = turf.point(userLngLat);
 
+    // Tìm điểm chính xác trên đường (projection)
+    const snappedPoint = turf.nearestPointOnLine(line, userPoint);
+
+    return snappedPoint.geometry.coordinates as [number, number];
+}
 
 
 export function MapDriver() {
     const api = useApi()
     const queryClient = useQueryClient();
 
+    const listOfStopsRef = useRef<HTMLOListElement>(null);
     const mapRef = useRef<MapRef>(null);
     const markerRef = useRef<MarkeRef>(null);
     const forceToMarker = useRef(false);
+    const lastUserPos = useRef<[number, number] | null>(null);
 
     const { id } = useParams()
     const [userPos, setUserPos] = useState<[number, number]>([106.6297, 10.8231]);
@@ -72,28 +65,45 @@ export function MapDriver() {
     const [remainingRoute, setRemainingRoute] = useState<[number, number][]>([]);
 
     const [sidebarState, setSidebarState] = useState<"CONFIG_START" | "CONFIG_END" | "ARRIVE_STOP" | "NONE">("CONFIG_END");
+    const [nextStopIndex, setNextStopIndex] = useState<number | null>(null);
 
     const { data: tripInfo } = useQuery({
         queryKey: ['trip-info', id],
         queryFn: async () => {
             const tripData = await api.api.getTripById(id!);
             console.log("Fetched trip data:", tripData);
+            if (tripData.data.data?.status === "ONGOING") {
+                const nextStop = tripData.data.data.stops.findIndex((stop: any) => stop.status === "PENDING");
+                setNextStopIndex(nextStop !== -1 ? nextStop : null);
+            }
             return tripData.data.data!;
         },
     })
 
-    const [currentStopIndex, setCurrentStopIndex] = useState<number | null>(null);
 
     const distanceToNextStop = useMemo(() => {
-        if (currentStopIndex === null || !tripInfo) return null;
-        if (currentStopIndex >= tripInfo.stops.length - 1) return 0;
+        // distance from userPos to next stop based on path
+        // cut the route from userPos to next stop and calculate its length
+        if (nextStopIndex === null) return null;
+        if (!tripInfo) return null;
+        const nextStop = tripInfo.stops[nextStopIndex];
+        const line = turf.lineString(tripInfo.rotute.path);
+        const userPoint = turf.point(userPos);
+        const stopPoint = turf.point(nextStop.location as [number, number]);
 
-        const from = turf.point(tripInfo.stops[currentStopIndex].location as [number, number]);
-        const to = turf.point(tripInfo.stops[currentStopIndex + 1].location as [number, number]);
-        const options = { units: 'meters' as turf.Units };
-        const distance = turf.distance(from, to, options);
-        return distance;
-    }, [currentStopIndex, tripInfo]);
+        // Tìm điểm chính xác trên đường (projection)
+        const snappedUserPoint = turf.nearestPointOnLine(line, userPoint);
+        const snappedStopPoint = turf.nearestPointOnLine(line, stopPoint);
+
+        const slicedLine = turf.lineSlice(
+            snappedUserPoint.geometry.coordinates,
+            snappedStopPoint.geometry.coordinates,
+            line
+        );
+
+        const length = turf.length(slicedLine, { units: 'meters' });
+        return length;
+    }, [nextStopIndex, tripInfo, userPos]);
 
     const startTrip = useMutation({
         mutationFn: async () => {
@@ -102,7 +112,7 @@ export function MapDriver() {
             return res.data.data;
         },
         onSuccess: (data) => {
-            setCurrentStopIndex(0);
+            setNextStopIndex(0);
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             queryClient.setQueryData(['trip-info', id], (old: any) => {
                 if (!old) return old;
@@ -146,6 +156,24 @@ export function MapDriver() {
             const res = await api.api.markStoppointAsArrived(tripInfo.id, stopId);
             return res.data.data;
         },
+        onSuccess: () => {
+            queryClient.setQueryData(['trip-info', id], (old: any) => {
+                if (!old) return old;
+                const updatedStops = old.stops.map((stop: any) => {
+                    if (stop.id === stopId) {
+                        return {
+                            ...stop,
+                            status: "ARRIVED"
+                        };
+                    }
+                    return stop;
+                });
+                return {
+                    ...old,
+                    stops: updatedStops
+                };
+            });
+        }
     })
 
     const markCompleteStop = useMutation({
@@ -154,9 +182,33 @@ export function MapDriver() {
             const res = await api.api.markStoppointAsDeparted(tripInfo.id, stopId);
             return res.data.data;
         },
+
+        onSuccess: (data) => {
+            setNextStopIndex(prev => {
+                if (prev === null) return null;
+                return prev + 1;
+            });
+            queryClient.setQueryData(['trip-info', id], (old: any) => {
+                if (!old) return old;
+                const updatedStops = old.stops.map((stop: any) => {
+                    if (stop.id === data?.stopId) {
+                        return {
+                            ...stop,
+                            status: "DONE"
+                        };
+                    }
+                    return stop;
+                });
+                return {
+                    ...old,
+                    stops: updatedStops
+                };
+            });
+        }
     })
 
     // update completed and remaining route when userPos or tripInfo changes
+    // send user position to server
     useEffect(() => {
         if (!userPos) return;
         if (!tripInfo) return;
@@ -164,23 +216,66 @@ export function MapDriver() {
 
         const { completed, remaining } = splitRouteByPosition(tripInfo.rotute.path, userPos);
 
+        if (tripInfo.status === "ONGOING" && updateTripPosition.status !== "pending") updateTripPosition.mutate({ longitude: userPos[0], latitude: userPos[1] });
+
         setCompletedRoute(completed);
         setRemainingRoute(remaining);
-    }, [userPos, tripInfo]);
+    }, [userPos, tripInfo, updateTripPosition]);
 
     // watch user position
     useEffect(() => {
         const watchId = navigator.geolocation.watchPosition((pos) => {
-            const { latitude, longitude } = pos.coords;
+            let { latitude, longitude } = pos.coords;
+            // snap to route
+            if (tripInfo) {
+                const snappedPos = snapToRoute(tripInfo.rotute.path, [longitude, latitude]);
+                longitude = snappedPos[0];
+                latitude = snappedPos[1];
+            }
+
+
+            let heading: number | null = null;
+            if (lastUserPos.current) {
+                // map point to north-up heading
+                const lastPos = lastUserPos.current;
+                // heading = Math.atan2(
+                //     latitude - lastPos[1],
+                //     longitude - lastPos[0]
+                // ) * (180 / Math.PI);
+                const deltaLng = longitude - lastPos[0];
+                const deltaLat = latitude - lastPos[1];
+                heading = Math.atan2(deltaLng, deltaLat) * (180 / Math.PI);
+                if (heading < 0) heading += 360;
+            }
+
+            lastUserPos.current = [longitude, latitude];
             setUserPos([longitude, latitude]);
 
             if (mapRef.current && forceToMarker.current) {
+
+                // get position of point add 1/2 of map hight and 2/3 of map width to the left-top
                 const mapp = mapRef.current!;
-                mapRef.current.easeTo({
+                const cavans = mapp.getCanvas();
+                const w = cavans.width;
+                const h = cavans.height;
+                const targetPixel: [number, number] = [w * 1.5/4, h * 1/2];
+
+                const targetLngLat = mapp.unproject(targetPixel);
+                const center = mapp.getCenter();
+
+                let offsetLng: [number, number] = [
+                    center.lng - targetLngLat.lng,
+                    center.lat - targetLngLat.lat
+                ]
+                
+                mapp.easeTo({
                     center: [
-                        longitude + (mapp.getBounds()!.getWest() - mapp.getBounds()!.getEast()) / 6,
-                        latitude
+                        longitude - offsetLng[0],
+                        latitude - offsetLng[1]
                     ],
+                    bearing: heading !== null ? heading : mapp.getBearing(),
+                    pitch: 45,
+                    zoom: Math.max(mapp.getZoom(), 15),
                     duration: 1000
                 });
             }
@@ -217,49 +312,29 @@ export function MapDriver() {
                 },
                 properties: {
                     name: stop.name,
-                    status: stop.status
+                    status: (nextStopIndex !== null && tripInfo.stops[nextStopIndex].id === stop.id) ? "NEXT" : stop.status,
                 }
             }))
         }
-    }, [tripInfo]);
+    }, [nextStopIndex, tripInfo]);
 
 
     const listOfStops = useMemo(() => {
-        return tripInfo?.stops.map((stop, idx, array) => (
-            <li
-                key={stop.id + "-stop-list" + idx}
-                className="flex items-center justify-between bg-white/80 p-2 rounded-lg shadow-sm"
-            >
-                <div className="flex items-center">
-                    <MapPin className="mr-3 text-sky-600" />
-                    <div>
-                        <p className="text-sm text-gray-800">{stop.name}</p>
-                        <p className="text-xs text-gray-500">
-                            {stop.location[1].toFixed(6)}, {stop.location[0].toFixed(6)}
-                        </p>
-                    </div>
-                </div>
-
-                <div className="flex gap-2">
-                    <p className="text-gray-500 text-sm"> {
-                        // calculate distance from current stop to next stop
-                        (() => {
-                            if (idx === array.length - 1) return "0 m";
-                            const from = turf.point(stop.location as [number, number]);
-                            const to = turf.point(array[idx + 1].location as [number, number]);
-                            const options = { units: 'meters' as turf.Units };
-                            const distance = turf.distance(from, to, options);
-                            if (distance < 1000) {
-                                return `${distance.toFixed(0)} m`;
-                            } else {
-                                return `${(distance / 1000).toFixed(2)} km`;
-                            }
-                        })()
-                    } </p>
-                </div>
-            </li>
+        if (!tripInfo) return [];
+        return tripInfo.stops.map((stop, idx, array) => (
+            {
+                data: stop,
+                distanceToNext: (() => {
+                    if (idx === array.length - 1) return 0;
+                    const from = turf.point(stop.location as [number, number]);
+                    const to = turf.point(array[idx + 1].location as [number, number]);
+                    const options = { units: 'meters' as turf.Units };
+                    const distance = turf.distance(from, to, options);
+                    return distance;
+                })()
+            }
         ))
-    }, [tripInfo?.stops])
+    }, [tripInfo])
 
     return (
         <div className="w-full h-screen relative">
@@ -290,7 +365,7 @@ export function MapDriver() {
                         </div>
                     </header>
 
-                    <main className="p-2 h-full overflow-hidden">
+                    <main className="p-2 h-full overflow-hidden flex flex-col">
                         {/* navigation info */}
                         <div className="bg-white/80 p-3 rounded-lg mb-4 shadow-sm">
                             <h2 className="text-lg font-semibold mb-2">Navigation</h2>
@@ -299,39 +374,46 @@ export function MapDriver() {
                                     <div>
                                         <p className="text-xs text-gray-500">Current position</p>
                                         <p className="text-sm font-medium">
-                                            {userPos[1].toFixed(6)}, {userPos[0].toFixed(6)}
+                                            {userPos[1].toFixed(6)}, <br/> {userPos[0].toFixed(6)}
                                         </p>
                                     </div>
 
                                     <div>
-                                        <p className="text-xs text-gray-500">Nearest stop</p>
-                                        <p className="text-sm font-medium">0000</p>
+                                        <p className="text-xs text-gray-500">Next stop</p>
+                                        <p className="text-sm font-medium">{
+                                            nextStopIndex !== null && tripInfo ? 
+                                                tripInfo.stops[nextStopIndex].name : "N/A"
+                                        }</p>
                                     </div>
 
                                     <div>
                                         <p className="text-xs text-gray-500">Distance to next</p>
-                                        <p className="text-sm font-medium">99999</p>
+                                        <p className="text-sm font-medium">{
+                                            distanceToNextStop !== null ? distanceToNextStop.toFixed(0) + " m" : "N/A"
+                                        }</p>
                                     </div>
 
                                     <div>
                                         <p className="text-xs text-gray-500">Remaining</p>
-                                        <p className="text-sm font-medium">99h99m</p>
+                                        <p className="text-sm font-medium">
+                                            {nextStopIndex || "N/A"} / { tripInfo?.stops.length }
+                                        </p>
                                     </div>
                                 </div>
 
                                 <div className="flex items-center gap-2">
+                                    {
+                                    // <button
+                                    //     className="px-3 py-1 bg-sky-600 text-white rounded hover:opacity-90"
+                                    //     onClick={() => {
+                                    //
+                                    //     }}
+                                    // >
+                                    //     Go to next
+                                    // </button>
+                                    }
                                     <button
-                                        className="px-3 py-1 bg-sky-600 text-white rounded hover:opacity-90"
-                                        onClick={() => {
-                                            // setUserPos(nextStop);
-                                            // setViewState({ longitude: nextStop[0], latitude: nextStop[1], zoom: 15 });
-                                        }}
-                                    >
-                                        Go to next
-                                    </button>
-
-                                    <button
-                                        className="px-3 py-1 bg-white border rounded"
+                                        className="bg-sky-600 px-3 py-1 text-white rounded  hover:opacity-90"
                                         onClick={() => {
                                             // setViewState({ longitude: userPos[0], latitude: userPos[1], zoom: 15 })
                                             const longitude = userPos[0]
@@ -350,18 +432,57 @@ export function MapDriver() {
                                         Center on me
                                     </button>
 
-                                    <div className="ml-auto text-right">
-                                        <p className="text-xs text-gray-500">ETA</p>
-                                        <p className="text-sm font-medium">dddd</p>
-                                    </div>
+                                    {
+                                        // <div className="ml-auto text-right">
+                                        //     <p className="text-xs text-gray-500">ETA</p>
+                                        //     <p className="text-sm font-medium">dddd</p>
+                                        // </div>
+                                    }
+
                                 </div>
                             </div>
                         </div>
                         {/* display stops */}
-                        <div className="overflow-auto">
-                            <ol className="space-y-2  p-2">
+                        <div className="overflow-auto h-auto">
+                            <ol className="space-y-2 p-2" ref={listOfStopsRef}>
                                 {
-                                    listOfStops
+                                    listOfStops.map(({
+                                        data: stop,
+                                        distanceToNext
+                                    }, idx) => (
+                                        <li
+                                            key={stop.id + "-stop-list" + idx}
+                                            className={"flex items-center justify-between bg-white/80 p-2 rounded-lg shadow-sm " + (nextStopIndex === idx ? "border-2 border-sky-600" : "")}
+                                        >
+                                            <div className="flex items-center">
+                                                <MapPin className="mr-3 text-sky-600" />
+                                                <div>
+                                                    <p className="text-sm text-gray-800">{stop.name}</p>
+                                                    <p className="text-xs text-gray-500">
+                                                        {stop.location[1].toFixed(6)}, {stop.location[0].toFixed(6)}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex gap-2">
+                                                <p className="text-gray-500 text-sm"> {
+                                                    distanceToNext > 0 ?
+                                                        (() => {
+                                                            if (distanceToNext < 1000) {
+                                                                return `${distanceToNext.toFixed(0)} m`;
+                                                            }
+                                                            else {
+                                                                return `${(distanceToNext / 1000).toFixed(2)} km`;
+                                                            }
+                                                        })()
+                                                        :
+                                                        "=))"
+                                                } </p>
+                                            </div>
+                                        </li>
+                                    ))
+
+
                                 }
                             </ol>
                         </div>
@@ -372,26 +493,32 @@ export function MapDriver() {
                     <footer className="p-2">
                         {
                             // info of the trip
-                            // time start, number of stops
+                            // next stop, distance to next stop, start time, number of stops
                         }
                         <div className="bg-white/70 backdrop-blur-sm rounded-lg p-2">
                             <div className="w-full flex items-center justify-between">
-                                <div className="flex flex-col">
-                                    <p className="text-gray-600 text-sm">Start time</p>
-                                    <p className="text-lg font-medium">
+                                <div>
+                                    <p className="text-sm text-gray-600">Next stop</p>
+                                    <h2 className="text-lg font-semibold">
                                         {
-                                            tripInfo ? new Date(tripInfo.rotute.startTime).toLocaleString().split(',')[1] : "N/A"
+                                            nextStopIndex !== null && tripInfo ?
+                                                tripInfo.stops[nextStopIndex].name
+                                                :
+                                                "N/A"
                                         }
-                                    </p>
+                                    </h2>
                                 </div>
 
-                                <div className="flex flex-col ml-6">
-                                    <p className="text-gray-600 text-sm">Stops</p>
-                                    <p className="text-lg font-medium">
+                                <div className="text-right">
+                                    <p className="text-sm text-gray-600">Distance to next</p>
+                                    <h2 className="text-lg font-semibold">
                                         {
-                                            tripInfo ? tripInfo.stops.length : "N/A"
+                                            distanceToNextStop !== null ?
+                                                `${distanceToNextStop.toFixed(0)} m`
+                                                :
+                                                "N/A"
                                         }
-                                    </p>
+                                    </h2>
                                 </div>
                             </div>
 
@@ -401,49 +528,40 @@ export function MapDriver() {
                                     if (tripInfo?.status === "PLANNED") {
                                         return <button className="px-4 w-full py-2 bg-red-600 text-white rounded-lg hover:opacity-90" onClick={() => {
                                             startTrip.mutate();
-                                            console.log("Start trip" );
+                                            console.log("Start trip");
                                         }}>
                                             {
                                                 startTrip.status === "pending" ? "Starting..." : "Bắt đầu chuyến đi"
                                             }
                                         </button>
-                                    }
-
-                                    if (tripInfo?.status === "ONGOING") {
+                                    } else if (tripInfo?.status === "ONGOING") {
                                         if (distanceToNextStop !== null && distanceToNextStop < 100) {
                                             return <button className="px-4 w-full py-2 bg-green-600 text-white rounded-lg hover:opacity-90" onClick={() => {
-                                                if (currentStopIndex === null || !tripInfo) return;
-                                                const nextStop = tripInfo.stops[currentStopIndex];
-                                                // markArriveStop.mutate(nextStop.id, {
-                                                //     onSuccess: () => {
-                                                //         setCurrentStopIndex(currentStopIndex + 1);
-                                                //     }
-                                                // });
+                                                if (nextStopIndex === null || !tripInfo) return;
+                                                const nextStop = tripInfo.stops[nextStopIndex];
+                                                markArriveStop.mutate(nextStop.id);
                                                 console.log("Arrived at stop:", nextStop.name);
-                                            }}>
-                                                Đến điểm dừng tiếp theo
-                                            </button>
-                                        } 
-                                        else if (currentStopIndex !== null && tripInfo && tripInfo.stops[currentStopIndex].status === "ARRIVED") {
-                                            return <button className="px-4 w-full py-2 bg-blue-600 text-white rounded-lg hover:opacity-90" onClick={() => {
-                                                if (currentStopIndex === null || !tripInfo) return;
-                                                const nextStop = tripInfo.stops[currentStopIndex];
-                                                // markCompleteStop.mutate(nextStop.id, {
-                                                //     onSuccess: () => {
-                                                //         setCurrentStopIndex(currentStopIndex + 1);
-                                                //     }
-                                                // });
-                                                console.log("Departed from stop:", nextStop.name);
-                                            }}>
-                                                Khởi hành từ điểm dừng
+                                            }} disabled={markArriveStop.status === "pending"}>
+                                                {
+                                                    markArriveStop.status === "pending" ? "Đang xử lý..." : "Đã đến điểm dừng"
+                                                }
                                             </button>
                                         }
-                                        else if (currentStopIndex === tripInfo.stops.length - 1) {
+                                        else if (nextStopIndex !== null && tripInfo && tripInfo.stops[nextStopIndex].status === "ARRIVED") {
+                                            return <button className="px-4 w-full py-2 bg-blue-600 text-white rounded-lg hover:opacity-90" onClick={() => {
+                                                if (nextStopIndex === null || !tripInfo) return;
+                                                const nextStop = tripInfo.stops[nextStopIndex];
+                                                markCompleteStop.mutate(nextStop.id);
+                                            }} disabled={markCompleteStop.status === "pending"}>
+                                                {markCompleteStop.status === "pending" ? "Đang xử lý..." : "Rời khỏi điểm dừng"}
+                                            </button>
+                                        }
+                                        else if (nextStopIndex === tripInfo.stops.length - 1 && tripInfo.stops[nextStopIndex].status === "DONE") {
                                             return <button className="px-4 w-full py-2 bg-red-600 text-white rounded-lg hover:opacity-90" onClick={() => {
-                                                // endTrip.mutate();
+                                                endTrip.mutate();
                                                 console.log("End trip");
-                                            }}>
-                                                Kết thúc chuyến đi
+                                            }} disabled={endTrip.status === "pending"}>
+                                                {endTrip.status === "pending" ? "Kết thúc..." : "Kết thúc chuyến đi"}
                                             </button>
                                         }
                                         else {
@@ -451,7 +569,7 @@ export function MapDriver() {
                                                 Đang di chuyển...
                                             </button>
                                         }
-                                        
+
                                     }
 
                                 })()
@@ -523,7 +641,8 @@ export function MapDriver() {
                                     'ARRIVED', '#3b82f6',    // xanh dương
                                     'DONE', '#10b981',       // xanh lá
                                     'SKIPPED', '#ef4444',    // đỏ
-                                    '#6b7280'                // xám (mặc định)
+                                    'NEXT', '#8b5cf6',       // tím
+                                    '#6b7280',               // xám (mặc định)
                                 ],
                                 "circle-stroke-color": "#ffffff",
                                 "circle-stroke-width": 2
@@ -540,6 +659,9 @@ export function MapDriver() {
                         anchor="center"
                         ref={markerRef}
                     >
+                        {
+                            // add heading arrow
+                        }
                         <div
                             style={{
                                 width: "26px",
