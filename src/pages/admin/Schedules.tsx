@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Button } from "../../components/uiItem/button";
 import { Plus, Calendar, Clock } from "lucide-react";
 import Select from 'react-select';
 import { vi } from 'date-fns/locale';
-import { format } from 'date-fns';
+import { format, startOfWeek, addDays, getDay } from 'date-fns';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
-// Dữ liệu tham chiếu (từ API thực tế sẽ fetch)
+// Dữ liệu tham chiếu
 const busOptions = [
   { value: 'bus_001', label: '29A-12345 - Trần Văn A' },
   { value: 'bus_002', label: '29B-67890 - Nguyễn Thị B' },
@@ -23,76 +23,97 @@ const driverOptions = [
   { value: 'driver_002', label: 'Trần Thị Bé (B67890)' },
 ];
 
+// Dữ liệu lịch trình từ DB
+const schedulesFromDB = [
+  {
+    id: "sch_001",
+    routeId: "route_01",
+    busId: "bus_001",
+    driverId: "driver_001",
+    type: "MORNING" as const,
+    daysOfWeek: [1, 2, 3, 4, 5],
+    startTime: "06:45:00",
+    startDate: "2025-11-01",
+    endDate: null,
+    status: "ACTIVE" as const,
+  },
+  {
+    id: "sch_002",
+    routeId: "route_02",
+    busId: "bus_002",
+    driverId: "driver_002",
+    type: "MORNING" as const,
+    daysOfWeek: [1, 2, 3, 4, 5, 6],
+    startTime: "06:45:00",
+    startDate: "2025-11-01",
+    endDate: "2025-12-31",
+    status: "ACTIVE" as const,
+  },
+  {
+    id: "sch_003",
+    routeId: "route_01",
+    busId: "bus_001",
+    driverId: "driver_001",
+    type: "AFTERNOON" as const,
+    daysOfWeek: [1, 1, 2, 3, 4, 5],
+    startTime: "16:45:00",
+    startDate: "2025-11-01",
+    endDate: null,
+    status: "ACTIVE" as const,
+  },
+];
+
+// Hàm lấy tuần bắt đầu từ Thứ 2
+const getWeekDays = (date: Date) => {
+  const start = startOfWeek(date, { weekStartsOn: 1 });
+  return Array.from({ length: 7 }, (_, i) => addDays(start, i));
+};
+
+// Kiểm tra lịch có hoạt động trong ngày không
+const isScheduleActiveOnDate = (sch: any, date: Date): boolean => {
+  if (sch.status !== "ACTIVE") return false;
+  const dateStr = format(date, 'yyyy-MM-dd');
+  const dayOfWeek = getDay(date) || 7; // CN = 7
+
+  return (
+    sch.daysOfWeek.includes(dayOfWeek) &&
+    dateStr >= sch.startDate &&
+    (!sch.endDate || dateStr <= sch.endDate)
+  );
+};
+
+// Tính số chuyến mỗi ngày trong tuần
+const getWeeklySummary = (dateInWeek: Date) => {
+  const days = getWeekDays(dateInWeek);
+  return days.map(date => {
+    const count = schedulesFromDB.filter(sch => isScheduleActiveOnDate(sch, date)).length;
+    return {
+      date,
+      dayName: format(date, 'EEEE', { locale: vi }),
+      dayShort: format(date, 'dd/MM'),
+      tripCount: count,
+    };
+  });
+};
+
 export const Schedules = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
-  // Format ngày đẹp: "Thứ 6, 22/11/2025"
   const formatDateDisplay = (date: Date) => {
     return format(date, 'EEEE, dd/MM/yyyy', { locale: vi });
   };
 
-  // Dữ liệu lịch trình chuẩn DB
-  const schedulesFromDB = [
-    {
-      id: "sch_001",
-      routeId: "route_01",
-      busId: "bus_001",
-      driverId: "driver_001",
-      type: "MORNING" as const,
-      daysOfWeek: [1, 2, 3, 4, 5],
-      startTime: "06:45:00",
-      startDate: "2025-11-01",
-      endDate: null,
-      status: "ACTIVE" as const,
-      meta: { note: "Lịch cố định hàng tuần" },
-      createdAt: "2025-10-20T10:00:00.000Z",
-      updatedAt: "2025-10-20T10:00:00.000Z",
-    },
-    {
-      id: "sch_002",
-      routeId: "route_02",
-      busId: "bus_002",
-      driverId: "driver_002",
-      type: "MORNING" as const,
-      daysOfWeek: [1, 2, 3, 4, 5, 6],
-      startTime: "06:45:00",
-      startDate: "2025-11-01",
-      endDate: "2025-12-31",
-      status: "ACTIVE" as const,
-      meta: { note: "Tăng cường cuối năm" },
-      createdAt: "2025-10-25T08:15:00.000Z",
-      updatedAt: "2025-10-25T08:15:00.000Z",
-    },
-    {
-      id: "sch_003",
-      routeId: "route_01",
-      busId: "bus_001",
-      driverId: "driver_001",
-      type: "AFTERNOON" as const,
-      daysOfWeek: [1, 2, 3, 4, 5],
-      startTime: "16:45:00",
-      startDate: "2025-11-01",
-      endDate: null,
-      status: "ACTIVE" as const,
-      meta: { note: "Ca chiều cố định" },
-      createdAt: "2025-10-20T10:00:00.000Z",
-      updatedAt: "2025-10-20T10:00:00.000Z",
-    },
-  ];
-
-  // Hàm lọc lịch theo ngày được chọn
+  // Lấy lịch của ngày được chọn
   const getSchedulesForDate = (date: Date) => {
-    const dayOfWeek = date.getDay();
-    const isoDay = dayOfWeek === 0 ? 7 : dayOfWeek; // CN = 7, T2 = 1
+    const dayOfWeek = date.getDay() || 7;
     const dateStr = format(date, 'yyyy-MM-dd');
 
     return schedulesFromDB
       .filter(s => {
-        const inDateRange = dateStr >= s.startDate && (!s.endDate || dateStr <= s.endDate);
-        const inWeekDays = s.daysOfWeek.includes(isoDay);
-        const isActive = s.status === "ACTIVE";
-        return inDateRange && inWeekDays && isActive;
+        const inRange = dateStr >= s.startDate && (!s.endDate || dateStr <= s.endDate);
+        const inWeekDay = s.daysOfWeek.includes(dayOfWeek);
+        return s.status === "ACTIVE" && inRange && inWeekDay;
       })
       .map(s => ({
         id: s.id,
@@ -111,7 +132,12 @@ export const Schedules = () => {
   const morningSchedules = todaySchedules.filter(s => s.type === "MORNING");
   const afternoonSchedules = todaySchedules.filter(s => s.type === "AFTERNOON");
 
-  return (
+  // Tính tổng quan tuần (tự động cập nhật khi đổi ngày)
+  const weeklySummary = useMemo(() => getWeeklySummary(selectedDate), [selectedDate]);
+
+  const totalTripsThisWeek = weeklySummary.reduce((sum, day) => sum + day.tripCount, 0);
+
+return (
     <div className="p-6 bg-gray-100 min-h-screen">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
@@ -378,22 +404,44 @@ export const Schedules = () => {
         )}
       </div>
 
-      {/* Weekly Summary */}
+      {/* TỔNG QUAN TUẦN - ĐẸP & CHÍNH XÁC 100% */}
       <div className="bg-white rounded-lg shadow p-6 border border-blue-200 mt-6">
-        <h3 className="text-lg font-semibold mb-4">Tổng quan tuần</h3>
-        <div className="grid grid-cols-7 gap-4">
-          {["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ nhật"].map((day, idx) => {
-            const trips = idx < 5 ? 6 : 0; // ví dụ: T2-T6 có 6 chuyến
-            return (
-              <div key={idx} className="text-center p-4 border rounded-lg bg-gray-50">
-                <span className="block font-semibold text-gray-700">{day}</span>
-                <span className="block text-[#656BEB] font-bold text-2xl mt-2">{trips}</span>
-                <span className="block text-sm text-gray-600">chuyến</span>
-              </div>
-            );
-          })}
+        <h3 className="text-2xl font-bold text-center text-gray-800 mb-8 mb-8">
+          Tổng quan tuần ({format(weeklySummary[0].date, 'dd/MM', { locale: vi })} - {format(weeklySummary[6].date, 'dd/MM', { locale: vi })})
+        </h3>
+
+        <div className="grid grid-cols-7 gap-5 mb-8">
+          {weeklySummary.map((day, idx) => (
+            <div
+              key={idx}
+              className={`text-center p-6 rounded-2xl shadow-md transition-all hover:scale-105 ${
+                day.tripCount > 0 ? 'bg-white border-2 border-indigo-300' : 'bg-gray-100 opacity-70'
+              }`}
+            >
+              <p className="text-sm font-bold text-gray-600">
+                {["Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7", "Chủ nhật"][idx]}
+              </p>
+              <p className="text-4xl font-extrabold text-indigo-600 my-3">
+                {day.tripCount}
+              </p>
+              <p className="text-xs text-gray-500">{day.dayShort}</p>
+              <p className="text-sm text-gray-600 mt-1">chuyến</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="text-center">
+          <p className="text-lg font-semibold text-gray-700">
+            Tổng cộng tuần này:{' '}
+            <span className="text-4xl font-bold text-indigo-600">
+              {totalTripsThisWeek}
+            </span>{' '}
+            chuyến xe
+          </p>
         </div>
       </div>
     </div>
   );
 };
+
+export default Schedules;
