@@ -6,6 +6,9 @@ import parentIcon from "../assets/vector_parent.png";
 import { useApi } from "../contexts/apiConetxt";
 import { path } from "../router";
 import { Toast } from "../components/uiPart/ToastContainer";
+import { useEffect, useState } from "react";
+import { round } from "@turf/turf";
+import { RollerCoaster } from "lucide-react";
 
 // HomePage.tsx
 //
@@ -78,36 +81,64 @@ const toast = Toast({
 export function HomePage() {
     const { api } = useApi();
     const navigate = useNavigate();
+    const [userRoles, setUserRoles] = useState<string[]>([]);
+    useEffect(() => {
+        const apiSecurityData = localStorage.getItem('securityData');
+        if (!apiSecurityData) {
+            navigate(path.LOGIN);
+            return;
+        }
+        const parsed = JSON.parse(apiSecurityData);
+        const rolesFromStorage: string[] = parsed?.roles ?? [];
+        setUserRoles(rolesFromStorage);
+
+        if (rolesFromStorage.length === 1) {
+            const role = rolesFromStorage[0];
+            if (role === 'admin') {
+                navigate(path.ADMIN);
+            } else if (role === 'driver') {
+                navigate(path.DRIVER);
+            } else if (role === 'parent') {
+                navigate(path.PARENT);
+            }
+        }
+    }, [navigate]);
+
+
     const roles = [
         {
             title: "Quản lý",
+            role: 'admin',
             description:
                 "Quản lý toàn bộ hệ thống xe bus, lịch trình và giám sát hoạt động",
             icon: adminIcon,
             features: ["Quản lý xe Bus", "Lập lịch trình", "Theo dõi xe Bus"],
-            buttonText: "Đăng nhập quản lý",
+            buttonText: "Vào trang quản lý",
             path: path.ADMIN
         },
         {
             title: "Tài xế",
+            role: 'driver',
             description: "Xem lịch làm việc, danh sách học sinh và báo cáo tình trạng",
             icon: busIcon,
             features: ["Lịch làm việc", "Danh sách học sinh", "Báo cáo sự cố"],
-            buttonText: "Đăng nhập tài xế",
-            pat: path.DRIVER
+            buttonText: "Vào trang tài xế",
+            path: path.DRIVER
         },
         {
             title: "Phụ huynh",
+            role: 'parent',
             description: "Theo dõi vị trí xe Bus của học sinh và nhận thông báo",
             icon: parentIcon,
             features: ["Liên hệ khẩn cấp", "Thông báo", "Theo dõi xe Bus"],
-            buttonText: "Đăng nhập phụ huynh",
+            buttonText: "Vào trang phụ huynh",
             path: path.PARENT
         },
     ];
 
     const renderItems = [];
     for (let i = 0; i < roles.length; i++) {
+        if (!userRoles.includes(roles[i].role)) continue;
         renderItems.push(
             <div key={i} className="rounded-xl bg-white lg:max-w-80 min-w-30 p-5 shadow-2xl text-center">
                 <img src={roles[i].icon} alt={roles[i].title} className="w-20 h-20 mb-4 mx-auto" />
@@ -121,18 +152,7 @@ export function HomePage() {
                             navigate(path.LOGIN, { state: { from: roles[i].path } });
                             return;
                         }
-
-
-                        // NOTE: 4/11/2025 Uncomment the following lines to enable role-based access control
-                        // Currently, all logged-in users can access any role for testing purposes
-                        // if (!apiSecurityData.roles.includes(roles[i].title.toLowerCase())) {
-                        //     alert("Bạn không có quyền truy cập vào khu vực này.");
-                        //     return;
-                        // }
-
                         navigate(roles[i].path);
-
-
                     }
 
                 } className="bg-[#111827] text-[#FFFDFD] text-[15px] font-semibold my-5 px-10 py-3 rounded-xl">{roles[i].buttonText}</button>

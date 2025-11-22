@@ -22,6 +22,7 @@ import QRRollCall from "../pages/driver/QRRollCall"
 import DriverSchedule from "../pages/driver/Schedule"
 import { MapDriver } from "../pages/driver/Map"
 
+import NotificationsPage from "../pages/driver/NotificationsPage"
 
 export const path = {
     INDEX: "/",
@@ -140,6 +141,10 @@ export const router = createBrowserRouter([
             {
                 path: "*",
                 element: <NotFoundPage />
+            },
+            {
+                path: path.DRIVER_NOTIFICATIONS,
+                element: <NotificationsPage />
             }
         ]
     }
