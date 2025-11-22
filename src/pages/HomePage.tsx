@@ -94,7 +94,7 @@ export function HomePage() {
             icon: busIcon,
             features: ["Lịch làm việc", "Danh sách học sinh", "Báo cáo sự cố"],
             buttonText: "Đăng nhập tài xế",
-            pat: path.DRIVER
+            path: path.DRIVER
         },
         {
             title: "Phụ huynh",
