@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button } from "../../components/uiItem/button";
 import { Search, Plus, Pen, Delete } from "lucide-react";
 
@@ -7,36 +7,40 @@ export const Student = () => {
   const [showForm, setShowForm] = useState(false);
   const [editForm, editShowForm] = useState(false);
   const [deleteForm, deleteShowForm] = useState(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const itemsPerPage = 10;
 
   const students = [
-    {
-      name: "Nguyễn Minh Khang",
-      class: "6A",
-      driver: "Nguyễn Văn X",
-      phone: "0901234567",
-      pickupPoint: "Bến xe Bến Thành",
-      bus: "29A-12345",
-      status: "Hoạt động",
-    },
-    {
-      name: "Lê Thị Mai",
-      class: "6A",
-      driver: "Nguyễn Văn X",
-      phone: "0901234567",
-      pickupPoint: "Bến xe Bến Thành",
-      bus: "29A-12345",
-      status: "Hoạt động",
-    },
-    {
-      name: "Trần Văn Nam",
-      class: "6A",
-      driver: "Nguyễn Văn X",
-      phone: "0901234567",
-      pickupPoint: "Bến xe Bến Thành",
-      bus: "29A-12345",
-      status: "Hoạt động",
-    },
+    { name: "Nguyễn Minh Khang", class: "6A", driver: "Nguyễn Văn X", phone: "0901234001", pickupPoint: "Bến xe Bến Thành", bus: "29A-12345", status: "Hoạt động" },
+    { name: "Lê Thị Mai", class: "6A", driver: "Nguyễn Văn X", phone: "0901234002", pickupPoint: "Công viên 23/9", bus: "29A-12345", status: "Hoạt động" },
+    { name: "Trần Văn Nam", class: "6A", driver: "Nguyễn Văn Y", phone: "0901234003", pickupPoint: "Chợ Bến Thành", bus: "29B-67890", status: "Hoạt động" },
+    { name: "Phạm Thị Hồng", class: "7B", driver: "Trần Văn B", phone: "0901234004", pickupPoint: "Trường THCS ABC", bus: "29A-12345", status: "Hoạt động" },
+    { name: "Võ Hoàng Long", class: "7B", driver: "Lê Văn C", phone: "0901234005", pickupPoint: "Công viên Tao Đàn", bus: "29B-67890", status: "Tạm dừng" },
+    { name: "Ngô Thị Lan", class: "8C", driver: "Phan Văn D", phone: "0901234006", pickupPoint: "Cầu Ánh Sao", bus: "30C-11111", status: "Hoạt động" },
+    { name: "Đỗ Minh Tú", class: "6B", driver: "Nguyễn Văn X", phone: "0901234007", pickupPoint: "Bến xe Miền Đông", bus: "29A-12345", status: "Hoạt động" },
+    { name: "Lương Thùy Chi", class: "6C", driver: "Trần Văn B", phone: "0901234008", pickupPoint: "Chợ Tân Định", bus: "29B-67890", status: "Hoạt động" },
+    { name: "Hà Quốc Đại", class: "7A", driver: "Lê Văn C", phone: "0901234009", pickupPoint: "Công viên 23/9", bus: "30C-11111", status: "Hoạt động" },
+    { name: "Bùi Thuỳ Dung", class: "7C", driver: "Phan Văn D", phone: "0901234010", pickupPoint: "Trường THPT XYZ", bus: "29A-12345", status: "Hoạt động" },
+    { name: "Trịnh Bá Sơn", class: "8A", driver: "Nguyễn Văn Z", phone: "0901234011", pickupPoint: "Bến xe Bến Thành", bus: "29B-67890", status: "Hoạt động" },
+    { name: "Nguyễn Thị Hạnh", class: "8B", driver: "Nguyễn Văn X", phone: "0901234012", pickupPoint: "Công viên Tao Đàn", bus: "30C-11111", status: "Tạm dừng" },
+    { name: "Lê Văn Phúc", class: "6A", driver: "Trần Văn B", phone: "0901234013", pickupPoint: "Chợ Bến Thành", bus: "29A-12345", status: "Hoạt động" },
+    { name: "Phan Mỹ Linh", class: "6B", driver: "Lê Văn C", phone: "0901234014", pickupPoint: "Cầu Ánh Sao", bus: "29B-67890", status: "Hoạt động" },
+    { name: "Vũ Ngọc Ánh", class: "7B", driver: "Phan Văn D", phone: "0901234015", pickupPoint: "Trường THCS ABC", bus: "30C-11111", status: "Hoạt động" },
+    { name: "Hoàng Minh Đức", class: "8C", driver: "Nguyễn Văn Z", phone: "0901234016", pickupPoint: "Bến xe Miền Đông", bus: "29A-12345", status: "Hoạt động" },
+    { name: "Đặng Thị Phương", class: "7A", driver: "Nguyễn Văn X", phone: "0901234017", pickupPoint: "Chợ Tân Định", bus: "29B-67890", status: "Hoạt động" },
+    { name: "Mai Quốc Huy", class: "6C", driver: "Lê Văn C", phone: "0901234018", pickupPoint: "Trường THPT XYZ", bus: "30C-11111", status: "Hoạt động" },
+    { name: "Trần Thùy Vy", class: "8B", driver: "Phan Văn D", phone: "0901234019", pickupPoint: "Bến xe Bến Thành", bus: "29A-12345", status: "Hoạt động" },
+    { name: "Nguyễn Khánh Duy", class: "7C", driver: "Nguyễn Văn Z", phone: "0901234020", pickupPoint: "Cầu Ánh Sao", bus: "29B-67890", status: "Tạm dừng" },
   ];
+
+  const totalPages = Math.max(1, Math.ceil(students.length / itemsPerPage));
+
+  // ensure current page is valid if students length changes
+  if (currentPage > totalPages) setCurrentPage(totalPages);
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const displayedStudents = students.slice(startIndex, endIndex);
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
@@ -162,43 +166,53 @@ export const Student = () => {
 
       {/* Student Table */}
       <div className="bg-white rounded-lg shadow p-4 border border-blue-200  text-sm">
-        <h2 className="text-xl font-semibold mb-4">Danh sách học sinh (3)</h2>
-        <table className="w-full text-left leading-relaxed">
+        <h2 className="text-xl font-semibold mb-4">Danh sách học sinh ({students.length})</h2>
+        <table className="w-full text-left leading-relaxed table-fixed">
+          <colgroup>
+            <col style={{ width: '12.5%' }} />
+            <col style={{ width: '12.5%' }} />
+            <col style={{ width: '12.5%' }} />
+            <col style={{ width: '12.5%' }} />
+            <col style={{ width: '12.5%' }} />
+            <col style={{ width: '12.5%' }} />
+            <col style={{ width: '12.5%' }} />
+            <col style={{ width: '12.5%' }} />
+          </colgroup>
           <thead>
             <tr className="border-b">
-              <th className="py-2 px-4 whitespace-nowrap text-[#95999F] ">Họ tên</th>
-              <th className="py-2 px-4 whitespace-nowrap text-[#95999F] ">Lớp</th>
-              <th className="py-2 px-4 whitespace-nowrap text-[#95999F] ">Phụ huynh</th>
-              <th className="py-2 px-4 whitespace-nowrap text-[#95999F] ">SĐT</th>
-              <th className="py-2 px-4 whitespace-nowrap text-[#95999F] ">Điểm đón</th>
-              <th className="py-2 px-4 whitespace-nowrap text-[#95999F] ">Xe Bus</th>
-              <th className="py-2 px-4 whitespace-nowrap text-[#95999F] ">Trạng thái</th>
-              <th className="py-2 px-4 whitespace-nowrap text-[#95999F] ">Thao tác</th>
+              <th className="py-2 px-4 text-[#95999F]">Họ tên</th>
+              <th className="py-2 px-4 text-[#95999F]">Lớp</th>
+              <th className="py-2 px-4 text-[#95999F]">Phụ huynh</th>
+              <th className="py-2 px-4 text-[#95999F]">SĐT</th>
+              <th className="py-2 px-4 text-[#95999F]">Điểm đón</th>
+              <th className="py-2 px-4 text-[#95999F]">Xe Bus</th>
+              <th className="py-2 px-4 text-[#95999F]">Trạng thái</th>
+              <th className="py-2 px-4 text-[#95999F]">Thao tác</th>
             </tr>
           </thead>
           <tbody>
-            {students.map((student, index) => (
-              <tr key={index} className="border-b">
-                <td className="py-2 px-4 whitespace-nowrap font-bold">{student.name}</td>
-                <td className="py-2 px-4 whitespace-nowrap">{student.class}</td>
-                <td className="py-2 px-4 whitespace-nowrap">{student.driver}</td>
-                <td className="py-2 px-4 whitespace-nowrap">{student.phone}</td>
-                <td className="py-2 px-4 whitespace-nowrap">{student.pickupPoint}</td>
-                <td className="py-2 px-4 whitespace-nowrap">
-                <div className="  px-3 py-2 rounded-lg shadow-sm font-bold inline-block">
-                  {student.bus}
-                </div>
-              </td>
-                <td className="py-2 px-4 whitespace-nowrap">
+            {displayedStudents.map((student, idx) => (
+              <tr key={startIndex + idx} className="border-b">
+                <td className="py-2 px-4 truncate font-bold">{student.name}</td>
+                <td className="py-2 px-4 truncate">{student.class}</td>
+                <td className="py-2 px-4 truncate">{student.driver}</td>
+                <td className="py-2 px-4 truncate">{student.phone}</td>
+                <td className="py-2 px-4 truncate">{student.pickupPoint}</td>
+                <td className="py-2 px-4 truncate">
+                  <div className="px-3 py-2 rounded-lg shadow-sm font-bold inline-block truncate max-w-full">
+                    {student.bus}
+                  </div>
+                </td>
+                <td className="py-2 px-4 truncate">
                   <span className="px-2 py-1 bg-[#D3FDCB] text-[#38B76A] rounded-full text-xs font-semibold">
                     {student.status}
                   </span>
                 </td>
 
-                <td className="py-2 px-4 flex space-x-4 ">
-                    <Button variant="default" 
-                     className="bg-gray-700  border"
-                     onClick={() => editShowForm(true)}>
+                <td className="py-2 px-4 flex space-x-4 justify-end">
+                     <Button variant="default" 
+                      className="bg-gray-700  border"
+                      onClick={() => editShowForm(true)}>
                     
                      <Pen className="mr-2" size={18} />
                       <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
@@ -342,6 +356,37 @@ export const Student = () => {
       )}
           </tbody>
         </table>
+        {/* Pagination controls */}
+        <div className="flex justify-end mt-4">
+          <div className="inline-flex items-center space-x-2">
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className={`px-3 py-1 rounded border ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'}`}
+            >
+              Prev
+            </button>
+
+            {/* page numbers */}
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+              <button
+                key={p}
+                onClick={() => setCurrentPage(p)}
+                className={`px-3 py-1 rounded border ${p === currentPage ? 'bg-sky-600 text-white' : 'hover:bg-gray-100'}`}
+              >
+                {p}
+              </button>
+            ))}
+
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className={`px-3 py-1 rounded border ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'}`}
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
