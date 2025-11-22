@@ -6,6 +6,8 @@ import { Buss } from "../pages/admin/Buss"
 import { Overview } from "../pages/admin/Overview"
 import { RouteAdmin } from "../pages/admin/RouteAdmin"
 import { Schedules } from "../pages/admin/Schedules"
+import { Student } from "../pages/admin/Student"
+import { Parent } from "../pages/admin/Parent"
 import { HomePage } from "../pages/HomePage"
 import { LoginPage } from "../pages/LoginPage"
 import { BusLocationPage } from "../pages/parent/busLocationPage"
@@ -34,6 +36,7 @@ export const path = {
     ADMIN_BUSES: "/admin/buses",
     ADMIN_STOPS_POINTS: "/admin/stops_points",
     ADMIN_STUDENTS: "/admin/students",
+    ADMIN_PARENTS: "/admin/parents",
     ADMIN_SCHEDULES: "/admin/schedules",
     ADMIN_ROUTES: "/admin/routes",
 
@@ -99,7 +102,11 @@ export const router = createBrowserRouter([
                     },
                     {
                         path: path.ADMIN_STUDENTS,
-                        element: <StudentPage />
+                        element: <Student />
+                    },
+                    {
+                        path: path.ADMIN_PARENTS,
+                        element: <Parent />
                     },
                     {
                         path: path.ADMIN_SCHEDULES,

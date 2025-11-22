@@ -63,19 +63,21 @@ function RouteInfoCard({ route, isSelected, onClick }: {
         className={`p-4 rounded-xl border bg-white cursor-pointer hover:shadow-sm transition-shadow` + (isSelected ? ' border-red-500 shadow-md' : ' border-gray-200')}
         onClick={onClick}
     >
-        <div className="flex justify-between items-start mb-2">
-            <div className="flex items-center">
-                <span className="flex min-w-3 min-h-3 me-3 rounded-full" style={{
-                    backgroundColor: route.metadata.Color || '#000000'
-                }}></span>
-                <h3 className="font-semibold text-base">
-                    Tuyến {route.name}
-                </h3>
-            </div>
-            <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full">
-                Hoạt động
-            </span>
-        </div>
+<div className="flex flex-wrap items-center justify-between gap-3 mb-2">
+    <div className="flex items-center gap-3">
+        <span 
+            className="flex shrink-0 w-3 h-3 rounded-full" 
+            style={{ backgroundColor: route.metadata.Color || '#000000' }}
+        />
+        <h3 className="font-semibold text-base">
+            Tuyến {route.name}
+        </h3>
+    </div>
+
+    <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full whitespace-nowrap">
+        Hoạt động
+    </span>
+</div>
 
         {/* flex-col để hiển thị theo chiều dọc */}
         <div className="flex flex-col gap-2 text-sm text-gray-600">
