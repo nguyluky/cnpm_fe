@@ -6,6 +6,7 @@ import parentIcon from "../assets/vector_parent.png";
 import { useApi } from "../contexts/apiConetxt";
 import { path } from "../router";
 import { Toast } from "../components/uiPart/ToastContainer";
+import { useEffect } from "react";
 
 // HomePage.tsx
 //
@@ -78,6 +79,13 @@ const toast = Toast({
 export function HomePage() {
     const { api } = useApi();
     const navigate = useNavigate();
+    useEffect(() => {
+        if (!api.getSecurityData()) {
+            navigate(path.LOGIN);
+        }
+    }, []);
+
+
     const roles = [
         {
             title: "Quản lý",
