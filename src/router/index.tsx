@@ -22,6 +22,7 @@ import ScheduleAdminTable from "../pages/admin/test_ui";
 import { MapDriver } from "../pages/driver/Map";
 
 import NotificationsPage from "../pages/driver/NotificationsPage";
+import { GetAllStudent } from "../pages/admin/Students/getAllStudent";
 
 export const path = {
   INDEX: "/",
@@ -33,6 +34,7 @@ export const path = {
   ADMIN_BUS_MANAGEMENT: "/admin/bus-management",
   ADMIN_STOPS_POINTS: "/admin/stops_points",
   ADMIN_STUDENTS: "/admin/students",
+  ADMIN_STUDENTS_MANAGEMENT: "/admin/students-management",
   ADMIN_SCHEDULES: "/admin/schedules",
   ADMIN_ROUTES: "/admin/routes",
 
@@ -94,6 +96,10 @@ export const router = createBrowserRouter([
           {
             path: path.ADMIN_BUS_MANAGEMENT,
             element: <Bus />,
+          },
+          {
+            path: path.ADMIN_STUDENTS_MANAGEMENT,
+            element: <GetAllStudent />,
           },
           {
             path: path.ADMIN_STOPS_POINTS,

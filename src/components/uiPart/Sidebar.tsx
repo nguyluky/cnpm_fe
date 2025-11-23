@@ -39,6 +39,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { icon: Calendar, label: "Lịch trình", path: path.ADMIN_SCHEDULES }, // Đã thay đổi
     { icon: MessageSquare, label: "Tin nhắn", path: "/admin/messages" }, // Giữ nguyên, không có trong path mới
     { icon: Bus, label: "Quản lý xe Bus", path: path.ADMIN_BUS_MANAGEMENT },
+    //
+    {
+      icon: Users,
+      label: "Quản lý student",
+      path: path.ADMIN_STUDENTS_MANAGEMENT,
+    },
   ];
 
   const parentMenuItems = [
