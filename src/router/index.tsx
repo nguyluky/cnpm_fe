@@ -16,13 +16,11 @@ import { StopsPointsPage } from "../pages/stopPoint"
 import { DriverLayout } from "../layouts/DriverLayout"
 import { RootLayout } from "../layouts/RootLayout"
 import ScheduleAdminTable from "../pages/admin/test_ui"
-import DriverHome from "../pages/driver/Home"
 // import DriverNotifications from "../pages/driver/Notifications"
-import QRRollCall from "../pages/driver/QRRollCall"
-import DriverSchedule from "../pages/driver/Schedule"
 import { MapDriver } from "../pages/driver/Map"
 
 import NotificationsPage from "../pages/driver/NotificationsPage"
+import { KeepAlive } from "react-activation"
 
 export const path = {
     INDEX: "/",
@@ -68,7 +66,9 @@ export const router = createBrowserRouter([
                 children: [
                     {
                         index: true,
-                        element: <BusLocationPage />
+                        element: <KeepAlive>
+                            <BusLocationPage />
+                        </KeepAlive>
                     },
                     {
                         path: path.PARENT_NOTIFICATIONS,
