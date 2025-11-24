@@ -1,6 +1,6 @@
 import { Card } from '../../components/uiItem/card.tsx';
 import { useEffect, useState } from "react";
-import { UserCircle2, Baby, School, Calendar, User, X, ChevronRight, Mars, Venus } from "lucide-react";
+import { UserCircle2, Baby, School, Calendar, User, X, ChevronRight, Mars, Venus, Phone, MapPin } from "lucide-react";
 
 interface Student {
   id: string;
@@ -25,7 +25,6 @@ export function StudentPage() {
   useEffect(() => {
     const fetchStudents = async () => {
       setLoading(true);
-
       const mockData: Student[] = [
         {
           id: "stu_001",
@@ -60,191 +59,137 @@ export function StudentPage() {
       setTimeout(() => {
         setStudents(mockData);
         setLoading(false);
-      }, 600);
+      }, 800);
     };
-
     fetchStudents();
   }, []);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full bg-[#E0E7FF]">
-        <div className="text-indigo-600 text-lg">Đang tải thông tin các bé...</div>
+      <div className="flex items-center justify-center h-screen bg-gradient-to-b from-indigo-50 to-purple-50">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-indigo-700 font-medium">Đang tải thông tin các bé...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex bg-[#E0E7FF] w-full h-full overflow-y-auto">
-      <div className="my-5 mx-7 flex-1 max-w-4xl">
-        <Card className="shadow-lg">
-          <div className="p-6">
-            <h2 className="text-2xl font-bold text-indigo-800 mb-6 flex items-center gap-3">
-              <Baby className="w-8 h-8" />
-              Thông tin học sinh
-            </h2>
-
-            {students.length === 0 ? (
-              <div className="text-center py-16 text-gray-500">
-                <UserCircle2 className="w-20 h-20 mx-auto mb-4 text-gray-300" />
-                <p>Chưa có thông tin học sinh nào được liên kết với tài khoản của bạn.</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {students.map((student) => (
-                  <div
-                    key={student.id}
-                    onClick={() => setSelectedStudent(student)}
-                    className="bg-white border-2 border-[#8fd67c] rounded-2xl p-5 flex items-center gap-5 hover:shadow-md transition-all duration-200 cursor-pointer group"
-                  >
-                    <div className="bg-gradient-to-br from-green-100 to-blue-100 rounded-full p-3">
-                      <div className={`w-14 h-14 ${student.meta.gender === "Nam" ? "bg-blue-400" : "bg-pink-400"} rounded-full flex items-center justify-center text-white font-bold text-xl shadow-md`}>
-                        {student.name.charAt(0)}
-                      </div>
-                    </div>
-
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold text-gray-800">{student.name}</h3>
-                      {student.meta.nickname && (
-                        <p className="text-indigo-600 font-medium mt-1">{student.meta.nickname}</p>
-                      )}
-                      <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
-                        {student.meta.class && (
-                          <span className="flex items-center gap-1">
-                            <School className="w-4 h-4" />
-                            Lớp {student.meta.class}
-                          </span>
-                        )}
-                        <span className={student.meta.gender === "Nam" ? "text-blue-600 font-semibold" : "text-pink-600 font-semibold"}>
-                          {student.meta.gender}
-                        </span>
-                      </div>
-                    </div>
-
-                    <ChevronRight className="w-6 h-6 text-indigo-600 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                ))}
-              </div>
-            )}
+    <>
+      {/* Background nhẹ cho mobile */}
+      <div className="min-h-screen bg-gradient-to-b from-indigo-50 via-purple-50 to-pink-50">
+        <div className="pb-20 pt-6 px-4">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-indigo-800 flex items-center justify-center gap-3">
+              <Baby className="w-10 h-10 text-indigo-600" />
+              Các bé của bạn
+            </h1>
+            <p className="text-gray-600 mt-2">Chọn bé để xem thông tin chi tiết</p>
           </div>
-        </Card>
-      </div>
 
-      {/* Modal Chi Tiết */}
-      {selectedStudent && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-            <div className="relative">
-              <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-t-3xl p-8 text-white">
+          {/* Danh sách học sinh */}
+          <div className="space-y-4 max-w-md mx-auto">
+            {students.map((student) => (
+              <div
+                key={student.id}
+                onClick={() => setSelectedStudent(student)}
+                className="bg-white rounded-3xl shadow-lg overflow-hidden border border-gray-100 transform transition-all duration-200 active:scale-95"
+              >
+                <div className="p-5 flex items-center gap-4">
+                  {/* Avatar */}
+                  <div className="relative">
+                    <div className={`w-16 h-16 ${student.meta.gender === "Nam" ? "bg-gradient-to-br from-blue-400 to-blue-600" : "bg-gradient-to-br from-pink-400 to-rose-500"} rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-xl`}>
+                      {student.name.charAt(0)}
+                    </div>
+                    {student.meta.gender === "Nam" ? (
+                      <Mars className="w-6 h-6 text-blue-600 absolute -bottom-1 -right-1 bg-white rounded-full p-1 shadow" />
+                    ) : (
+                      <Venus className="w-6 h-6 text-pink-600 absolute -bottom-1 -right-1 bg-white rounded-full p-1 shadow" />
+                    )}
+                  </div>
+
+                  {/* Thông tin */}
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold text-gray-800">{student.name}</h3>
+                    {student.meta.nickname && (
+                      <p className="text-indigo-600 font-medium text-sm mt-0.5">"{student.meta.nickname}"</p>
+                    )}
+                    <div className="flex items-center gap-4 mt-2 text-sm">
+                      <span className="flex items-center gap-1 text-gray-600">
+                        <School className="w-4 h-4 text-green-600" />
+                        Lớp {student.meta.class}
+                      </span>
+                      <span className={`font-bold ${student.meta.gender === "Nam" ? "text-blue-600" : "text-pink-600"}`}>
+                        {student.meta.gender === "Nam" ? "♂" : "♀"} {student.meta.gender}
+                      </span>
+                    </div>
+                  </div>
+
+                  <ChevronRight className="w-7 h-7 text-indigo-500" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Modal Chi tiết - Full màn hình mobile style */}
+        {selectedStudent && (
+          <div className="fixed inset-0 bg-black/60 z-50 flex items-end justify-center">
+            <div className="bg-white w-full max-w-md rounded-t-3xl overflow-hidden animate-slide-up max-h-[95vh]">
+              {/* Header gradient */}
+              <div className="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 pt-10 pb-12 px-6 relative">
                 <button
                   onClick={() => setSelectedStudent(null)}
-                  className="absolute top-4 right-4 bg-white/20 hover:bg-white/30 rounded-full p-2 transition-all"
+                  className="absolute top-4 right-4 bg-white/30 backdrop-blur-sm hover:bg-white/40 rounded-full p-2 transition-all"
                 >
-                  <X className="w-6 h-6" />
+                  <X className="w-6 h-6 text-white" />
                 </button>
 
-                <div className="flex flex-col items-center mt-4">
-                  <div className={`w-28 h-28 ${selectedStudent.meta.gender === "Nam" ? "bg-blue-300" : "bg-pink-300"} rounded-full flex items-center justify-center text-white text-5xl font-bold shadow-xl border-4 border-white`}>
+                <div className="flex flex-col items-center text-white">
+                  <div className={`w-32 h-32 ${selectedStudent.meta.gender === "Nam" ? "bg-blue-400" : "bg-pink-400"} rounded-full flex items-center justify-center text-white text-6xl font-bold shadow-2xl border-8 border-white/50`}>
                     {selectedStudent.name.charAt(0)}
                   </div>
-                  <h2 className="text-3xl font-bold mt-4">{selectedStudent.name}</h2>
+                  <h2 className="text-3xl font-bold mt-5">{selectedStudent.name}</h2>
                   {selectedStudent.meta.nickname && (
-                    <p className="text-lg opacity-90 mt-1">"{selectedStudent.meta.nickname}"</p>
+                    <p className="text-xl opacity-90 mt-1 italic">"{selectedStudent.meta.nickname}"</p>
                   )}
                 </div>
               </div>
 
-              <div className="p-6 space-y-6">
-                <div className="space-y-5">
-
-                  {/* Mã học sinh */}
+              {/* Nội dung */}
+              <div className="px-6 pb-8 -mt-6">
+                <div className="bg-white rounded-3xl shadow-xl p-6 space-y-6 -mt-12 relative z-10">
                   {selectedStudent.meta.studentCode && (
-                    <div className="flex items-center gap-4">
-                      <User className="w-6 h-6 text-indigo-600" />
-                      <div>
-                        <p className="text-sm text-gray-500">Mã học sinh</p>
-                        <p className="font-bold text-gray-800">{selectedStudent.meta.studentCode}</p>
-                      </div>
-                    </div>
+                    <InfoRow icon={<User className="w-6 h-6 text-indigo-600" />} label="Mã học sinh" value={selectedStudent.meta.studentCode} />
                   )}
-
-                  {/* Lớp học */}
                   {selectedStudent.meta.class && (
-                    <div className="flex items-center gap-4">
-                      <School className="w-6 h-6 text-green-600" />
-                      <div>
-                        <p className="text-sm text-gray-500">Lớp học</p>
-                        <p className="font-bold text-gray-800">Lớp {selectedStudent.meta.class}</p>
-                      </div>
-                    </div>
+                    <InfoRow icon={<School className="w-6 h-6 text-green-600" />} label="Lớp học" value={`Lớp ${selectedStudent.meta.class}`} />
                   )}
-
-                  {/* Ngày sinh */}
                   {selectedStudent.meta.birthday && (
-                    <div className="flex items-center gap-4">
-                      <Calendar className="w-6 h-6 text-purple-600" />
-                      <div>
-                        <p className="text-sm text-gray-500">Ngày sinh</p>
-                        <p className="font-bold text-gray-800">{selectedStudent.meta.birthday}</p>
-                      </div>
-                    </div>
+                    <InfoRow icon={<Calendar className="w-6 h-6 text-purple-600" />} label="Ngày sinh" value={selectedStudent.meta.birthday} />
                   )}
-
-                  {/* Giới tính - ĐẸP NHẤT */}
-                  <div className="flex items-center gap-4">
-                    {selectedStudent.meta.gender === "Nam" ? (
-                      <Mars className="w-8 h-8 text-blue-600" strokeWidth={2.5} />
-                    ) : (
-                      <Venus className="w-8 h-8 text-pink-600" strokeWidth={2.5} />
-                    )}
-                    <div>
-                      <p className="text-sm text-gray-500">Giới tính</p>
-                      <p className={`text-xl font-bold ${selectedStudent.meta.gender === "Nam" ? "text-blue-600" : "text-pink-600"}`}>
-                        {selectedStudent.meta.gender}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Các thông tin khác giữ nguyên... */}
+                  <InfoRow
+                    icon={selectedStudent.meta.gender === "Nam" ? <Mars className="w-8 h-8 text-blue-600" /> : <Venus className="w-8 h-8 text-pink-600" />}
+                    label="Giới tính"
+                    value={<span className={`text-2xl font-bold ${selectedStudent.meta.gender === "Nam" ? "text-blue-600" : "text-pink-600"}`}>{selectedStudent.meta.gender}</span>}
+                  />
                   {selectedStudent.meta.parentName && (
-                    <div className="flex items-center gap-4">
-                      <UserCircle2 className="w-6 h-6 text-indigo-600" />
-                      <div>
-                        <p className="text-sm text-gray-500">Phụ huynh</p>
-                        <p className="font-bold text-gray-800">{selectedStudent.meta.parentName}</p>
-                      </div>
-                    </div>
+                    <InfoRow icon={<UserCircle2 className="w-6 h-6 text-indigo-600" />} label="Phụ huynh" value={selectedStudent.meta.parentName} />
                   )}
-
                   {selectedStudent.meta.phone && (
-                    <div className="flex items-center gap-4">
-                      <svg className="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                      </svg>
-                      <div>
-                        <p className="text-sm text-gray-500">Số điện thoại</p>
-                        <p className="font-bold text-gray-800">{selectedStudent.meta.phone}</p>
-                      </div>
-                    </div>
+                    <InfoRow icon={<Phone className="w-6 h-6 text-green-600" />} label="Số điện thoại" value={selectedStudent.meta.phone} />
                   )}
-
                   {selectedStudent.meta.address && (
-                    <div className="flex items-start gap-4">
-                      <svg className="w-6 h-6 text-orange-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                      </svg>
-                      <div>
-                        <p className="text-sm text-gray-500">Địa chỉ</p>
-                        <p className="font-bold text-gray-800">{selectedStudent.meta.address}</p>
-                      </div>
-                    </div>
+                    <InfoRow icon={<MapPin className="w-6 h-6 text-orange-600" />} label="Địa chỉ" value={selectedStudent.meta.address} />
                   )}
                 </div>
 
-                <div className="pt-6 text-center">
+                <div className="mt-8 text-center">
                   <button
                     onClick={() => setSelectedStudent(null)}
-                    className="bg-indigo-600 text-white px-10 py-3 rounded-full hover:bg-indigo-700 transition-all font-semibold text-lg"
+                    className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-12 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl active:scale-95 transition-all"
                   >
                     Đóng
                   </button>
@@ -252,8 +197,32 @@ export function StudentPage() {
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
+
+      {/* Animation cho modal */}
+      <style jsx>{`
+        @keyframes slide-up {
+          from { transform: translateY(100%); }
+          to { transform: translateY(0); }
+        }
+        .animate-slide-up {
+          animation: slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+      `}</style>
+    </>
+  );
+}
+
+// Component nhỏ để tái sử dụng
+function InfoRow({ icon, label, value }: { icon: React.ReactNode; label: string; value: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-4 py-2">
+      {icon}
+      <div className="flex-1">
+        <p className="text-sm text-gray-500">{label}</p>
+        <p className="font-semibold text-gray-800 text-lg">{value}</p>
+      </div>
     </div>
   );
 }
