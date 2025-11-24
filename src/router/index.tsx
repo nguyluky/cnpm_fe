@@ -20,6 +20,7 @@ import { RootLayout } from "../layouts/RootLayout";
 import ScheduleAdminTable from "../pages/admin/test_ui";
 // import DriverNotifications from "../pages/driver/Notifications"
 import { MapDriver } from "../pages/driver/Map";
+import { DriverHome } from "../pages/driver/Home";
 
 import NotificationsPage from "../pages/driver/NotificationsPage";
 import { GetAllStudent } from "../pages/admin/Students/getAllStudent";
@@ -123,10 +124,10 @@ export const router = createBrowserRouter([
         path: path.DRIVER,
         element: <DriverLayout />,
         children: [
-          // {
-          //     index: true,
-          //     element: <DriverHome />
-          // },
+          {
+              index: true,
+              element: <DriverHome />
+          },
           // {
           //     path: path.DRIVER_SCHEDULE,
           //     element: <DriverSchedule />
