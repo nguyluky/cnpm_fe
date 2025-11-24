@@ -8,6 +8,7 @@ import { useParams } from "react-router";
 import * as turf from '@turf/turf';
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+
 function splitRouteByPosition(coordinates: [number, number][], userLngLat: [number, number]) {
     const line = turf.lineString(coordinates);
     const userPoint = turf.point(userLngLat);
@@ -113,7 +114,7 @@ export function MapDriver() {
         },
         onSuccess: (data) => {
             setNextStopIndex(0);
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
             queryClient.setQueryData(['trip-info', id], (old: any) => {
                 if (!old) return old;
                 return {
@@ -131,7 +132,7 @@ export function MapDriver() {
             return res.data.data;
         },
         onSuccess: (data) => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
             queryClient.setQueryData(['trip-info', id], (old: any) => {
                 if (!old) return old;
                 return {
@@ -157,10 +158,11 @@ export function MapDriver() {
             return res.data.data;
         },
         onSuccess: () => {
-            queryClient.setQueryData(['trip-info', id], (old: any) => {
+            queryClient.setQueryData(['trip-info', id], (old: typeof tripInfo) => {
                 if (!old) return old;
-                const updatedStops = old.stops.map((stop: any) => {
-                    if (stop.id === stopId) {
+
+                const updatedStops = old.stops.map((stop) => {
+                    if (stop.id === tripInfo?.stops[nextStopIndex!].id) {
                         return {
                             ...stop,
                             status: "ARRIVED"
@@ -212,15 +214,25 @@ export function MapDriver() {
     useEffect(() => {
         if (!userPos) return;
         if (!tripInfo) return;
-        // if (tripInfo.rotute.path.length > 2) return;
 
         const { completed, remaining } = splitRouteByPosition(tripInfo.rotute.path, userPos);
 
-        if (tripInfo.status === "ONGOING" && updateTripPosition.status !== "pending") updateTripPosition.mutate({ longitude: userPos[0], latitude: userPos[1] });
+        const [longitude, latitude] = userPos;
+
+        const lastPos = lastUserPos.current;
+        if (lastPos) {
+            if (turf.distance(turf.point(lastPos), turf.point([longitude, latitude]), { units: 'meters' }) > 5) {
+                lastUserPos.current = [longitude, latitude];
+                if (tripInfo.status === "ONGOING" && updateTripPosition.status !== "pending") 
+                    updateTripPosition.mutate({ longitude: userPos[0], latitude: userPos[1] });
+            }
+        } {
+            lastUserPos.current = [longitude, latitude];
+        }
 
         setCompletedRoute(completed);
         setRemainingRoute(remaining);
-    }, [userPos, tripInfo, updateTripPosition]);
+    }, [userPos, tripInfo]);
 
     // watch user position
     useEffect(() => {
@@ -236,19 +248,15 @@ export function MapDriver() {
 
             let heading: number | null = null;
             if (lastUserPos.current) {
-                // map point to north-up heading
                 const lastPos = lastUserPos.current;
-                // heading = Math.atan2(
-                //     latitude - lastPos[1],
-                //     longitude - lastPos[0]
-                // ) * (180 / Math.PI);
                 const deltaLng = longitude - lastPos[0];
                 const deltaLat = latitude - lastPos[1];
                 heading = Math.atan2(deltaLng, deltaLat) * (180 / Math.PI);
                 if (heading < 0) heading += 360;
+
+                // cal distance from last position
             }
 
-            lastUserPos.current = [longitude, latitude];
             setUserPos([longitude, latitude]);
 
             if (mapRef.current && forceToMarker.current) {
@@ -258,16 +266,16 @@ export function MapDriver() {
                 const cavans = mapp.getCanvas();
                 const w = cavans.width;
                 const h = cavans.height;
-                const targetPixel: [number, number] = [w * 1.5/4, h * 1/2];
+                const targetPixel: [number, number] = [w * 1.5 / 4, h * 1 / 2];
 
                 const targetLngLat = mapp.unproject(targetPixel);
                 const center = mapp.getCenter();
 
-                let offsetLng: [number, number] = [
+                const offsetLng: [number, number] = [
                     center.lng - targetLngLat.lng,
                     center.lat - targetLngLat.lat
                 ]
-                
+
                 mapp.easeTo({
                     center: [
                         longitude - offsetLng[0],
@@ -284,7 +292,7 @@ export function MapDriver() {
         return () => {
             navigator.geolocation.clearWatch(watchId);
         }
-    }, []);
+    }, [tripInfo]);
 
 
     useEffect(() => {
@@ -374,14 +382,14 @@ export function MapDriver() {
                                     <div>
                                         <p className="text-xs text-gray-500">Current position</p>
                                         <p className="text-sm font-medium">
-                                            {userPos[1].toFixed(6)}, <br/> {userPos[0].toFixed(6)}
+                                            {userPos[1].toFixed(6)}, <br /> {userPos[0].toFixed(6)}
                                         </p>
                                     </div>
 
                                     <div>
                                         <p className="text-xs text-gray-500">Next stop</p>
                                         <p className="text-sm font-medium">{
-                                            nextStopIndex !== null && tripInfo ? 
+                                            nextStopIndex !== null && tripInfo ?
                                                 tripInfo.stops[nextStopIndex].name : "N/A"
                                         }</p>
                                     </div>
@@ -396,21 +404,21 @@ export function MapDriver() {
                                     <div>
                                         <p className="text-xs text-gray-500">Remaining</p>
                                         <p className="text-sm font-medium">
-                                            {nextStopIndex || "N/A"} / { tripInfo?.stops.length }
+                                            {nextStopIndex || "N/A"} / {tripInfo?.stops.length}
                                         </p>
                                     </div>
                                 </div>
 
                                 <div className="flex items-center gap-2">
                                     {
-                                    // <button
-                                    //     className="px-3 py-1 bg-sky-600 text-white rounded hover:opacity-90"
-                                    //     onClick={() => {
-                                    //
-                                    //     }}
-                                    // >
-                                    //     Go to next
-                                    // </button>
+                                        // <button
+                                        //     className="px-3 py-1 bg-sky-600 text-white rounded hover:opacity-90"
+                                        //     onClick={() => {
+                                        //
+                                        //     }}
+                                        // >
+                                        //     Go to next
+                                        // </button>
                                     }
                                     <button
                                         className="bg-sky-600 px-3 py-1 text-white rounded  hover:opacity-90"
@@ -535,7 +543,16 @@ export function MapDriver() {
                                             }
                                         </button>
                                     } else if (tripInfo?.status === "ONGOING") {
-                                        if (distanceToNextStop !== null && distanceToNextStop < 100) {
+                                        if (nextStopIndex !== null && tripInfo && tripInfo.stops[nextStopIndex].status === "ARRIVED") {
+                                            return <button className="px-4 w-full py-2 bg-blue-600 text-white rounded-lg hover:opacity-90" onClick={() => {
+                                                if (nextStopIndex === null || !tripInfo) return;
+                                                const nextStop = tripInfo.stops[nextStopIndex];
+                                                markCompleteStop.mutate(nextStop.id);
+                                            }} disabled={markCompleteStop.status === "pending"}>
+                                                {markCompleteStop.status === "pending" ? "Đang xử lý..." : "Rời khỏi điểm dừng"}
+                                            </button>
+                                        }
+                                        else if (distanceToNextStop !== null && distanceToNextStop < 100) {
                                             return <button className="px-4 w-full py-2 bg-green-600 text-white rounded-lg hover:opacity-90" onClick={() => {
                                                 if (nextStopIndex === null || !tripInfo) return;
                                                 const nextStop = tripInfo.stops[nextStopIndex];
@@ -545,15 +562,6 @@ export function MapDriver() {
                                                 {
                                                     markArriveStop.status === "pending" ? "Đang xử lý..." : "Đã đến điểm dừng"
                                                 }
-                                            </button>
-                                        }
-                                        else if (nextStopIndex !== null && tripInfo && tripInfo.stops[nextStopIndex].status === "ARRIVED") {
-                                            return <button className="px-4 w-full py-2 bg-blue-600 text-white rounded-lg hover:opacity-90" onClick={() => {
-                                                if (nextStopIndex === null || !tripInfo) return;
-                                                const nextStop = tripInfo.stops[nextStopIndex];
-                                                markCompleteStop.mutate(nextStop.id);
-                                            }} disabled={markCompleteStop.status === "pending"}>
-                                                {markCompleteStop.status === "pending" ? "Đang xử lý..." : "Rời khỏi điểm dừng"}
                                             </button>
                                         }
                                         else if (nextStopIndex === tripInfo.stops.length - 1 && tripInfo.stops[nextStopIndex].status === "DONE") {

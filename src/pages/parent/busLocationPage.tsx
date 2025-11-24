@@ -1,40 +1,112 @@
-import Map, { type MapRef } from "react-map-gl/mapbox";
-import { useRef, useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import Map, { Layer, type MapRef, Marker, NavigationControl, Source } from "react-map-gl/mapbox";
+import { useEffect, useRef, useState } from "react";
 import { ChevronUp, Search } from "lucide-react";
+import { useApi } from "../../contexts/apiConetxt";
 
-const mockStudent = [
-    {
-        id: 1,
-        name: "John Doe",
-        age: 10,
-        location: "123 Main St, Cityville",
-        avatarUrl: "https://avatar.iran.liara.run/public"
-    },
-    {
-        id: 2,
-        name: "Jane Smith",
-        age: 9,
-        location: "456 Oak Ave, Townsville",
-        avatarUrl: "https://avatar.iran.liara.run/public"
-    },
-    {
-        id: 3,
-        name: "Sam Johnson",
-        age: 11,
-        location: "789 Pine Rd, Villagetown",
-        avatarUrl: "https://avatar.iran.liara.run/public"
-    }
-]
+import { useQuery } from "@tanstack/react-query";
+import { useSocketIo } from "../../hooks/useSocketIo";
+
+interface Student {
+    id: string;
+    name: string;
+
+    meta: any;
+}
 
 export function BusLocationPage() {
+    const api = useApi();
     const mapRef = useRef<MapRef>(null);
+    const { socket, connected } = useSocketIo();
     const [viewState, setViewState] = useState({
         longitude: 106.660172,
         latitude: 10.762622,
         zoom: 12
     });
-    const [selectedStudent, setSelectedStudent] = useState(mockStudent[0]);
+    const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
     const [showStudentList, setShowStudentList] = useState(false);
+    const [busLocation, setBusLocation] = useState<{ lat: number; lng: number } | null>(null);
+    const focusedToMarker = useRef(false);
+
+    const { data: students } = useQuery({
+        queryKey: ['student-info'],
+        queryFn: async () => {
+            const response = await api.api.getStudentsForParent();
+            console.log(response.data.data?.data);
+            setSelectedStudent(response.data.data?.data[0] || null);
+            return response.data.data?.data;
+        },
+    });
+
+    const {data: selectedStudentId} = useQuery({
+        queryKey: ['selected-student-id', selectedStudent?.id],
+        queryFn: async () => {
+            const response = await api.api.getStudentInfoForParent(selectedStudent?.id || '');
+            return response.data.data;
+        },
+    });
+
+    // how to stop refetching where 404
+    const { data: tripData } = useQuery({
+        queryKey: ['trip-info', selectedStudent?.id],
+        queryFn: async () => {
+            if (!selectedStudent) return null;
+            const response = await api.api.getTodaysTripForStudent(selectedStudent.id);
+
+            return response.data.data;
+        },
+        retry: (failureCount, error) => {
+            // Stop retrying on 404 errors
+            if ((error as any).status == 404) return false;
+            return failureCount < 3;
+        },
+    })
+
+    useEffect(() => {
+        // center path on map
+        if (tripData?.route?.path && tripData.route.path.length > 0) {
+            const coordinates = tripData.route.path;
+            const lons = coordinates.map(coord => coord[0]);
+            const lats = coordinates.map(coord => coord[1]);
+            const minLon = Math.min(...lons);
+            const maxLon = Math.max(...lons);
+            const minLat = Math.min(...lats);
+            const maxLat = Math.max(...lats);
+
+            mapRef.current?.fitBounds(
+                [
+                    [minLon, minLat],
+                    [maxLon, maxLat]
+                ],
+                { padding: 40 }
+            );
+        }
+    }, [tripData]);
+
+    useEffect(() => {
+        console.log('Socket connected:', socket, connected);
+        if (!socket || !tripData?.tripId || !connected) return;
+        console.log('Joining trip room:', tripData.tripId);
+
+        socket.emit('joinTripRoom', tripData?.tripId || '');
+
+        const handleTripUpdate = ({ lat, lng }: { lat: number; lng: number; }) => {
+            setBusLocation({ lat, lng });
+            if (focusedToMarker.current) {
+                mapRef.current?.flyTo({
+                    center: [lng, lat],
+                    essential: true
+                });
+            }
+        };
+
+        socket.on('LiveLocationUpdate', handleTripUpdate);
+
+        return () => {
+            socket.off('UpdateLocation', handleTripUpdate);
+        };
+
+    }, [tripData?.tripId, socket, connected]);
 
     return <>
         <Map
@@ -42,9 +114,108 @@ export function BusLocationPage() {
             {...viewState}
             mapboxAccessToken="pk.eyJ1Ijoibmd1eWx1a3kxIiwiYSI6ImNtZ2Yxb2hoMjAzbW8yam9teHN1MGhiYXYifQ.5gyVRqeLYNO0lXUYIRgpJQ"
             mapStyle="mapbox://styles/mapbox/streets-v9"
-            onMove={evt => setViewState(evt.viewState)}
+            onMove={evt => {
+                setViewState(evt.viewState)
+            }}
+            onDrag={() => {
+                focusedToMarker.current = false;
+            }}
         >
+            {
+                // drawn path of bus
+            }
+            <Source id="route" type="geojson" data={
+                {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {
+                        "type": "LineString",
+                        "coordinates": tripData ? tripData.route.path || [] : []
+                    }
+                }
+            }>
+                <Layer
+                    id="route-layer"
+                    type="line"
+                    paint={{
+                        "line-color": "#007cbf",
+                        "line-width": 6
+                    }}
+                />
+            </Source>
+
+            <Marker
+                longitude={busLocation ? busLocation.lng : (tripData && tripData.route.path.length > 0 ? tripData.route.path[0][0] : 106.660172)}
+                latitude={busLocation ? busLocation.lat : (tripData && tripData.route.path.length > 0 ? tripData.route.path[0][1] : 10.762622)}
+                anchor="center"
+            >
+                <div className="w-8 h-8 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center">
+                    {
+                        // bus icon
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v3a2 2 0 002 2h1v3H4a2 2 0 00-2 2v1a1 1 0 001 1h1a3 3 0 006 0h4a3 3 0 006 0h1a1 1 0 001-1v-1a2 2 0 00-2-2h-1v-3h1a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 00-1-1H6zm0 2h8v2H6V4zm0 4h8v3H6V8zm0 5h8v3H6v-3z" />
+                        </svg>
+                    }
+                </div>
+            </Marker>
+
+
+            {
+                // bus stops markers
+            }
+            <Source id="stops" type="geojson" data={
+                {
+                    type: "Feature",
+                    properties: {
+                        name: tripData?.stopPoint.stopName || ''
+                    },
+                    geometry: {
+                        type: "Point",
+                        coordinates: tripData ? [tripData.stopPoint.pos[1], tripData.stopPoint.pos[0]] : [0, 0]
+                    },
+                }
+            }>
+                <Layer
+                    id="stops-layer"
+                    type="circle"
+                    paint={{
+                        "circle-radius": 8,
+                        "circle-color": "#FF0000",
+                        "circle-stroke-width": 2,
+                        "circle-stroke-color": "#FFFFFF"
+                    }}
+                />
+            </Source>
+
+            {
+
+                // <NavigationControl style={{
+                //     marginTop: 90,
+                //     marginLeft: 10
+                // }} 
+                // />
+            }
         </Map>
+
+        {
+            // center to bus location button
+        }
+        <div className="absolute top-20 right-4 bg-white bg-opacity-90 rounded-full shadow-lg p-2 cursor-pointer hover:bg-blue-500 hover:text-white transition"
+            onClick={() => {
+                if (busLocation) {
+                    mapRef.current?.flyTo({
+                        center: [busLocation.lng, busLocation.lat],
+                        zoom: 15,
+                        essential: true
+                    });
+                    focusedToMarker.current = true;
+                }
+            }}
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m0 14v1m8-8h1M4 12H3m15.364-6.364l.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+        </div>
 
         {
             // student info overlay
@@ -53,7 +224,7 @@ export function BusLocationPage() {
             <div className="relative w-full" >
                 <div className="flex items-center space-x-4">
                     <img
-                        src={selectedStudent?.avatarUrl}
+                        src="https://avatar.iran.liara.run/public"
                         alt="Student Avatar"
                         className="w-16 h-16 rounded-full border-2 border-blue-500"
                     />
@@ -62,9 +233,16 @@ export function BusLocationPage() {
                             {selectedStudent?.name}
                         </h2>
                         <p className="text-xs text-gray-600">
-                            Age: {selectedStudent?.age}
+                            Age: {selectedStudent?.meta?.age}
                         </p>
-                        <p className="text-xs text-gray-600 truncate">Location: {selectedStudent?.location}</p>
+                        <p className="text-xs text-gray-600 truncate">
+                            Status: {tripData ? (() => {
+                                if (!selectedStudentId?.assignment.pickupStop) {
+                                    return "On Going to School";
+                                }
+                                return "Pending Pickup";
+                            })() : 'No trip today'}
+                        </p>
                     </div>
                 </div>
 
@@ -76,9 +254,9 @@ export function BusLocationPage() {
                 </div>
             </div>
             {
-                showStudentList &&
+                (showStudentList && students) &&
                 <div className="absolute bottom-full left-0 w-full bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto z-20">
-                    {mockStudent.map((student) => (
+                    {students.map((student) => (
                         <div
                             key={student.id}
                             className="flex items-center space-x-4 p-2 hover:bg-gray-100 cursor-pointer"
@@ -88,7 +266,7 @@ export function BusLocationPage() {
                             }}
                         >
                             <img
-                                src={student.avatarUrl}
+                                src="https://avatar.iran.liara.run/public"
                                 alt="Student Avatar"
                                 className="w-10 h-10 rounded-full border-2 border-blue-500"
                             />
@@ -97,7 +275,7 @@ export function BusLocationPage() {
                                     {student.name}
                                 </h3>
                                 <p className="text-xs text-gray-600">
-                                    Age: {student.age}
+                                    Age: {student.meta.age}
                                 </p>
                             </div>
                         </div>
@@ -122,6 +300,5 @@ export function BusLocationPage() {
             />
             <Search className="w-6 h-6 text-gray-500 m-2" />
         </div>
-
     </>
 }

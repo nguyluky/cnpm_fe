@@ -20,7 +20,6 @@ import ScheduleAdminTable from "../pages/admin/test_ui"
 import { MapDriver } from "../pages/driver/Map"
 
 import NotificationsPage from "../pages/driver/NotificationsPage"
-import { KeepAlive } from "react-activation"
 
 export const path = {
     INDEX: "/",
@@ -66,9 +65,7 @@ export const router = createBrowserRouter([
                 children: [
                     {
                         index: true,
-                        element: <KeepAlive>
-                            <BusLocationPage />
-                        </KeepAlive>
+                        element: <BusLocationPage />
                     },
                     {
                         path: path.PARENT_NOTIFICATIONS,

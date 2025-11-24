@@ -14,11 +14,13 @@ import type {
   AnyObject,
   BusData,
   BusInfo,
+  BusMetadata,
   GeoLocation,
   PaginationMetaData,
   RouteData,
-  StopPointsData,
   StopPointsMeta,
+  StudentInfoReqAssignmetStop,
+  StudentMetadata,
   TimeTable,
 } from "./data-contracts";
 import { ContentType, HttpClient, type RequestParams } from "./http-client";
@@ -392,7 +394,7 @@ export class Api<
     data: {
       licensePlate: string;
       capacity: number;
-      metadata: AnyObject;
+      metadata: BusMetadata;
     },
     params: RequestParams = {},
   ) =>
@@ -414,7 +416,7 @@ export class Api<
           id: string;
           licensePlate: string;
           capacity: number;
-          metadata: AnyObject;
+          metadata: BusMetadata;
         };
       },
       | {
@@ -480,8 +482,7 @@ export class Api<
           id: string;
           licensePlate: string;
           capacity: number;
-          metadata: AnyObject;
-          test: string;
+          metadata: BusMetadata;
         };
       },
       | {
@@ -510,6 +511,80 @@ export class Api<
       path: `/api/buses/${id}`,
       method: "GET",
       secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags BusesController
+ * @name UpdateABus
+ * @summary Update a bus
+ * @request PUT:/api/buses/{id}
+ * @secure*/
+
+  /**
+   */
+
+  updateABus = (
+    id: string,
+    data: {
+      licensePlate: string;
+      capacity: number;
+      metadata: BusMetadata;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          /**
+           * @format uuid
+           * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$
+           */
+          id: string;
+          licensePlate: string;
+          capacity: number;
+          metadata: BusMetadata;
+        };
+      },
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
+    >({
+      path: `/api/buses/${id}`,
+      method: "PUT",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
       format: "json",
       ...params,
     });
@@ -2044,7 +2119,7 @@ export class Api<
  * @tags ParentController
  * @name GetStudentsForParent
  * @summary Get students for parent
- * @request GET:/api/parents/getStudents
+ * @request GET:/api/parents/students
  * @secure*/
 
   /**
@@ -2065,8 +2140,7 @@ export class Api<
           data: {
             id: string;
             name: string;
-            stopPoint: StopPointsData;
-            status: "PENDING" | "PICKED_UP" | "DROPPED_OFF" | "MISSED";
+            meta: any;
           }[];
           total: number;
         };
@@ -2094,9 +2168,221 @@ export class Api<
           name?: string;
         }
     >({
-      path: `/api/parents/getStudents`,
+      path: `/api/parents/students`,
       method: "GET",
       secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags ParentController
+ * @name GetStudentInfoForParent
+ * @summary Get student info for parent
+ * @request GET:/api/parents/student-info/{studentId}
+ * @secure*/
+
+  /**
+   */
+
+  getStudentInfoForParent = (studentId: string, params: RequestParams = {}) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          studentId: string;
+          name: string;
+          assignment: {
+            pickupStop?: StudentInfoReqAssignmetStop;
+            dropoffStop?: StudentInfoReqAssignmetStop;
+          };
+        };
+      },
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
+    >({
+      path: `/api/parents/student-info/${studentId}`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags ParentController
+ * @name GetTodaysTripForStudent
+ * @summary Get todays trip for student
+ * @request GET:/api/parents/today-trip/{studentId}*/
+
+  /**
+   */
+
+  getTodaysTripForStudent = (studentId: string, params: RequestParams = {}) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          tripId: string;
+          status: "ONGOING" | "COMPLETED" | "PENDING";
+          type: "DISPATCH" | "RETURN";
+          route: {
+            routeId: string;
+            routeName: string;
+            path: any[];
+          };
+          stopPoint: {
+            stopId: string;
+            stopName: string;
+            pos: any[];
+          };
+        };
+      },
+      {
+        /**
+         * HTTP status code of the error
+         * @min 400
+         * @max 599
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        /** Error class name */
+        name?: string;
+      }
+    >({
+      path: `/api/parents/today-trip/${studentId}`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags ParentController
+ * @name GetStudentAttendanceForToday
+ * @summary Get student attendance for today
+ * @request GET:/api/parents/student/{studentId}/attendance/today*/
+
+  /**
+   */
+
+  getStudentAttendanceForToday = (
+    studentId: string,
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          studentId: string;
+          tripId?: string;
+          status?: "PENDING" | "PICKED_UP" | "DROPPED_OFF" | "MISSED";
+          pickupTime?: string;
+          dropoffTime?: string;
+        };
+      },
+      any
+    >({
+      path: `/api/parents/student/${studentId}/attendance/today`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags ParentController
+ * @name UpdateStudentAssignmentForParent
+ * @summary Update student assignment for parent
+ * @request POST:/api/parents/student/{studentId}/assignment*/
+
+  /**
+   */
+
+  updateStudentAssignmentForParent = (
+    studentId: string,
+    data: {
+      routeId: string;
+      stopId: string;
+      direction: "PICKUP" | "DROPOFF";
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+      },
+      {
+        /**
+         * HTTP status code of the error
+         * @min 400
+         * @max 599
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        /** Error class name */
+        name?: string;
+      }
+    >({
+      path: `/api/parents/student/${studentId}/assignment`,
+      method: "POST",
+      body: data,
+      type: ContentType.Json,
       format: "json",
       ...params,
     });
@@ -2125,7 +2411,16 @@ export class Api<
         /** Human-readable error message */
         message?: string;
         data?: {
-          data: StopPointsData[];
+          data: {
+            /**
+             * @format uuid
+             * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$
+             */
+            id: string;
+            name: string;
+            location: GeoLocation;
+            meta: StopPointsMeta;
+          }[];
           total: number;
         };
       },
@@ -2409,6 +2704,393 @@ export class Api<
         }
     >({
       path: `/api/stoppoints/stoppoints/${id}`,
+      method: "DELETE",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags StudentsController
+ * @name GetAllStudents
+ * @summary Get all students
+ * @request GET:/api/students/
+ * @secure*/
+
+  /**
+   */
+
+  getAllStudents = (
+    query?: {
+      /** Search term to filter results */
+      search?: string;
+      /**
+       * Page number, minimum is 1
+       * @min 1
+       * @default 1
+       */
+      page?: number;
+      /**
+       * Number of items per page, minimum is 1 and maximum is 100
+       * @min 1
+       * @max 100
+       * @default 10
+       */
+      limit?: number;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          data: {
+            /**
+             * @format uuid
+             * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$
+             */
+            id: string;
+            name: string;
+            /**
+             * @format date-time
+             * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+             */
+            createdAt: string;
+            /**
+             * @format date-time
+             * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+             */
+            updatedAt: string;
+            metadata: StudentMetadata;
+          }[];
+          meta: PaginationMetaData;
+        };
+      },
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
+    >({
+      path: `/api/students/`,
+      method: "GET",
+      query: query,
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags StudentsController
+ * @name CreateANewStudent
+ * @summary Create a new student
+ * @request POST:/api/students/
+ * @secure*/
+
+  /**
+   */
+
+  createANewStudent = (
+    data: {
+      name: string;
+      userId: string;
+      metadata: StudentMetadata;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          /**
+           * @format uuid
+           * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$
+           */
+          id: string;
+          name: string;
+          /**
+           * @format date-time
+           * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+           */
+          createdAt: string;
+          /**
+           * @format date-time
+           * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+           */
+          updatedAt: string;
+          metadata: StudentMetadata;
+        };
+      },
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
+    >({
+      path: `/api/students/`,
+      method: "POST",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags StudentsController
+ * @name GetStudentById
+ * @summary Get student by ID
+ * @request GET:/api/students/{id}
+ * @secure*/
+
+  /**
+   */
+
+  getStudentById = (id: string, params: RequestParams = {}) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          /**
+           * @format uuid
+           * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$
+           */
+          id: string;
+          name: string;
+          /**
+           * @format date-time
+           * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+           */
+          createdAt: string;
+          /**
+           * @format date-time
+           * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+           */
+          updatedAt: string;
+          metadata: StudentMetadata;
+        };
+      },
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
+    >({
+      path: `/api/students/${id}`,
+      method: "GET",
+      secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags StudentsController
+ * @name UpdateAStudent
+ * @summary Update a student
+ * @request PUT:/api/students/{id}
+ * @secure*/
+
+  /**
+   */
+
+  updateAStudent = (
+    id: string,
+    data: {
+      name: string;
+      metadata: StudentMetadata;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          /**
+           * @format uuid
+           * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$
+           */
+          id: string;
+          name: string;
+          /**
+           * @format date-time
+           * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+           */
+          createdAt: string;
+          /**
+           * @format date-time
+           * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
+           */
+          updatedAt: string;
+          metadata: StudentMetadata;
+        };
+      },
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
+    >({
+      path: `/api/students/${id}`,
+      method: "PUT",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags StudentsController
+ * @name DeleteAStudent
+ * @summary Delete a student
+ * @request DELETE:/api/students/{id}
+ * @secure*/
+
+  /**
+   */
+
+  deleteAStudent = (id: string, params: RequestParams = {}) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+      },
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
+    >({
+      path: `/api/students/${id}`,
       method: "DELETE",
       secure: true,
       format: "json",
