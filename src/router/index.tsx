@@ -15,11 +15,11 @@ import { NotiPage } from "../pages/parent/notiPage";
 import { StudentPage } from "../pages/parent/studentPage";
 import { StopsPointsPage } from "../pages/stopPoint";
 // import { AddSchedulePage } from "../pages/admin/test_ui1"
-import { DriverLayout } from "../layouts/DriverLayout";
-import { RootLayout } from "../layouts/RootLayout";
-import ScheduleAdminTable from "../pages/admin/test_ui";
+import { DriverLayout } from "../layouts/DriverLayout"
+import { RootLayout } from "../layouts/RootLayout"
+import ScheduleAdminTable from "../pages/admin/test_ui"
 // import DriverNotifications from "../pages/driver/Notifications"
-import { MapDriver } from "../pages/driver/Map";
+import { MapDriver } from "../pages/driver/Map"
 
 import NotificationsPage from "../pages/driver/NotificationsPage";
 import { GetAllStudent } from "../pages/admin/Students/getAllStudent";

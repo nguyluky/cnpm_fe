@@ -8,16 +8,19 @@ import {
     QueryClient,
     QueryClientProvider,
 } from '@tanstack/react-query'
+import { SocketProvider } from './contexts/socketContext.tsx';
 
 const queryClient = new QueryClient()
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <>
-            <QueryClientProvider client={queryClient}>
-                <ToastContainer />
-                <RouterProvider router={router} />
-            </QueryClientProvider>
+            <SocketProvider url={"http://localhost:3000"}>
+                <QueryClientProvider client={queryClient}>
+                    <ToastContainer />
+                    <RouterProvider router={router} />
+                </QueryClientProvider>
+            </SocketProvider>
         </>
     </StrictMode>,
 )

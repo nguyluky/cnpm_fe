@@ -17,6 +17,32 @@ export interface GeoLocation {
   longitude: number;
 }
 
+export interface BusMetadata {
+  color?: string;
+  brand?: string;
+  madeYear?: number;
+  camera?: boolean;
+}
+
+export interface BusInfo {
+  id: string;
+  licensePlate: string;
+}
+
+export interface StudentInfoReqAssignmetStop {
+  id: string;
+  name: string;
+  routeId: string;
+}
+
+export interface StudentAssignment {
+  id: string;
+  busId: string;
+  stopPointId: string;
+  effectiveFrom: string;
+  effectiveTo: string;
+}
+
 export interface AnyObject {
   __?: string;
 }
@@ -36,7 +62,7 @@ export interface BusData {
   id: string;
   licensePlate: string;
   capacity: number;
-  metadata: AnyObject;
+  metadata: BusMetadata;
 }
 
 export interface RouteData {
@@ -66,22 +92,6 @@ export interface TimeTable {
   departureTime: string;
 }
 
-export interface BusInfo {
-  id: string;
-  licensePlate: string;
-}
-
-export interface StopPointsData {
-  /**
-   * @format uuid
-   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$
-   */
-  id: string;
-  name: string;
-  location: GeoLocation;
-  meta: StopPointsMeta;
-}
-
 export interface StopPointsMeta {
   zone?: string;
   ward?: string;
@@ -90,4 +100,15 @@ export interface StopPointsMeta {
   supportDisability?: string;
   status?: string;
   search?: string;
+}
+
+export interface StudentMetadata {
+  gender?: string;
+  birthday?: string;
+  school?: string;
+  emergencyContact?: {
+    name: string;
+    phone: string;
+    relation: string;
+  };
 }
