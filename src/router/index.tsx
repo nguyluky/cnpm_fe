@@ -128,10 +128,10 @@ export const router = createBrowserRouter([
               index: true,
               element: <DriverHome />
           },
-          // {
-          //     path: path.DRIVER_SCHEDULE,
-          //     element: <DriverSchedule />
-          // },
+          {
+              path: path.DRIVER_SCHEDULE,
+              element: <HomePage />
+          },
           // {
           //     path: path.DRIVER_QR_ROLL_CALL,
           //     element: <QRRollCall />
