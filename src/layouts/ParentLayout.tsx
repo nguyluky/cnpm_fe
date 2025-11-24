@@ -3,8 +3,16 @@ import { Outlet } from 'react-router';
 import { Sidebar } from "../components/uiPart/Sidebar";
 // import { Header } from "../components/uiPart/Header";
 import { useLocation } from "react-router-dom";
+import { useApi } from '../contexts/apiConetxt';
+import { Forbidden } from '../pages/403Page';
 
 export function ParentLayout() {
+  const {api} = useApi();
+
+  const securityData = api.getSecurityData();
+  if (!securityData || securityData.roles.indexOf('admin') <= -1) {
+      return <Forbidden />;
+  }
   const location = useLocation();
   const pathname: Record<string, string> = {
     '/parent': 'Theo doi xe Bus',
