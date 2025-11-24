@@ -13,7 +13,7 @@ export const DriverLayout: React.FC<DriverLayoutProps> = ({ children }) => {
     const {api} = useApi();
   
     const securityData = api.getSecurityData();
-    if (!securityData || securityData.roles.indexOf('admin') <= -1) {
+    if (!securityData || securityData.roles.indexOf('driver') <= -1) {
       return <Forbidden />;
     }
   return (
