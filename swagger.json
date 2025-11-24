@@ -40,6 +40,96 @@
         "additionalProperties": false,
         "id": "GeoLocation"
       },
+      "BusMetadata": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "color": {
+            "type": "string"
+          },
+          "brand": {
+            "type": "string"
+          },
+          "madeYear": {
+            "type": "number"
+          },
+          "camera": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false,
+        "id": "BusMetadata"
+      },
+      "BusInfo": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "licensePlate": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "licensePlate"
+        ],
+        "additionalProperties": false,
+        "id": "BusInfo"
+      },
+      "student_infoReqAssignmet_Stop": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "routeId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "routeId"
+        ],
+        "additionalProperties": false,
+        "id": "student_infoReqAssignmet_Stop"
+      },
+      "StudentAssignment": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "busId": {
+            "type": "string"
+          },
+          "stopPointId": {
+            "type": "string"
+          },
+          "effectiveFrom": {
+            "type": "string"
+          },
+          "effectiveTo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "busId",
+          "stopPointId",
+          "effectiveFrom",
+          "effectiveTo"
+        ],
+        "additionalProperties": false,
+        "id": "StudentAssignment"
+      },
       "AnyObject": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -93,7 +183,7 @@
             "type": "number"
           },
           "metadata": {
-            "$ref": "#/components/schemas/AnyObject"
+            "$ref": "#/components/schemas/BusMetadata"
           }
         },
         "required": [
@@ -179,52 +269,6 @@
         "additionalProperties": false,
         "id": "TimeTable"
       },
-      "BusInfo": {
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string"
-          },
-          "licensePlate": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "id",
-          "licensePlate"
-        ],
-        "additionalProperties": false,
-        "id": "BusInfo"
-      },
-      "StopPointsData": {
-        "$schema": "https://json-schema.org/draft/2020-12/schema",
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
-          },
-          "name": {
-            "type": "string"
-          },
-          "location": {
-            "$ref": "#/components/schemas/GeoLocation"
-          },
-          "meta": {
-            "$ref": "#/components/schemas/StopPointsMeta"
-          }
-        },
-        "required": [
-          "id",
-          "name",
-          "location",
-          "meta"
-        ],
-        "additionalProperties": false,
-        "id": "StopPointsData"
-      },
       "StopPointsMeta": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -253,6 +297,43 @@
         },
         "additionalProperties": false,
         "id": "StopPointsMeta"
+      },
+      "StudentMetadata": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "gender": {
+            "type": "string"
+          },
+          "birthday": {
+            "type": "string"
+          },
+          "school": {
+            "type": "string"
+          },
+          "emergencyContact": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "phone": {
+                "type": "string"
+              },
+              "relation": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name",
+              "phone",
+              "relation"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false,
+        "id": "StudentMetadata"
       }
     }
   },
@@ -979,7 +1060,7 @@
                     "type": "number"
                   },
                   "metadata": {
-                    "$ref": "#/components/schemas/AnyObject"
+                    "$ref": "#/components/schemas/BusMetadata"
                   }
                 },
                 "required": [
@@ -1028,7 +1109,7 @@
                           "type": "number"
                         },
                         "metadata": {
-                          "$ref": "#/components/schemas/AnyObject"
+                          "$ref": "#/components/schemas/BusMetadata"
                         }
                       },
                       "required": [
@@ -1160,18 +1241,201 @@
                           "type": "number"
                         },
                         "metadata": {
-                          "$ref": "#/components/schemas/AnyObject"
-                        },
-                        "test": {
-                          "type": "string"
+                          "$ref": "#/components/schemas/BusMetadata"
                         }
                       },
                       "required": [
                         "id",
                         "licensePlate",
                         "capacity",
-                        "metadata",
-                        "test"
+                        "metadata"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "BusesController"
+        ],
+        "summary": "Update a bus",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "type": "object",
+                "properties": {
+                  "licensePlate": {
+                    "type": "string"
+                  },
+                  "capacity": {
+                    "type": "number"
+                  },
+                  "metadata": {
+                    "$ref": "#/components/schemas/BusMetadata"
+                  }
+                },
+                "required": [
+                  "licensePlate",
+                  "capacity",
+                  "metadata"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": true
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+                        },
+                        "licensePlate": {
+                          "type": "string"
+                        },
+                        "capacity": {
+                          "type": "number"
+                        },
+                        "metadata": {
+                          "$ref": "#/components/schemas/BusMetadata"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "licensePlate",
+                        "capacity",
+                        "metadata"
                       ],
                       "additionalProperties": false
                     }
@@ -4667,7 +4931,7 @@
         ]
       }
     },
-    "/api/parents/getStudents": {
+    "/api/parents/students": {
       "get": {
         "tags": [
           "ParentController"
@@ -4707,24 +4971,12 @@
                               "name": {
                                 "type": "string"
                               },
-                              "stopPoint": {
-                                "$ref": "#/components/schemas/StopPointsData"
-                              },
-                              "status": {
-                                "type": "string",
-                                "enum": [
-                                  "PENDING",
-                                  "PICKED_UP",
-                                  "DROPPED_OFF",
-                                  "MISSED"
-                                ]
-                              }
+                              "meta": {}
                             },
                             "required": [
                               "id",
                               "name",
-                              "stopPoint",
-                              "status"
+                              "meta"
                             ],
                             "additionalProperties": false
                           }
@@ -4806,6 +5058,498 @@
         ]
       }
     },
+    "/api/parents/student-info/{studentId}": {
+      "get": {
+        "tags": [
+          "ParentController"
+        ],
+        "summary": "Get student info for parent",
+        "parameters": [
+          {
+            "name": "studentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "studentId": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "assignment": {
+                          "type": "object",
+                          "properties": {
+                            "pickupStop": {
+                              "$ref": "#/components/schemas/student_infoReqAssignmet_Stop"
+                            },
+                            "dropoffStop": {
+                              "$ref": "#/components/schemas/student_infoReqAssignmet_Stop"
+                            }
+                          },
+                          "additionalProperties": false
+                        }
+                      },
+                      "required": [
+                        "studentId",
+                        "name",
+                        "assignment"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/parents/today-trip/{studentId}": {
+      "get": {
+        "tags": [
+          "ParentController"
+        ],
+        "summary": "Get todays trip for student",
+        "parameters": [
+          {
+            "name": "studentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "tripId": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "ONGOING",
+                            "COMPLETED",
+                            "PENDING"
+                          ]
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "DISPATCH",
+                            "RETURN"
+                          ]
+                        },
+                        "route": {
+                          "type": "object",
+                          "properties": {
+                            "routeId": {
+                              "type": "string"
+                            },
+                            "routeName": {
+                              "type": "string"
+                            },
+                            "path": {
+                              "type": "array",
+                              "items": {}
+                            }
+                          },
+                          "required": [
+                            "routeId",
+                            "routeName",
+                            "path"
+                          ],
+                          "additionalProperties": false
+                        },
+                        "stopPoint": {
+                          "type": "object",
+                          "properties": {
+                            "stopId": {
+                              "type": "string"
+                            },
+                            "stopName": {
+                              "type": "string"
+                            },
+                            "pos": {
+                              "type": "array",
+                              "items": {}
+                            }
+                          },
+                          "required": [
+                            "stopId",
+                            "stopName",
+                            "pos"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "required": [
+                        "tripId",
+                        "status",
+                        "type",
+                        "route",
+                        "stopPoint"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/parents/student/{studentId}/attendance/today": {
+      "get": {
+        "tags": [
+          "ParentController"
+        ],
+        "summary": "Get student attendance for today",
+        "parameters": [
+          {
+            "name": "studentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "studentId": {
+                          "type": "string"
+                        },
+                        "tripId": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "PENDING",
+                            "PICKED_UP",
+                            "DROPPED_OFF",
+                            "MISSED"
+                          ]
+                        },
+                        "pickupTime": {
+                          "type": "string"
+                        },
+                        "dropoffTime": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "studentId"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/parents/student/{studentId}/assignment": {
+      "post": {
+        "tags": [
+          "ParentController"
+        ],
+        "summary": "Update student assignment for parent",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "type": "object",
+                "properties": {
+                  "routeId": {
+                    "type": "string"
+                  },
+                  "stopId": {
+                    "type": "string"
+                  },
+                  "direction": {
+                    "type": "string",
+                    "enum": [
+                      "PICKUP",
+                      "DROPOFF"
+                    ]
+                  }
+                },
+                "required": [
+                  "routeId",
+                  "stopId",
+                  "direction"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": true
+        },
+        "parameters": [
+          {
+            "name": "studentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/stoppoints/stoppoints": {
       "get": {
         "tags": [
@@ -4838,7 +5582,30 @@
                         "data": {
                           "type": "array",
                           "items": {
-                            "$ref": "#/components/schemas/StopPointsData"
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "location": {
+                                "$ref": "#/components/schemas/GeoLocation"
+                              },
+                              "meta": {
+                                "$ref": "#/components/schemas/StopPointsMeta"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name",
+                              "location",
+                              "meta"
+                            ],
+                            "additionalProperties": false
                           }
                         },
                         "total": {
@@ -5402,6 +6169,886 @@
         "responses": {
           "200": {
             "description": "Delete Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/students/": {
+      "get": {
+        "tags": [
+          "StudentsController"
+        ],
+        "summary": "Get all students",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "description": "Search term to filter results",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "default": 1,
+              "description": "Page number, minimum is 1",
+              "type": "number",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "default": 10,
+              "description": "Number of items per page, minimum is 1 and maximum is 100",
+              "type": "number",
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string",
+                                "format": "uuid",
+                                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "createdAt": {
+                                "type": "string",
+                                "format": "date-time",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                              },
+                              "updatedAt": {
+                                "type": "string",
+                                "format": "date-time",
+                                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                              },
+                              "metadata": {
+                                "$ref": "#/components/schemas/StudentMetadata"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name",
+                              "createdAt",
+                              "updatedAt",
+                              "metadata"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "meta": {
+                          "$ref": "#/components/schemas/PaginationMetaData"
+                        }
+                      },
+                      "required": [
+                        "data",
+                        "meta"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "StudentsController"
+        ],
+        "summary": "Create a new student",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "userId": {
+                    "type": "string"
+                  },
+                  "metadata": {
+                    "$ref": "#/components/schemas/StudentMetadata"
+                  }
+                },
+                "required": [
+                  "name",
+                  "userId",
+                  "metadata"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                        },
+                        "metadata": {
+                          "$ref": "#/components/schemas/StudentMetadata"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "createdAt",
+                        "updatedAt",
+                        "metadata"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      }
+    },
+    "/api/students/{id}": {
+      "get": {
+        "tags": [
+          "StudentsController"
+        ],
+        "summary": "Get student by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                        },
+                        "metadata": {
+                          "$ref": "#/components/schemas/StudentMetadata"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "createdAt",
+                        "updatedAt",
+                        "metadata"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "StudentsController"
+        ],
+        "summary": "Update a student",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "metadata": {
+                    "$ref": "#/components/schemas/StudentMetadata"
+                  }
+                },
+                "required": [
+                  "name",
+                  "metadata"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": true
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "format": "uuid",
+                          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time",
+                          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                        },
+                        "metadata": {
+                          "$ref": "#/components/schemas/StudentMetadata"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "createdAt",
+                        "updatedAt",
+                        "metadata"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "StudentsController"
+        ],
+        "summary": "Delete a student",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
             "content": {
               "application/json": {
                 "schema": {

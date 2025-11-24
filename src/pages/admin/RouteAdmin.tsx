@@ -59,7 +59,6 @@ function RouteInfoCard({ route, isSelected, onClick }: {
     onClick: () => void;
 }) {
     return <Card
-        key={route.id}
         className={`p-4 rounded-xl border bg-white cursor-pointer hover:shadow-sm transition-shadow` + (isSelected ? ' border-red-500 shadow-md' : ' border-gray-200')}
         onClick={onClick}
     >
@@ -234,7 +233,7 @@ export const RouteAdmin: React.FC = () => {
                             </div>
                         ) : (
                             <div className="flex flex-col gap-3">
-                                {allRoutes.map((route) => <RouteInfoCard key={route.id} route={route} isSelected={selectedRouteId === route.id} onClick={() => {
+                                {allRoutes.map((route, index) => <RouteInfoCard key={route.id + "-" + index} route={route} isSelected={selectedRouteId === route.id} onClick={() => {
                                     setSelectedRouteId(route.id);
                                 }} />)}
                             </div>
@@ -393,7 +392,7 @@ export const RouteAdmin: React.FC = () => {
                                 })</h4>
                                 {stopPoints.map((stop, idx) => (
                                     <Card
-                                        key={stop.id}
+                                        key={stop.id + "-" + idx}
                                         className="p-3 flex items-center gap-3 bg-[#DDEDF4] border border-gray-200"
                                         onClick={() => {
                                             mapRef.current?.flyTo({

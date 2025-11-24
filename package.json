@@ -28,6 +28,7 @@
     "mapbox-gl": "^3.16.0",
     "qr-scanner": "^1.4.2",
     "react": "^18.2.0",
+    "react-activation": "^0.13.4",
     "react-datepicker": "^8.9.0",
     "react-dom": "^18.2.0",
     "react-map-gl": "^8.1.0",
