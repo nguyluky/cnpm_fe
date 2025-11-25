@@ -1,10 +1,18 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import Map, { Layer, /*Marker,*/ NavigationControl, Popup, Source, type MapRef } from 'react-map-gl/mapbox';
 import { useApi } from '../../contexts/apiConetxt';
-import type { StopPointsData } from '../../api/data-contracts';
 import { useModal } from '../../contexts/modalContext';
 import { Search } from 'lucide-react';
 import type { MapLayerMouseEvent } from 'mapbox-gl';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import type { GeoLocation, StopPointsMeta } from '../../api/data-contracts';
+
+interface StopPointsData {
+    id: string;
+    name: string;
+    location: GeoLocation;
+    meta: StopPointsMeta;
+}
 
 
 interface AddStopPointModalProps {
@@ -21,8 +29,8 @@ const AddStopPointModal: React.FC<AddStopPointModalProps> = ({ onSubmit, editDat
     const [street, setStreet] = useState(editData ? editData.meta.street : '');
     const [ward, setWard] = useState(editData ? editData.meta.ward : '');
     const [zone, setZone] = useState(editData ? editData.meta.zone : '');
-    const [status, setStatus] = useState<'Active' | 'Inactive'>(editData ? (editData.meta.status) : 'Active');
-    const [supportDisability, setSupportDisability] = useState<'Yes' | 'No' | 'Unknown'>(editData ? editData.meta.supportDisability : 'Unknown');
+    const [status, setStatus] = useState<'Active' | 'Inactive'>(editData ? (editData.meta.status as 'Active' | 'Inactive') : 'Active');
+    const [supportDisability, setSupportDisability] = useState<'Yes' | 'No' | 'Unknown'>(editData ? (editData.meta.supportDisability as 'Yes' | 'No' | 'Unknown') : 'Unknown');
     const [isLoading, setIsLoading] = useState(false);
 
     const { closeModal: onClose } = useModal();
@@ -60,7 +68,7 @@ const AddStopPointModal: React.FC<AddStopPointModalProps> = ({ onSubmit, editDat
 
     return (
         <div
-            className={"relative w-full max-w-xl transform rounded-lg bg-white p-6 shadow-xl transition-all" + (isLoading ? ' opacity-60 pointer-events-none' : '')} 
+            className={"relative w-full max-w-xl transform rounded-lg bg-white p-6 shadow-xl transition-all" + (isLoading ? ' opacity-60 pointer-events-none' : '')}
         >
 
             {
@@ -366,7 +374,7 @@ const StopPointsStripedTable: React.FC<StopPointsTableProps> = ({ stopPoints, fo
                             {/* Cột 5: Actions (Thường) */}
                             <td className="px-6 py-4 flex space-x-4">
                                 <button className="text-blue-600 hover:underline" onClick={() => {
-                                    openModal(<AddStopPointModal editData={point} onSubmit={ async (e) => {
+                                    openModal(<AddStopPointModal editData={point} onSubmit={async (e) => {
                                         if (updateStopPoint) await updateStopPoint(point.id, e);
                                     }} />);
                                 }}>Edit</button>
@@ -387,16 +395,27 @@ const StopPointsStripedTable: React.FC<StopPointsTableProps> = ({ stopPoints, fo
     );
 };
 
+
+
 const start = [106.660172, 10.762622];
 export function StopsPointsPage() {
+    const queryClient = useQueryClient();
     const { openModal } = useModal();
     const { api } = useApi();
     const mapRef = useRef<MapRef>(null); // <--- 1. Tạo ref để truy cập map instance
 
-    const [allStopPoints, setAllStopPoints] = useState<StopPointsData[]>([]);
+    const { data: allStopPoints, isLoading } = useQuery({
+        queryKey: ['all-stop-points'],
+        queryFn: async () => {
+            const response = await api.getAllStoppoints();
+            return response.data?.data?.data || [];
+        }
+    })
+
+    // const [allStopPoints, setAllStopPoints] = useState<typeof allStopPointsData>([]);
     const [visibleStopPoints, setVisibleStopPoints] = useState<StopPointsData[]>([]);
     const [searchTerm, setSearchTerm] = useState<string>('');
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    // const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const [selectedStopPoint, setSelectedStopPoint] = useState<string[]>([]);
     const [popupInfo, setPopupInfo] = useState<StopPointsData | null>(null);
@@ -409,6 +428,8 @@ export function StopsPointsPage() {
 
     // Hàm lọc dữ liệu dựa trên bounds hiện tại của map
     const updateVisiblePoints = useCallback(() => {
+        if (!allStopPoints || allStopPoints.length === 0) return;
+
         if (!mapRef.current || allStopPoints.length === 0) return;
 
         const map = mapRef.current.getMap();
@@ -429,20 +450,19 @@ export function StopsPointsPage() {
         setVisibleStopPoints(filtered);
     }, [allStopPoints]);
 
-    // 1. Tải dữ liệu ban đầu
-    useEffect(() => {
-        const getStopPoints = async () => {
-            const response = await api.getAllStoppoints();
-            if (response && response.data) {
-                const data = response.data?.data?.data || [];
-                setAllStopPoints(data);
-                // Chưa setVisibleStopPoints ngay ở đây, để useEffect bên dưới lo
-            }
-        }
-        setIsLoading(true);
-        getStopPoints().finally(() => setIsLoading(false));
-    }, []);
-
+    // // 1. Tải dữ liệu ban đầu
+    // useEffect(() => {
+    //     const getStopPoints = async () => {
+    //         const response = await api.getAllStoppoints();
+    //         if (response && response.data) {
+    //             const data = response.data?.data?.data || [];
+    //             setAllStopPoints(data);
+    //             // Chưa setVisibleStopPoints ngay ở đây, để useEffect bên dưới lo
+    //         }
+    //     }
+    //     setIsLoading(true);
+    //     getStopPoints().finally(() => setIsLoading(false));
+    // }, []);
     // 2. Mỗi khi allStopPoints thay đổi (lúc mới tải xong) hoặc map đã sẵn sàng, cập nhật list hiển thị lần đầu
     useEffect(() => {
         // Chạy lần đầu khi có dữ liệu
@@ -452,6 +472,7 @@ export function StopsPointsPage() {
 
     const pointsToRender = useMemo(() => {
         // Ưu tiên 1: Nếu đang tìm kiếm, lọc trong TOÀN BỘ dữ liệu
+        if (!allStopPoints) return [];
         if (searchTerm.trim() !== '') {
             const lowerTerm = searchTerm.toLowerCase();
             return allStopPoints.filter(point =>
@@ -463,7 +484,7 @@ export function StopsPointsPage() {
 
         // Ưu tiên 2: Nếu không tìm kiếm, chỉ hiển thị các điểm trong Viewport
         return visibleStopPoints;
-    }, [searchTerm, allStopPoints, visibleStopPoints]);
+    }, [allStopPoints, searchTerm, visibleStopPoints]);
 
     const createStopPoint = async (fromData: Omit<StopPointsData, 'id' | 'meta'> & { meta: StopPointsData['meta'] }) => {
         await api.createANewStoppoint({
@@ -475,8 +496,12 @@ export function StopsPointsPage() {
             // Thêm điểm mới vào danh sách
             if (response && response.data) {
 
-                // const newPoint = response.data;
+                const newPoint = response.data;
                 // setAllStopPoints(prev => [...prev, newPoint]);
+                queryClient.setQueryData(['all-stop-points'], (oldData: typeof allStopPoints) => {
+                    if (!oldData) return [newPoint];
+                    return [...oldData, newPoint];
+                });
             }
         });
     }
@@ -490,7 +515,11 @@ export function StopsPointsPage() {
         }).then((response) => {
             if (response && response.data) {
                 // Cập nhật điểm trong danh sách
-                setAllStopPoints(prev => prev.map(p => p.id === id ? { ...p, ...formData } : p));
+                // setAllStopPoints(prev => prev.map(p => p.id === id ? { ...p, ...formData } : p));
+                queryClient.setQueryData(['all-stop-points'], (oldData: typeof allStopPoints) => {
+                    if (!oldData) return [];
+                    return oldData.map(p => p.id === id ? { ...p, ...formData } : p);
+                });
             }
         });
     }
@@ -499,7 +528,11 @@ export function StopsPointsPage() {
         const response = await api.deleteAStoppoint(id);
         if (response && response.data) {
             // Xoá điểm khỏi danh sách
-            setAllStopPoints(prev => prev.filter(p => p.id !== id));
+            // setAllStopPoints(prev => prev.filter(p => p.id !== id));
+            queryClient.setQueryData(['all-stop-points'], (oldData: typeof allStopPoints) => {
+                if (!oldData) return [];
+                return oldData.filter(p => p.id !== id);
+            });
         }
     }
 
@@ -510,11 +543,13 @@ export function StopsPointsPage() {
     const onMapClick = useCallback((event: MapLayerMouseEvent) => {
         // Lấy các feature tại điểm click từ layer có id là 'point'
         const features = event.features || [];
-        const clickedFeature = features.find(f => f.layer.id === 'point');
+        if (!allStopPoints) return;
+        const clickedFeature = features.find(f => f.layer?.id === 'point');
 
         if (clickedFeature) {
             const { id, name } = clickedFeature.properties || {};
-            const [longitude, latitude] = clickedFeature.geometry.coordinates;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const [longitude, latitude] = (clickedFeature.geometry as any).coordinates;
             const fullData = allStopPoints.find(p => p.id === id) || {
                 id, name, location: { longitude, latitude }
             } as StopPointsData; // Ép kiểu tạm nếu tìm không thấy (hiếm khi xảy ra)
@@ -561,6 +596,7 @@ export function StopsPointsPage() {
                 </div>
             </Popup>
         );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [popupInfo]);
 
     return (
@@ -572,7 +608,7 @@ export function StopsPointsPage() {
                             Stop Points
                             {/* Hiển thị số lượng đang render để debug cho dễ */}
                             <span className="text-sm font-normal text-gray-500 ml-2">
-                                (Showing {pointsToRender.length} / {allStopPoints.length})
+                                (Showing {pointsToRender.length} / {allStopPoints?.length || 0})
                             </span>
                         </h1>
                         <div className="relative w-1/3 ms-6">
@@ -603,7 +639,7 @@ export function StopsPointsPage() {
                             // Hiển thị popup
                             // setPopupInfo(data);
                             setSelectedStopPoint([data.id]);
-                        }} deleteStopPoint={deleteStopPoint} updateStopPoint={ updateStopPoint } />
+                        }} deleteStopPoint={deleteStopPoint} updateStopPoint={updateStopPoint} />
                 }
 
             </div>
@@ -612,7 +648,7 @@ export function StopsPointsPage() {
                 <Map
                     ref={mapRef} // <--- Gắn ref vào Map
                     {...viewState}
-                    mapboxAccessToken="pk.eyJ1Ijoibmd1eWx1a3kxIiwiYSI6ImNtZ2Yxb2hoMjAzbW8yam9teHN1MGhiYXYifQ.5gyVRqeLYNO0lXUYIRgpJQ"
+                    mapboxAccessToken={ import.meta.env.VITE_MAPBOX_ACCESS_TOKEN }
                     mapStyle="mapbox://styles/mapbox/streets-v9"
                     onMove={evt => setViewState(evt.viewState)}
                     onMoveEnd={updateVisiblePoints} // <--- Gọi hàm lọc khi DỪNG di chuyển
@@ -638,7 +674,7 @@ export function StopsPointsPage() {
                                 status: 'Active',
                                 supportDisability: 'Unknown',
                             }
-                        }} onSubmit={async () => {}}/>)
+                        }} onSubmit={async () => { }} />)
                         // event.point
                     }}
                     cursor={cursor}
@@ -682,4 +718,4 @@ export function StopsPointsPage() {
         </div >
     );
 }
-    
+

@@ -1,8 +1,8 @@
-import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useApi } from "../contexts/apiConetxt";
 import { path } from "../router";
-import { Eye, EyeOff } from "lucide-react";
 
 export function LoginPage() {
     const {api} = useApi();
@@ -15,7 +15,7 @@ export function LoginPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
-    const handleSubmit = (event) => {
+    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setError(''); // Reset lỗi mỗi khi thử đăng nhập
 
@@ -43,7 +43,7 @@ export function LoginPage() {
                 }
             }
             catch (err) {
-                setError(err.error.message);
+                setError((err as any).error.message);
             }
         }
         setIsLoading(true);

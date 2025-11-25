@@ -24,7 +24,7 @@ export const CreateStudentModal: React.FC<CreateStudentModalProps> = ({
   onClose,
   onSuccess,
 }) => {
-  const { api, securityData } = useApi();
+  const { securityData } = useApi();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",

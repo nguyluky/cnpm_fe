@@ -778,6 +778,59 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal Server Error",
             "content": {
@@ -807,7 +860,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
       }
     },
     "/api/auth/admin/change-password": {
@@ -3689,8 +3747,14 @@
                                   "type": "number"
                                 }
                               },
+                              "startTime": {
+                                "description": "HH:mm format",
+                                "type": "string"
+                              },
                               "startDate": {
-                                "description": "ISO 8601 date string",
+                                "type": "string"
+                              },
+                              "endDate": {
                                 "type": "string"
                               }
                             },
@@ -3700,6 +3764,7 @@
                               "bus",
                               "type",
                               "daysOfWeek",
+                              "startTime",
                               "startDate"
                             ],
                             "additionalProperties": false
@@ -4657,7 +4722,7 @@
         ]
       }
     },
-    "/api/drivers/": {
+    "/api/drivers/trip/{tripId}/students/{studentId}/dropoff": {
       "post": {
         "tags": [
           "DriverController"
@@ -5511,6 +5576,46 @@
                     "message": {
                       "type": "string",
                       "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "studentId": {
+                          "type": "string"
+                        },
+                        "routeId": {
+                          "type": "string"
+                        },
+                        "stopId": {
+                          "type": "string"
+                        },
+                        "direction": {
+                          "type": "string",
+                          "enum": [
+                            "PICKUP",
+                            "DROPOFF"
+                          ]
+                        },
+                        "effectiveFrom": {
+                          "type": "string"
+                        },
+                        "effectiveTo": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "studentId",
+                        "routeId",
+                        "stopId",
+                        "direction",
+                        "effectiveFrom"
+                      ],
+                      "additionalProperties": false
                     }
                   },
                   "required": []
