@@ -21,9 +21,12 @@ import ScheduleAdminTable from "../pages/admin/test_ui"
 // import DriverNotifications from "../pages/driver/Notifications"
 import { MapDriver } from "../pages/driver/Map"
 import { DriverHome } from "../pages/driver/Home";
+// import HomePagesche  from "../pages/driver/Schedule";
+  
 
 import NotificationsPage from "../pages/driver/NotificationsPage";
 import { GetAllStudent } from "../pages/admin/Students/getAllStudent";
+import DriverSchedule from "../pages/driver/Schedule";
 
 export const path = {
   INDEX: "/",
@@ -130,7 +133,7 @@ export const router = createBrowserRouter([
           },
           {
               path: path.DRIVER_SCHEDULE,
-              element: <HomePage />
+              element: <DriverSchedule />
           },
           // {
           //     path: path.DRIVER_QR_ROLL_CALL,
