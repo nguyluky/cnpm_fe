@@ -1,14 +1,15 @@
-import { Card } from '../../components/uiItem/card.tsx';
-import { Button } from '../../components/uiItem/button.tsx';
+import { Card } from '../../../components/uiItem/card.tsx';
+import { Button } from '../../../components/uiItem/button.tsx';
 import { MapPin, Search } from "lucide-react";
 import Map, { Layer, NavigationControl, Source, type MapRef } from "react-map-gl/mapbox";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 const MAPBOX_TOKEN = "pk.eyJ1Ijoibmd1eWx1a3kxIiwiYSI6ImNtZ2Yxb2hoMjAzbW8yam9teHN1MGhiYXYifQ.5gyVRqeLYNO0lXUYIRgpJQ";
 import { Route, Clock } from "lucide-react";
-import type { PaginationMetaData, RouteData, StopPointsData } from '../../api/data-contracts.ts';
-import { useApi } from '../../contexts/apiConetxt.tsx';
-import { Pagination } from '../../components/uiPart/Pagination.tsx';
+import type { PaginationMetaData, RouteData, StopPointsData } from '../../../api/data-contracts.ts';
+import { useApi } from '../../../contexts/apiConetxt.tsx';
+import { Pagination } from '../../../components/uiPart/Pagination.tsx';
 import mapboxgl from 'mapbox-gl';
+import CreateRouteModal from './createRoute';
 
 // Hàm helper để ghép địa chỉ
 const getFullAddress = (meta: StopPointsData['meta']) => {
@@ -59,6 +60,7 @@ function RouteInfoCard({ route, isSelected, onClick }: {
     onClick: () => void;
 }) {
     return <Card
+        key={route.id}
         className={`p-4 rounded-xl border bg-white cursor-pointer hover:shadow-sm transition-shadow` + (isSelected ? ' border-red-500 shadow-md' : ' border-gray-200')}
         onClick={onClick}
     >
@@ -82,7 +84,7 @@ function RouteInfoCard({ route, isSelected, onClick }: {
         <div className="flex flex-col gap-2 text-sm text-gray-600">
             <span className="flex items-center gap-1">
                 <MapPin size={16} />
-                {route.metadata.Distance} km
+                {route.metadata.Distance}m
             </span>
 
             <span className="flex items-center gap-1">
@@ -144,22 +146,26 @@ export const RouteAdmin: React.FC = () => {
         // và cập nhật viewState của bạn thông qua onMove.
     }, []);
 
-    useEffect(() => {
-
-        const processData = async () => {
-            await api.getAllRoutes({
-                page: page,
-                limit: pageSize,
-                search: search
-            }).then((routes) => {
-                setPaginationMeta(routes.data?.data?.meta || null);
-                setAllRoutes(routes.data?.data?.data || []);
-            });
-        }
+    const fetchRoutes = async (p = page, ps = pageSize, s = search) => {
         setLoading(true);
-        processData().finally(() => setLoading(false));
-        console.log("Fetching routes data...");
+        try {
+            const routes = await api.getAllRoutes({
+                page: p,
+                limit: ps,
+                search: s,
+            });
+            setPaginationMeta(routes.data?.data?.meta || null);
+            setAllRoutes(routes.data?.data?.data || []);
+        } catch (err) {
+            console.error('Error fetching routes', err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
+        fetchRoutes();
+        console.log("Fetching routes data...");
     }, [api, page, pageSize, search]);
 
     useEffect(() => {
@@ -233,7 +239,7 @@ export const RouteAdmin: React.FC = () => {
                             </div>
                         ) : (
                             <div className="flex flex-col gap-3">
-                                {allRoutes.map((route, index) => <RouteInfoCard key={route.id + "-" + index} route={route} isSelected={selectedRouteId === route.id} onClick={() => {
+                                {allRoutes.map((route) => <RouteInfoCard key={route.id} route={route} isSelected={selectedRouteId === route.id} onClick={() => {
                                     setSelectedRouteId(route.id);
                                 }} />)}
                             </div>
@@ -392,7 +398,7 @@ export const RouteAdmin: React.FC = () => {
                                 })</h4>
                                 {stopPoints.map((stop, idx) => (
                                     <Card
-                                        key={stop.id + "-" + idx}
+                                        key={stop.id}
                                         className="p-3 flex items-center gap-3 bg-[#DDEDF4] border border-gray-200"
                                         onClick={() => {
                                             mapRef.current?.flyTo({
@@ -428,98 +434,21 @@ export const RouteAdmin: React.FC = () => {
                     </Card>
                 </div>
             </div>
-                      {/* Modal Tạo tuyến đường mới */}
-          {isCreateModalOpen && (
-            <div className="fixed inset-0 bg-opacity-50 flex items-center justify-center z-50 p-4">
-              <Card className="w-full max-w-md bg-white rounded-xl shadow-xl">
-                <div className="p-6">
-                  <h3 className="text-lg font-semibold mb-4">Tạo tuyến đường mới</h3>
+            {/* Modal Tạo tuyến đường mới */}
+            <CreateRouteModal
+                isOpen={isCreateModalOpen}
+                onClose={() => setIsCreateModalOpen(false)}
+                onSuccess={async () => {
+                    // after creating a route, reset to first page and refresh list
+                    try {
+                        setPage(1);
+                        await fetchRoutes(1, pageSize, search);
+                    } catch (err) {
+                        console.error('Error refreshing routes after create', err);
+                    }
+                }}
+            />
 
-                  <div className="space-y-4">
-                    {/* Tên tuyến */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Tên tuyến
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Tuyến 3 - Quận 5"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-                      />
-                    </div>
-
-                    {/* Mô tả */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Mô tả
-                      </label>
-                      <textarea
-                        placeholder="Mô tả tuyến đường"
-                        rows={3}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-none"
-                      />
-                    </div>
-
-                    <div className="flex gap-4">
-                      {/* Khoảng cách */}
-                      <div className="flex-1">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Khoảng cách
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            defaultValue="10"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg pr-12 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-                          />
-                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">
-                            km
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Thời gian dự kiến */}
-                      <div className="flex-1">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Thời gian dự kiến
-                        </label>
-                        <div className="relative">
-                          <input
-                            type="text"
-                            defaultValue="30"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg pr-16 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-                          />
-                          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-gray-500">
-                            phút
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Nút hành động */}
-                  <div className="flex justify-end gap-3 mt-6">
-                    <Button
-                      variant="outline"
-                      onClick={() => setIsCreateModalOpen(false)}
-                      className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
-                    >
-                      Hủy
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        // Xử lý tạo tuyến ở đây
-                        setIsCreateModalOpen(false);
-                      }}
-                      className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-                    >
-                      Tạo tuyến
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-            </div>
-          )}
         </div>
     );
 }

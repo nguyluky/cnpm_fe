@@ -5,7 +5,7 @@ import { NotFoundPage } from "../pages/404Page";
 import { Bus } from "../pages/admin/Bus/getAllBus";
 import { Buss } from "../pages/admin/MapBuss";
 import { Overview } from "../pages/admin/Overview";
-import { RouteAdmin } from "../pages/admin/RouteAdmin";
+import { RouteAdmin } from "../pages/admin/Route/RouteAdmin";
 import { Schedules } from "../pages/admin/Schedules";
 import { Student } from "../pages/admin/Student";
 import { HomePage } from "../pages/HomePage";
