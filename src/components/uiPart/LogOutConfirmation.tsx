@@ -1,8 +1,7 @@
-import React, { useState } from "react";
-import { Button } from "../uiItem/button";
+import React from "react";
 import { useNavigate } from 'react-router-dom';
-import { useModal } from "../../contexts/modalContext";
 import { useApi } from "../../contexts/apiConetxt";
+import { useModal } from "../../contexts/modalContext";
 
 
 interface LogoutConfirmationProps {

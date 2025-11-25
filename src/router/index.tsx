@@ -15,14 +15,13 @@ import { NotiPage } from "../pages/parent/notiPage";
 import { StudentPage } from "../pages/parent/studentPage";
 import { StopsPointsPage } from "../pages/stopPoint";
 // import { AddSchedulePage } from "../pages/admin/test_ui1"
-import { DriverLayout } from "../layouts/DriverLayout"
-import { RootLayout } from "../layouts/RootLayout"
-import ScheduleAdminTable from "../pages/admin/test_ui"
+import { DriverLayout } from "../layouts/DriverLayout";
+import { RootLayout } from "../layouts/RootLayout";
 // import DriverNotifications from "../pages/driver/Notifications"
-import { MapDriver } from "../pages/driver/Map"
+import { MapDriver } from "../pages/driver/Map";
 
-import NotificationsPage from "../pages/driver/NotificationsPage";
 import { GetAllStudent } from "../pages/admin/Students/getAllStudent";
+import NotificationsPage from "../pages/driver/NotificationsPage";
 
 export const path = {
   INDEX: "/",
@@ -142,10 +141,10 @@ export const router = createBrowserRouter([
         path: path.DRIVER_TRIP,
         element: <MapDriver />,
       },
-      {
-        path: "/test",
-        element: <ScheduleAdminTable />,
-      },
+    //   {
+    //     path: "/test",
+    //     element: <ScheduleAdminTable />,
+    //   },
       {
         path: "*",
         element: <NotFoundPage />,

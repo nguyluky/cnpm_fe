@@ -36,7 +36,7 @@ export const UpdateStudentModal: React.FC<UpdateStudentModalProps> = ({
   studentId,
   studentData,
 }) => {
-  const { api, securityData } = useApi();
+  const { securityData } = useApi();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",

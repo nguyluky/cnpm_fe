@@ -1,14 +1,20 @@
-import { Card } from '../../components/uiItem/card.tsx';
-import { Button } from '../../components/uiItem/button.tsx';
-import { MapPin, Search } from "lucide-react";
-import Map, { Layer, NavigationControl, Source, type MapRef } from "react-map-gl/mapbox";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-const MAPBOX_TOKEN = "pk.eyJ1Ijoibmd1eWx1a3kxIiwiYSI6ImNtZ2Yxb2hoMjAzbW8yam9teHN1MGhiYXYifQ.5gyVRqeLYNO0lXUYIRgpJQ";
-import { Route, Clock } from "lucide-react";
-import type { PaginationMetaData, RouteData, StopPointsData } from '../../api/data-contracts.ts';
-import { useApi } from '../../contexts/apiConetxt.tsx';
-import { Pagination } from '../../components/uiPart/Pagination.tsx';
+import { Clock, MapPin, Route, Search } from "lucide-react";
 import mapboxgl from 'mapbox-gl';
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Map, { Layer, NavigationControl, Source, type MapRef } from "react-map-gl/mapbox";
+import type { GeoLocation, PaginationMetaData, RouteData, StopPointsMeta } from '../../api/data-contracts.ts';
+import { Button } from '../../components/uiItem/button.tsx';
+import { Card } from '../../components/uiItem/card.tsx';
+import { Pagination } from '../../components/uiPart/Pagination.tsx';
+import { useApi } from '../../contexts/apiConetxt.tsx';
+const MAPBOX_TOKEN = "pk.eyJ1Ijoibmd1eWx1a3kxIiwiYSI6ImNtZ2Yxb2hoMjAzbW8yam9teHN1MGhiYXYifQ.5gyVRqeLYNO0lXUYIRgpJQ";
+
+interface StopPointsData {
+    id: string;
+    name: string;
+    location: GeoLocation;
+    meta: StopPointsMeta;
+}
 
 // Hàm helper để ghép địa chỉ
 const getFullAddress = (meta: StopPointsData['meta']) => {
