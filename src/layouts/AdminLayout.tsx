@@ -1,7 +1,5 @@
 
 import 'mapbox-gl/dist/mapbox-gl.css';
-import React, { useEffect } from "react";
-import 'mapbox-gl/dist/mapbox-gl.css';
 import { Outlet } from 'react-router';
 import { Sidebar } from "../components/uiPart/Sidebar";
 import { useApi } from '../contexts/apiConetxt';

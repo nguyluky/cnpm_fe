@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import Map, { Layer, type MapRef, Marker, NavigationControl, Source } from "react-map-gl/mapbox";
+import { ChevronUp, LocateIcon, LocateOff, Search } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { ChevronUp, Search } from "lucide-react";
+import Map, { Layer, type MapRef, Marker, Source } from "react-map-gl/mapbox";
 import { useApi } from "../../contexts/apiConetxt";
 
 import { useQuery } from "@tanstack/react-query";
@@ -38,7 +38,7 @@ export function BusLocationPage() {
         },
     });
 
-    const {data: selectedStudentId} = useQuery({
+    const { data: selectedStudentId } = useQuery({
         queryKey: ['selected-student-id', selectedStudent?.id],
         queryFn: async () => {
             const response = await api.api.getStudentInfoForParent(selectedStudent?.id || '');
@@ -144,20 +144,24 @@ export function BusLocationPage() {
                 />
             </Source>
 
-            <Marker
-                longitude={busLocation ? busLocation.lng : (tripData && tripData.route.path.length > 0 ? tripData.route.path[0][0] : 106.660172)}
-                latitude={busLocation ? busLocation.lat : (tripData && tripData.route.path.length > 0 ? tripData.route.path[0][1] : 10.762622)}
-                anchor="center"
-            >
-                <div className="w-8 h-8 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center">
-                    {
-                        // bus icon
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v3a2 2 0 002 2h1v3H4a2 2 0 00-2 2v1a1 1 0 001 1h1a3 3 0 006 0h4a3 3 0 006 0h1a1 1 0 001-1v-1a2 2 0 00-2-2h-1v-3h1a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 00-1-1H6zm0 2h8v2H6V4zm0 4h8v3H6V8zm0 5h8v3H6v-3z" />
-                        </svg>
-                    }
-                </div>
-            </Marker>
+            {
+                busLocation && (
+                    <Marker
+                        longitude={busLocation.lng}
+                        latitude={busLocation.lat}
+                        anchor="center"
+                    >
+                        <div className="w-8 h-8 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center">
+                            {
+                                // bus icon
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v3a2 2 0 002 2h1v3H4a2 2 0 00-2 2v1a1 1 0 001 1h1a3 3 0 006 0h4a3 3 0 006 0h1a1 1 0 001-1v-1a2 2 0 00-2-2h-1v-3h1a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 00-1-1H6zm0 2h8v2H6V4zm0 4h8v3H6V8zm0 5h8v3H6v-3z" />
+                                </svg>
+                            }
+                        </div>
+                    </Marker>
+                )
+            }
 
 
             {
@@ -212,9 +216,14 @@ export function BusLocationPage() {
                 }
             }}
         >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m0 14v1m8-8h1M4 12H3m15.364-6.364l.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-            </svg>
+            {
+                busLocation ? (
+                    <LocateIcon className="w-6 h-6" />
+                ) : (
+
+                    <LocateOff className="w-6 h-6" />
+                )
+            }
         </div>
 
         {

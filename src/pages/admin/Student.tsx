@@ -1,6 +1,16 @@
 import { useState } from "react";
 import { Button } from "../../components/uiItem/button";
-import { Search, Plus, Pen, Delete, Eye } from "lucide-react";
+import { Search, Plus, Pen, Delete } from "lucide-react";
+import Select from "react-select"; // ← Thêm dòng này
+
+// Danh sách xe bus (giống như trong Schedules)
+const busOptions = [
+  { value: "29A-12345", label: "29A-12345 - Tuyến 1 - Quận 1" },
+  { value: "29B-67890", label: "29B-67890 - Tuyến 2 - Quận 3" },
+  { value: "30C-11111", label: "30C-11111 - Tuyến 3 - Quận 7" },
+  { value: "31D-22222", label: "31D-22222 - Tuyến 4 - Bình Thạnh" },
+  { value: "32E-33333", label: "32E-33333 - Tuyến 5 - Thủ Đức" },
+];
 
 type Student = {
   id: string;
@@ -21,7 +31,12 @@ export const Student = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const itemsPerPage = 10;
 
+  // State cho form Thêm/Sửa (chỉ cần cho phần Xe Bus)
+  const [selectedBusAdd, setSelectedBusAdd] = useState<any>(null);
+  const [selectedBusEdit, setSelectedBusEdit] = useState<any>(null);
+
   const students: Student[] = [
+    // ... dữ liệu 20 học sinh của bạn (giữ nguyên)
     { id: 'S001', name: "Nguyễn Minh Khang", class: "6A", driver: "Nguyễn Văn X", phone: "0901234001", pickupPoint: "Bến xe Bến Thành", bus: "29A-12345", status: "Hoạt động" },
     { id: 'S002', name: "Lê Thị Mai", class: "6A", driver: "Nguyễn Văn X", phone: "0901234002", pickupPoint: "Công viên 23/9", bus: "29A-12345", status: "Hoạt động" },
     { id: 'S003', name: "Trần Văn Nam", class: "6A", driver: "Nguyễn Văn Y", phone: "0901234003", pickupPoint: "Chợ Bến Thành", bus: "29B-67890", status: "Hoạt động" },
@@ -45,8 +60,6 @@ export const Student = () => {
   ];
 
   const totalPages = Math.max(1, Math.ceil(students.length / itemsPerPage));
-
-  // ensure current page is valid if students length changes
   if (currentPage > totalPages) setCurrentPage(totalPages);
 
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -67,116 +80,85 @@ export const Student = () => {
           />
           <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
         </div>
-        <Button variant="default" 
-        className="bg-indigo-500 text-white flex items-center w-50 h-10"
-         onClick={() => setShowForm(true)}>
+        <Button
+          variant="default"
+          className="bg-indigo-500 text-white flex items-center w-50 h-10"
+          onClick={() => {
+            setSelectedBusAdd(null);
+            setShowForm(true);
+          }}
+        >
           <Plus className="mr-2" size={18} /> Thêm học sinh mới
         </Button>
+
+        {/* Form Thêm – chỉ thay phần Xe Bus */}
         {showForm && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-40">
-          <div className="bg-white p-6 rounded-xl shadow-lg w-[600px] animate-scale-in">
+          <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-40">
+            <div className="bg-white p-6 rounded-xl shadow-lg w-[600px] animate-scale-in">
+              <h2 className="text-xl font-semibold mb-4">Thêm học sinh mới</h2>
 
-            <h2 className="text-xl font-semibold mb-4">
-              Thêm học sinh mới
-            </h2>
+              <div className="flex gap-4 mb-4">
+                <div className="flex flex-col w-1/2">
+                  <label className="text-sm font-medium text-gray-700 mb-1">Họ tên</label>
+                  <input type="text" placeholder="Nguyễn Văn A" className="border rounded p-2 w-full mb-4" />
+                  <label className="text-sm font-medium text-gray-700 mb-1">Tên phụ huynh</label>
+                  <input type="text" placeholder="Nguyễn Văn B" className="border rounded p-2 w-full mb-4" />
+                </div>
+                <div className="flex flex-col w-1/2">
+                  <label className="text-sm font-medium text-gray-700 mb-1">Lớp</label>
+                  <input type="text" placeholder="Lớp 6A" className="border rounded p-2 w-full mb-4" />
+                  <label className="text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
+                  <input type="text" placeholder="0987654321" className="border rounded p-2 w-full mb-4" />
+                </div>
+              </div>
 
-            <div className="flex gap-4 mb-4">
-              
-            <div className="flex flex-col w-1/2">
-            <label className="text-sm font-medium text-gray-700 mb-1">
-              Họ tên
-            </label>
-            <input
-              type="text"
-              placeholder="Nguyễn Văn A"
-              className="border rounded p-2 w-full mb-4"
-            />
-            <label className="text-sm font-medium text-gray-700 mb-1">
-              Tên phụ huynh
-            </label>
-            <input
-              type="text"
-              placeholder="Nguyễn Văn B"
-              className="border rounded p-2 w-full mb-4"
-            />
-             </div>
+              <div className="flex flex-col w-full">
+                <label className="text-sm font-medium text-gray-700 mb-1">Địa chỉ</label>
+                <input type="text" placeholder="Địa chỉ nhà" className="border rounded p-2 w-full mb-4" />
+              </div>
 
+              <div className="flex gap-4 mb-4">
+                <div className="flex flex-col w-1/2">
+                  <label className="text-sm font-medium text-gray-700 mb-1">Địa điểm đến</label>
+                  <input type="text" placeholder="Bến xe bến thành" className="border rounded p-2 w-full mb-4" />
+                </div>
 
-             <div className="flex flex-col w-1/2">
-            <label className="text-sm font-medium text-gray-700 mb-1">
-              Lớp
-            </label>
-            <input
-              type="text"
-              placeholder="Lớp 6A"
-              className="border rounded p-2 w-full mb-4"
-            />
-            <label className="text-sm font-medium text-gray-700 mb-1">
-              Số điện thoại
-            </label>
-            <input
-              type="text"
-              placeholder="0987654321"
-              className="border rounded p-2 w-full mb-4"
-            />
-             </div>
-            </div>
-            <div className="flex flex-col w-full">
-                <label className="text-sm font-medium text-gray-700 mb-1">
-                  Địa chỉ
-                </label>
-                <input
-                  type="text"
-                  placeholder="Địa chỉ nhà"
-                  className="border rounded p-2 w-full mb-4"
-                />
-            </div>
-            <div className="flex gap-4 mb-4">
-              
-            <div className="flex flex-col w-1/2">
-            <label className="text-sm font-medium text-gray-700 mb-1">
-              Địa điểm đến
-            </label>
-            <input
-              type="text"
-              placeholder="Bến xe bến thành"
-              className="border rounded p-2 w-full mb-4"
-            />
-             </div>
+                {/* ← Chỉ thay phần này */}
+                <div className="flex flex-col w-1/2">
+                  <label className="text-sm font-medium text-gray-700 mb-1">Xe Bus</label>
+                  <Select
+                    options={busOptions}
+                    value={selectedBusAdd}
+                    onChange={setSelectedBusAdd}
+                    placeholder="Tìm kiếm xe bus..."
+                    isSearchable
+                    className="react-select-container"
+                    classNamePrefix="react-select"
+                    styles={{
+                      control: (base) => ({
+                        ...base,
+                        border: "1px solid #d1d5db",
+                        borderRadius: "0.375rem",
+                        padding: "0.25rem",
+                        minHeight: "40px",
+                      }),
+                    }}
+                  />
+                </div>
+                {/* ← Kết thúc thay đổi */}
+              </div>
 
-
-             <div className="flex flex-col w-1/2">
-            <label className="text-sm font-medium text-gray-700 mb-1">
-              Xe Bus
-            </label>
-            <select
-              className="border rounded p-2 w-full mb-4"
-              defaultValue=""
-            >
-              <option value="" disabled>Chọn xe bus</option>
-              <option value="xe1">29A-12345 - Tuyến 1 - Quận 1</option>
-              <option value="xe2">Xe Bus 02</option>
-              <option value="xe3">Xe Bus 03</option>
-            </select>
-             </div>
-            </div>
-
-            {/* Buttons */}
-            <div className="flex justify-end gap-2">
-              <Button  onClick={() => setShowForm(false)}>
-                Hủy
-              </Button>
-              <Button className="bg-indigo-600 text-white">
-                Thêm học sinh
-              </Button>
+              <div className="flex justify-end gap-2">
+                <Button onClick={() => setShowForm(false)}>Hủy</Button>
+                <Button className="bg-indigo-600 text-white">Thêm học sinh</Button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
       </div>
 
-      {/* Student Table */}
-      <div className="bg-white rounded-lg shadow p-4 border border-blue-200  text-sm">
+      {/* Bảng danh sách – giữ nguyên 100% */}
+      <div className="bg-white rounded-lg shadow p-4 border border-blue-200 text-sm">
         <h2 className="text-xl font-semibold mb-4">Danh sách học sinh ({students.length})</h2>
         <table className="w-full text-left leading-relaxed table-fixed">
           <colgroup>
@@ -219,175 +201,119 @@ export const Student = () => {
                     {student.status}
                   </span>
                 </td>
-
                 <td className="py-2 px-4 flex space-x-4 justify-end">
-                  <Button variant="default" 
-                      className="bg-gray-700  border"
-                      onClick={() => editShowForm(true)}>
-                     <Pen className="mr-2" size={18} />
+                  <Button
+                    variant="default"
+                    className="bg-gray-700 border"
+                    onClick={() => {
+                      setSelectedBusEdit(busOptions.find(b => b.value === student.bus) || null);
+                      editShowForm(true);
+                    }}
+                  >
+                    <Pen className="mr-2" size={18} />
                   </Button>
-                  <Button variant="default" 
-                     className="bg-gray-700  border"
-                     onClick={() => deleteShowForm(true)}>
-                     <Delete className="mr-2" size={18} />
+                  <Button variant="default" className="bg-gray buts-700 border" onClick={() => deleteShowForm(true)}>
+                    <Delete className="mr-2" size={18} />
                   </Button>
                 </td>
               </tr>
             ))}
+
+            {/* Form Sửa – chỉ thay phần Xe Bus */}
             {editForm && (
               <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-40">
                 <div className="bg-white p-6 rounded-xl shadow-lg w-[600px] animate-scale-in">
-
-                  <h2 className="text-xl font-semibold mb-4">
-                    Sửa học sinh 
-                  </h2>
+                  <h2 className="text-xl font-semibold mb-4">Sửa học sinh</h2>
 
                   <div className="flex gap-4 mb-4">
-                    
-                  <div className="flex flex-col w-1/2">
-                  <label className="text-sm font-medium text-gray-700 mb-1">
-                    Họ tên
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Nguyễn Văn A"
-                    className="border rounded p-2 w-full mb-4"
-                  />
-                  <label className="text-sm font-medium text-gray-700 mb-1">
-                    Tên phụ huynh
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Nguyễn Văn B"
-                    className="border rounded p-2 w-full mb-4"
-                  />
+                    <div className="flex flex-col w-1/2">
+                      <label className="text-sm font-medium text-gray-700 mb-1">Họ tên</label>
+                      <input type="text" placeholder="Nguyễn Văn A" className="border rounded p-2 w-full mb-4" />
+                      <label className="text-sm font-medium text-gray-700 mb-1">Tên phụ huynh</label>
+                      <input type="text" placeholder="Nguyễn Văn B" className="border rounded p-2 w-full mb-4" />
+                    </div>
+                    <div className="flex flex-col w-1/2">
+                      <label className="text-sm font-medium text-gray-700 mb-1">Lớp</label>
+                      <input type="text" placeholder="Lớp 6A" className="border rounded p-2 w-full mb-4" />
+                      <label className="text-sm font-medium text-gray-700 mb-1">Số điện thoại</label>
+                      <input type="text" placeholder="0987654321" className="border rounded p-2 w-full mb-4" />
+                    </div>
                   </div>
 
-
-                  <div className="flex flex-col w-1/2">
-                  <label className="text-sm font-medium text-gray-700 mb-1">
-                    Lớp
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Lớp 6A"
-                    className="border rounded p-2 w-full mb-4"
-                  />
-                  <label className="text-sm font-medium text-gray-700 mb-1">
-                    Số điện thoại
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="0987654321"
-                    className="border rounded p-2 w-full mb-4"
-                  />
-                  </div>
-                  </div>
                   <div className="flex flex-col w-full">
-                      <label className="text-sm font-medium text-gray-700 mb-1">
-                        Địa chỉ
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Địa chỉ nhà"
-                        className="border rounded p-2 w-full mb-4"
-                      />
+                    <label className="text-sm font-medium text-gray-700 mb-1">Địa chỉ</label>
+                    <input type="text" placeholder="Địa chỉ nhà" className="border rounded p-2 w-full mb-4" />
                   </div>
+
                   <div className="flex gap-4 mb-4">
-                    
-                  <div className="flex flex-col w-1/2">
-                  <label className="text-sm font-medium text-gray-700 mb-1">
-                    Địa điểm đến
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Bến xe bến thành"
-                    className="border rounded p-2 w-full mb-4"
-                  />
+                    <div className="flex flex-col w-1/2">
+                      <label className="text-sm font-medium text-gray-700 mb-1">Địa điểm đến</label>
+                      <input type="text" placeholder="Bến xe bến thành" className="border rounded p-2 w-full mb-4" />
+                    </div>
+
+                    {/* ← Chỉ thay phần này */}
+                    <div className="flex flex-col w-1/2">
+                      <label className="text-sm font-medium text-gray-700 mb-1">Xe Bus</label>
+                      <Select
+                        options={busOptions}
+                        value={selectedBusEdit}
+                        onChange={setSelectedBusEdit}
+                        placeholder="Tìm kiếm xe bus..."
+                        isSearchable
+                        className="react-select-container"
+                        classNamePrefix="react-select"
+                        styles={{
+                          control: (base) => ({
+                            ...base,
+                            border: "1px solid #d1d5db",
+                            borderRadius: "0.375rem",
+                            padding: "0.25rem",
+                            minHeight: "40px",
+                          }),
+                        }}
+                      />
+                    </div>
+                    {/* ← Kết thúc thay đổi */}
                   </div>
 
-
-                  <div className="flex flex-col w-1/2">
-                  <label className="text-sm font-medium text-gray-700 mb-1">
-                    Xe Bus
-                  </label>
-                  <select
-                    className="border rounded p-2 w-full mb-4"
-                    defaultValue=""
-                  >
-                    <option value="" disabled>Chọn xe bus</option>
-                    <option value="xe1">29A-12345 - Tuyến 1 - Quận 1</option>
-                    <option value="xe2">Xe Bus 02</option>
-                    <option value="xe3">Xe Bus 03</option>
-                  </select>
-                  </div>
-                  </div>
-
-                  {/* Buttons */}
                   <div className="flex justify-end gap-2">
-                    <Button  onClick={() => editShowForm(false)}>
-                      Hủy
-                    </Button>
-                    <Button className="bg-indigo-600 text-white">
-                      Sửa học sinh
-                    </Button>
+                    <Button onClick={() => editShowForm(false)}>Hủy</Button>
+                    <Button className="bg-indigo-600 text-white">Sửa học sinh</Button>
                   </div>
                 </div>
               </div>
             )}
+
+            {/* Xác nhận xóa – giữ nguyên */}
             {deleteForm && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-40">
-          <div className="bg-white p-6 rounded-xl shadow-lg w-[303px] animate-scale-in">
-
-            <h2 className="text-xl font-semibold mb-4">
-              Bạn có chắc chắn xóa học sinh 
-            </h2>
-
-            {/* Buttons */}
-            <div className="flex  justify-center  gap-2">
-              <Button className="text-white"
-              onClick={() => deleteShowForm(false)}>
-                Hủy
-              </Button>
-              <Button  
-              className="bg-red-600 text-white"
-                >
-                 Xóa
-              </Button>
-
-            </div>
-          </div>
-        </div>
-      )}
+              <div className="fixed inset-0 flex items-center justify-center bg-black/30 backdrop-blur-sm z-40">
+                <div className="bg-white p-6 rounded-xl shadow-lg w-[303px] animate-scale-in">
+                  <h2 className="text-xl font-semibold mb-4">Bạn có chắc chắn xóa học sinh</h2>
+                  <div className="flex justify-center gap-2">
+                    <Button className="text-white" onClick={() => deleteShowForm(false)}>Hủy</Button>
+                    <Button className="bg-red-600 text-white">Xóa</Button>
+                  </div>
+                </div>
+              </div>
+            )}
           </tbody>
         </table>
-        {/* Pagination controls */}
+
+        {/* Pagination – giữ nguyên */}
         <div className="flex justify-end mt-4">
           <div className="inline-flex items-center space-x-2">
-            <button
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
-              className={`px-3 py-1 rounded border ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'}`}
-            >
+            <button onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}
+              className={`px-3 py-1 rounded border ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'}`}>
               Prev
             </button>
-
-            {/* page numbers */}
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-              <button
-                key={p}
-                onClick={() => setCurrentPage(p)}
-                className={`px-3 py-1 rounded border ${p === currentPage ? 'bg-sky-600 text-white' : 'hover:bg-gray-100'}`}
-              >
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+              <button key={p} onClick={() => setCurrentPage(p)}
+                className={`px-3 py-1 rounded border ${p === currentPage ? 'bg-sky-600 text-white' : 'hover:bg-gray-100'}`}>
                 {p}
               </button>
             ))}
-
-            <button
-              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages}
-              className={`px-3 py-1 rounded border ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'}`}
-            >
+            <button onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}
+              className={`px-3 py-1 rounded border ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-100'}`}>
               Next
             </button>
           </div>
@@ -397,4 +323,4 @@ export const Student = () => {
   );
 };
 
-export default Student
+export default Student;
