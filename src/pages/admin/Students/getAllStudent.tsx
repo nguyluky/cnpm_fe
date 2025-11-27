@@ -1,12 +1,12 @@
 import {
-  Grid3x3,
-  List,
-  MoreVertical,
-  Pencil,
-  Plus,
-  Search,
-  Trash2,
-  User,
+    Grid3x3,
+    List,
+    MoreVertical,
+    Pencil,
+    Plus,
+    Search,
+    Trash2,
+    User,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { Button } from "../../../components/uiItem/button";
@@ -37,7 +37,7 @@ interface StudentData {
 }
 
 export const GetAllStudent: React.FC = () => {
-  const { api, securityData } = useApi();
+  const { securityData } = useApi();
   const [students, setStudents] = useState<StudentData[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");

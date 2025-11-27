@@ -1,6 +1,5 @@
-import { Card } from '../../components/uiItem/card.tsx';
+import { Bell, CheckCircle2, ChevronLeft } from 'lucide-react';
 import { Button } from "../../components/uiItem/button.tsx";
-import { Bell, ChevronLeft, CheckCircle2 } from 'lucide-react';
 
 export function NotiPage() {
   return (
