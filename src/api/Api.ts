@@ -11,13 +11,13 @@
  */
 
 import type {
-  AnyObject,
   BusData,
   BusInfo,
   BusMetadata,
   GeoLocation,
   PaginationMetaData,
   RouteData,
+  RouteMeta,
   StopPointsMeta,
   StudentInfoReqAssignmetStop,
   StudentMetadata,
@@ -750,7 +750,7 @@ export class Api<
       name: string;
       startLocation: GeoLocation;
       endLocation: GeoLocation;
-      meta?: AnyObject;
+      meta: RouteMeta;
       /**
        * @maxItems 50
        * @minItems 1
@@ -781,7 +781,9 @@ export class Api<
             name: string;
             location: GeoLocation;
             sequence: number;
-            meta: AnyObject;
+            meta: {
+              __?: string;
+            };
           }[];
           /**
            * @format date-time
@@ -854,13 +856,7 @@ export class Api<
           name: string;
           startLocation: GeoLocation;
           endLocation: GeoLocation;
-          metadata: {
-            Color?: string;
-            Headway?: string;
-            Distance?: number;
-            encodedPath: any;
-            OperationTime?: string;
-          };
+          metadata: RouteMeta;
           stopPoints: {
             /**
              * @format uuid
@@ -925,7 +921,7 @@ export class Api<
     id: string,
     data: {
       name: string;
-      meta?: AnyObject;
+      meta?: RouteMeta;
       /**
        * @maxItems 50
        * @minItems 1
@@ -2422,7 +2418,16 @@ export class Api<
   /**
    */
 
-  getAllStoppoints = (params: RequestParams = {}) =>
+  getAllStoppoints = (
+    query?: {
+      east?: number;
+      north?: number;
+      south?: number;
+      west?: number;
+      name?: string;
+    },
+    params: RequestParams = {},
+  ) =>
     this.request<
       {
         /**
@@ -2472,6 +2477,7 @@ export class Api<
     >({
       path: `/api/stoppoints/stoppoints`,
       method: "GET",
+      query: query,
       secure: true,
       format: "json",
       ...params,

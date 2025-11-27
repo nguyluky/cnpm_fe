@@ -130,16 +130,29 @@
         "additionalProperties": false,
         "id": "StudentAssignment"
       },
-      "AnyObject": {
+      "RouteMeta": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "__": {
+          "Color": {
+            "type": "string"
+          },
+          "Headway": {
+            "type": "string"
+          },
+          "Distance": {
+            "type": "number"
+          },
+          "encodedPath": {},
+          "OperationTime": {
             "type": "string"
           }
         },
+        "required": [
+          "encodedPath"
+        ],
         "additionalProperties": false,
-        "id": "AnyObject"
+        "id": "RouteMeta"
       },
       "PaginationMetaData": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -214,26 +227,7 @@
             "$ref": "#/components/schemas/GeoLocation"
           },
           "metadata": {
-            "type": "object",
-            "properties": {
-              "Color": {
-                "type": "string"
-              },
-              "Headway": {
-                "type": "string"
-              },
-              "Distance": {
-                "type": "number"
-              },
-              "encodedPath": {},
-              "OperationTime": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "encodedPath"
-            ],
-            "additionalProperties": false
+            "$ref": "#/components/schemas/RouteMeta"
           }
         },
         "required": [
@@ -1892,7 +1886,7 @@
                     "$ref": "#/components/schemas/GeoLocation"
                   },
                   "meta": {
-                    "$ref": "#/components/schemas/AnyObject"
+                    "$ref": "#/components/schemas/RouteMeta"
                   },
                   "stopPointIds": {
                     "minItems": 1,
@@ -1907,6 +1901,7 @@
                   "name",
                   "startLocation",
                   "endLocation",
+                  "meta",
                   "stopPointIds"
                 ],
                 "additionalProperties": false
@@ -1964,7 +1959,13 @@
                                 "type": "number"
                               },
                               "meta": {
-                                "$ref": "#/components/schemas/AnyObject"
+                                "type": "object",
+                                "properties": {
+                                  "__": {
+                                    "type": "string"
+                                  }
+                                },
+                                "additionalProperties": false
                               }
                             },
                             "required": [
@@ -2115,26 +2116,7 @@
                           "$ref": "#/components/schemas/GeoLocation"
                         },
                         "metadata": {
-                          "type": "object",
-                          "properties": {
-                            "Color": {
-                              "type": "string"
-                            },
-                            "Headway": {
-                              "type": "string"
-                            },
-                            "Distance": {
-                              "type": "number"
-                            },
-                            "encodedPath": {},
-                            "OperationTime": {
-                              "type": "string"
-                            }
-                          },
-                          "required": [
-                            "encodedPath"
-                          ],
-                          "additionalProperties": false
+                          "$ref": "#/components/schemas/RouteMeta"
                         },
                         "stopPoints": {
                           "type": "array",
@@ -2297,7 +2279,7 @@
                     "type": "string"
                   },
                   "meta": {
-                    "$ref": "#/components/schemas/AnyObject"
+                    "$ref": "#/components/schemas/RouteMeta"
                   },
                   "stopPointIds": {
                     "minItems": 1,
@@ -5661,6 +5643,48 @@
           "StoppointsController"
         ],
         "summary": "Get all stoppoints",
+        "parameters": [
+          {
+            "name": "east",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "number"
+            }
+          },
+          {
+            "name": "north",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "number"
+            }
+          },
+          {
+            "name": "south",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "number"
+            }
+          },
+          {
+            "name": "west",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "number"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
