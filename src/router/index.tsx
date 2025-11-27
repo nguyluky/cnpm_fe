@@ -19,10 +19,13 @@ import { DriverLayout } from "../layouts/DriverLayout"
 import { RootLayout } from "../layouts/RootLayout"
 // import ScheduleAdminTable from "../pages/admin/test_ui"
 // import DriverNotifications from "../pages/driver/Notifications"
-import { MapDriver } from "../pages/driver/Map";
+import { MapDriver } from "../pages/driver/Map"
+import { DriverHome } from "../pages/driver/Home";
+// import HomePagesche  from "../pages/driver/Schedule";
+  
 
 import { GetAllStudent } from "../pages/admin/Students/getAllStudent";
-import NotificationsPage from "../pages/driver/NotificationsPage";
+import { DriverSchedule } from "../pages/driver/Schedule";
 
 export const path = {
   INDEX: "/",
@@ -123,14 +126,14 @@ export const router = createBrowserRouter([
         path: path.DRIVER,
         element: <DriverLayout />,
         children: [
-          // {
-          //     index: true,
-          //     element: <DriverHome />
-          // },
-          // {
-          //     path: path.DRIVER_SCHEDULE,
-          //     element: <DriverSchedule />
-          // },
+          {
+              index: true,
+              element: <DriverHome />
+          },
+          {
+              path: path.DRIVER_SCHEDULE,
+              element: <DriverSchedule />
+          },
           // {
           //     path: path.DRIVER_QR_ROLL_CALL,
           //     element: <QRRollCall />
@@ -150,10 +153,10 @@ export const router = createBrowserRouter([
         path: "*",
         element: <NotFoundPage />,
       },
-      {
-        path: path.DRIVER_NOTIFICATIONS,
-        element: <NotificationsPage />,
-      },
+      // {
+      //   path: path.DRIVER_NOTIFICATIONS,
+      //   element: <NotificationsPage />,
+      // },
     ],
   },
 ]);

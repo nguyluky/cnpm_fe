@@ -1614,7 +1614,7 @@ export class Api<
  *
  * @tags DriverController
  * @name GetTripById
- * @summary Get trip by ID
+ * @summary Get trip by IDFend
  * @request GET:/api/drivers/trip/{id}
  * @secure*/
 
