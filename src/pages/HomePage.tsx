@@ -1,14 +1,12 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import bigBusIcon from "../assets/bus-side-solid-full.png";
 import adminIcon from "../assets/vector_admin.png";
 import busIcon from "../assets/vector_bus.png";
 import parentIcon from "../assets/vector_parent.png";
+import { Toast } from "../components/uiPart/ToastContainer";
 import { useApi } from "../contexts/apiConetxt";
 import { path } from "../router";
-import { Toast } from "../components/uiPart/ToastContainer";
-import { useEffect, useState } from "react";
-import { round } from "@turf/turf";
-import { RollerCoaster } from "lucide-react";
 
 // HomePage.tsx
 //
@@ -16,7 +14,7 @@ const toast = Toast({
     defultDuration: 3000,
     position: 'top-right',
     customToasts: {
-        success: ({ message }: { message: string }) => (
+        success: ({  }: { message: string }) => (
             <div
                 id="toast-simple"
                 className="flex items-center w-full max-w-sm p-4 text-body bg-neutral-primary-soft rounded-base shadow-xs border border-default"

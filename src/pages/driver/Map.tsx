@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import * as turf from '@turf/turf';
 import { MapPin } from "lucide-react";
 import type { Marker as MarkeRef } from "mapbox-gl";
-import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Map, { Layer, Marker, Source, type MapRef } from "react-map-gl/mapbox";
-import { useApi } from "../../contexts/apiConetxt";
+import type { GeoJsonProperties, Geometry, GeoJSON } from "geojson";
 import { useParams } from "react-router";
-import * as turf from '@turf/turf';
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useApi } from "../../contexts/apiConetxt";
 
 
 function splitRouteByPosition(coordinates: [number, number][], userLngLat: [number, number]) {
@@ -65,7 +66,6 @@ export function MapDriver() {
     const [completedRoute, setCompletedRoute] = useState<[number, number][]>([]);
     const [remainingRoute, setRemainingRoute] = useState<[number, number][]>([]);
 
-    const [sidebarState, setSidebarState] = useState<"CONFIG_START" | "CONFIG_END" | "ARRIVE_STOP" | "NONE">("CONFIG_END");
     const [nextStopIndex, setNextStopIndex] = useState<number | null>(null);
 
     const { data: tripInfo } = useQuery({
@@ -296,19 +296,22 @@ export function MapDriver() {
 
 
     useEffect(() => {
-        if (!tripInfo) return;
-
-        const startTime = new Date(tripInfo.rotute.startTime);
-        const now = new Date();
-
-        if (tripInfo.status === "PLANNED") {
-            setSidebarState("CONFIG_START");
-        }
+        // if (!tripInfo) return;
+        //
+        // const startTime = new Date(tripInfo.rotute.startTime);
+        // const now = new Date();
+        //
+        // if (tripInfo.status === "PLANNED") {
+        //     setSidebarState("CONFIG_START");
+        // }
     }, [tripInfo])
 
 
-    const generateJsonStop = useMemo(() => {
-        if (!tripInfo) return null;
+    const generateJsonStop: GeoJSON<Geometry, GeoJsonProperties> = useMemo(() => {
+        if (!tripInfo) return {
+            type: "FeatureCollection",
+            features: []
+        };
         return {
             type: "FeatureCollection",
             features: tripInfo.stops.map(stop => ({
@@ -602,6 +605,7 @@ export function MapDriver() {
                 >
                     <Source id="completed" type="geojson" data={{
                         type: 'Feature',
+                        properties: {},
                         geometry: {
                             type: 'LineString',
                             coordinates: completedRoute
@@ -618,6 +622,7 @@ export function MapDriver() {
                     </Source>
                     <Source id="remaining" type="geojson" data={{
                         type: 'Feature',
+                        properties: {},
                         geometry: {
                             type: 'LineString',
                             coordinates: remainingRoute
@@ -636,7 +641,7 @@ export function MapDriver() {
                     {
                         // draw stops markers
                     }
-                    <Source id="stops" type="geojson" data={generateJsonStop}>
+                    <Source id="stops" type="geojson" data={generateJsonStop!}>
                         <Layer
                             id="stops-layer"
                             type="circle"
