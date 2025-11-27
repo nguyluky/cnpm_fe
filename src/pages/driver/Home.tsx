@@ -7,7 +7,6 @@ import { toast } from "sonner";
 import { Clock, MapPin, Sun, Sunset } from "lucide-react";
 import type { Student } from "../../components/uiPart/TripCard";
 import { useApi } from "../../contexts/apiConetxt";
-
 import { useQuery } from "@tanstack/react-query";
 
 interface ApiSchedule {
@@ -16,7 +15,17 @@ interface ApiSchedule {
   bus: { id: string; licensePlate: string };
   type: "MORNING" | "AFTERNOON";
   daysOfWeek: number[];
+  startTime: string;
   startDate: string;
+  endDate: string;
+}
+
+interface TodaySchedule {
+  scheduleId: string;
+  tripId: string;
+  date: string;
+  static: "PLANNED" | "ONGOING" | "COMPLETED" | "CANCELLED";
+  type: "MORNING" | "AFTERNOON";
   startTime: string;
 }
 
@@ -28,68 +37,112 @@ interface TripInfo {
   dropPoint: string;
 }
 
+// hàm format giờ từ ISO
+function formatStartTime(isoString: string) {
+  if (!isoString) return "---";
+  const [, timeMs] = isoString.split("T"); // "06:30:00.000Z"
+  const timePart = timeMs?.split(".")[0] ?? "";
+  return timePart; // "06:30:00"
+}
+
 export const DriverHome: React.FC = () => {
   const api = useApi();
 
-  // State cho ca sáng/chiều và chuyến được chọn
   const [selectedShift, setSelectedShift] = React.useState<"MORNING" | "AFTERNOON">("MORNING");
   const [selectedTrip, setSelectedTrip] = React.useState<TripInfo | null>(null);
 
-  // Dùng React Query để lấy dữ liệu API
-  const { data, error, isLoading } = useQuery({
+  // 1) getDriverSchedules: để lấy licensePlate + route
+  const {
+    data: driverSchedules = [],
+    error: driverError,
+    isLoading: isLoadingDriver,
+  } = useQuery({
     queryKey: ["driverSchedules"],
     queryFn: async () => {
-      const result = await api.api.getDriverSchedules();
-      // Nếu result là Response (fetch), phải .json()
-      // Nếu đã là object rồi, thì giữ nguyên
-      if (typeof result.json === "function") {
-        // Nếu là Response, lấy JSON thực sự
-        const json = await result.json();
-        console.log("Kết quả JSON getDriverSchedules:", json);
-        if (json.code !== 200 || !json.data?.data) {
-          throw new Error(json.message || "API trả dữ liệu lỗi hoặc rỗng.");
-        }
-        return json.data.data;
-      } else {
-        // Nếu đã là object rồi
-        console.log("Kết quả lập tức getDriverSchedules:", result);
-        if (result.code !== 200 || !result.data?.data) {
-          throw new Error(result.message || "API trả dữ liệu lỗi hoặc rỗng.");
-        }
-        return result.data.data;
+      const res = await api.api.getDriverSchedules();
+      const json = typeof (res as any).json === "function" ? await (res as any).json() : res;
+      if (json.code !== 200 || !json.data?.data) {
+        throw new Error(json.message || "API getDriverSchedules lỗi hoặc rỗng.");
       }
+      return json.data.data as ApiSchedule[];
     },
   });
 
+  // 2) getTodaysSchedules: chỉ ca hôm nay
+  const {
+    data: todaySchedules = [],
+    error: todayError,
+    isLoading: isLoadingToday,
+  } = useQuery({
+    queryKey: ["todaySchedules"],
+    queryFn: async () => {
+      const res = await api.api.getTodaysSchedules();
+      const json = typeof (res as any).json === "function" ? await (res as any).json() : res;
+      if (json.code !== 200 || !json.data?.data) {
+        // hôm nay không có ca => mảng rỗng
+        return [] as TodaySchedule[];
+      }
+      return json.data.data as TodaySchedule[];
+    },
+  });
 
-  // Xử lý ca hiện tại
-  const currentShiftSchedules: ApiSchedule[] = (data || []).filter((sch) => sch.type === selectedShift);
+  // lọc schedule theo ca để lấy biển số
+  const currentShiftSchedules: ApiSchedule[] = driverSchedules.filter(
+    (sch) => sch.type === selectedShift
+  );
 
-  // Xử lý sự kiện
+  const licensePlateText =
+    currentShiftSchedules[0]?.bus?.licensePlate
+      ? `Xe buýt: ${currentShiftSchedules[0].bus.licensePlate}`
+      : "---";
+
+  // join todaySchedules với driverSchedules theo scheduleId
+  const todayShiftTrips: TripInfo[] = todaySchedules
+    .filter((t) => t.type === selectedShift) // ca sáng / chiều
+    .map((t) => {
+      const sched = driverSchedules.find((s) => s.id === t.scheduleId);
+      return {
+        id: t.tripId,
+        location: sched?.route?.name || "Chưa có tên tuyến",
+        time: formatStartTime(t.startTime),
+        students: [],
+        dropPoint: "---",
+      } as TripInfo;
+    });
+
+  // toast
   const handlePickUp = (student: Student) => toast.success(`✅ Đã đón ${student.name}`);
   const handleAbsent = (student: Student) => toast.info(`📋 ${student.name} vắng mặt`);
+
+  const isLoading = isLoadingDriver || isLoadingToday;
+  const error = driverError || todayError;
 
   return (
     <div className="p-6">
       <div className="space-y-6">
         <WelcomeBanner
           driverName="Nguyễn Thành Luân"
-          vehicleId={currentShiftSchedules[0]?.bus?.licensePlate ? `Xe buýt: ${currentShiftSchedules[0].bus.licensePlate}` : "---"}
+          vehicleId={licensePlateText}
           date={new Date().toLocaleDateString("vi-VN")}
         />
 
         {isLoading && <p>Đang tải dữ liệu...</p>}
-        {error && <p style={{ color: "red" }}>Lỗi API: {error.message}</p>}
+        {error && <p style={{ color: "red" }}>Lỗi API: {(error as Error).message}</p>}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
+            {/* nút chọn ca */}
             <div className="flex gap-3 mb-2">
               <button
                 onClick={() => {
                   setSelectedShift("MORNING");
                   setSelectedTrip(null);
                 }}
-                className={`px-4 py-2 rounded-lg border font-medium cursor-pointer ${selectedShift === "MORNING" ? "bg-orange-500 text-white border-orange-600" : "bg-white text-gray-700"}`}
+                className={`px-4 py-2 rounded-lg border font-medium cursor-pointer ${
+                  selectedShift === "MORNING"
+                    ? "bg-orange-500 text-white border-orange-600"
+                    : "bg-white text-gray-700"
+                }`}
               >
                 Ca sáng
               </button>
@@ -98,59 +151,77 @@ export const DriverHome: React.FC = () => {
                   setSelectedShift("AFTERNOON");
                   setSelectedTrip(null);
                 }}
-                className={`px-4 py-2 rounded-lg border font-medium cursor-pointer ${selectedShift === "AFTERNOON" ? "bg-purple-600 text-white border-purple-700" : "bg-white text-gray-700"}`}
+                className={`px-4 py-2 rounded-lg border font-medium cursor-pointer ${
+                  selectedShift === "AFTERNOON"
+                    ? "bg-purple-600 text-white border-purple-700"
+                    : "bg-white text-gray-700"
+                }`}
               >
                 Ca chiều
               </button>
             </div>
 
-            {currentShiftSchedules.length === 0 && !isLoading && (
-              <p>Không có dữ liệu ca cho ca này</p>
+            {/* nếu hôm nay không có ca cho shift đang chọn */}
+            {todayShiftTrips.length === 0 && !isLoading && (
+              <p>Hôm nay không có ca cho khung giờ này</p>
             )}
 
-            {currentShiftSchedules.map((sched, index) => {
-              const tripInfo: TripInfo = {
-                id: sched.id,
-                location: sched.route.name,
-                time: sched.startTime
-                 
-                ,
-                students: [], // Không có dữ liệu từ API, nên để rỗng
-                dropPoint: "---",
-              };
-              return (
-                <Card
-                  key={sched.id}
-                  className={`p-5 mb-4 cursor-pointer ${selectedTrip?.id === tripInfo.id ? "bg-gray-100" : ""}`}
-                  onClick={() => setSelectedTrip(tripInfo)}
+            {/* danh sách ca hôm nay */}
+            {todayShiftTrips.map((tripInfo, index) => (
+              <Card
+                key={tripInfo.id}
+                className={`p-5 mb-4 cursor-pointer ${
+                  selectedTrip?.id === tripInfo.id ? "bg-gray-100" : ""
+                }`}
+                onClick={() => setSelectedTrip(tripInfo)}
+              >
+                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                  {selectedShift === "MORNING" ? (
+                    <Sun className="w-5 h-5 text-orange-500" />
+                  ) : (
+                    <Sunset className="w-5 h-5 text-purple-500" />
+                  )}
+                  <span>
+                    {`Lịch làm việc hôm nay - ${
+                      selectedShift === "MORNING" ? "Ca sáng" : "Ca chiều"
+                    }`}
+                  </span>
+                </h2>
+
+                <div
+                  className={`flex justify-between p-4 rounded-lg border mb-5 ${
+                    selectedShift === "MORNING"
+                      ? "bg-orange-50 border-orange-200"
+                      : "bg-purple-50 border-purple-200"
+                  }`}
                 >
-                  <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                    {sched.type === "MORNING" ? <Sun className="w-5 h-5 text-orange-500" /> : <Sunset className="w-5 h-5 text-purple-500" />}
-                    <span>{`Lịch làm việc hôm nay - ${sched.type === "MORNING" ? "Ca sáng" : "Ca chiều"}`}</span>
-                  </h2>
-                  <div
-                    className={`flex justify-between p-4 rounded-lg border mb-5 ${sched.type === "MORNING" ? "bg-orange-50 border-orange-200" : "bg-purple-50 border-purple-200"
+                  <div className="flex items-center gap-2">
+                    <Clock
+                      className={`h-5 w-5 ${
+                        selectedShift === "MORNING" ? "text-orange-600" : "text-purple-600"
                       }`}
-                  >
-                    <div className="flex items-center gap-2">
-                      <Clock className={`h-5 w-5 ${sched.type === "MORNING" ? "text-orange-600" : "text-purple-600"}`} />
-                      <span className="font-medium">{tripInfo.time}</span>
-                    </div>
-                    <MapPin className={`h-5 w-5 ${sched.type === "MORNING" ? "text-orange-600" : "text-purple-600"}`} />
-                  </div>
-                  <div className="space-y-3">
-                    <TripCard
-                      index={index + 1}
-                      location={tripInfo.location}
-                      time={tripInfo.time}
-                      students={tripInfo.students}
-                      onPickUp={handlePickUp}
-                      onAbsent={handleAbsent}
                     />
+                    <span className="font-medium">{tripInfo.time}</span>
                   </div>
-                </Card>
-              );
-            })}
+                  <MapPin
+                    className={`h-5 w-5 ${
+                      selectedShift === "MORNING" ? "text-orange-600" : "text-purple-600"
+                    }`}
+                  />
+                </div>
+
+                <div className="space-y-3">
+                  <TripCard
+                    index={index + 1}
+                    location={tripInfo.location}
+                    time={tripInfo.time}
+                    students={tripInfo.students}
+                    onPickUp={handlePickUp}
+                    onAbsent={handleAbsent}
+                  />
+                </div>
+              </Card>
+            ))}
           </div>
 
           {/* Sidebar */}
@@ -158,12 +229,13 @@ export const DriverHome: React.FC = () => {
             <QuickInfoSidebar
               electricCount={3}
               studyCount={4}
-              WorkCount={data ? data.length : 0}
+              WorkCount={todaySchedules.length}
               routeInfo={{
                 vehicle: "Xe buýt",
-                vehicleId: currentShiftSchedules[0]?.bus?.licensePlate ? currentShiftSchedules[0].bus.licensePlate : "---",
+                vehicleId:
+                  currentShiftSchedules[0]?.bus?.licensePlate ??
+                  "---",
                 route: selectedTrip?.location ?? "---",
-                // dropPoint: selectedTrip?.dropPoint ?? "---",
                 time: selectedTrip?.time ?? "---",
               }}
             />

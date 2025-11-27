@@ -1638,6 +1638,7 @@ export class Api<
             daysOfWeek: number[];
             /** ISO 8601 date string */
             startDate: string;
+            endDate: string;
           }[];
         };
       },
