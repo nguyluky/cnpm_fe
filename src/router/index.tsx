@@ -5,7 +5,7 @@ import { NotFoundPage } from "../pages/404Page";
 import { Bus } from "../pages/admin/Bus/getAllBus";
 import { Buss } from "../pages/admin/MapBuss";
 import { Overview } from "../pages/admin/Overview";
-import { RouteAdmin } from "../pages/admin/RouteAdmin";
+import { RouteAdmin } from "../pages/admin/Route/RouteAdmin";
 import { Schedules } from "../pages/admin/Schedules";
 import { Student } from "../pages/admin/Student";
 import { HomePage } from "../pages/HomePage";
@@ -17,14 +17,13 @@ import { StopsPointsPage } from "../pages/stopPoint";
 // import { AddSchedulePage } from "../pages/admin/test_ui1"
 import { DriverLayout } from "../layouts/DriverLayout"
 import { RootLayout } from "../layouts/RootLayout"
-import ScheduleAdminTable from "../pages/admin/test_ui"
+// import ScheduleAdminTable from "../pages/admin/test_ui"
 // import DriverNotifications from "../pages/driver/Notifications"
 import { MapDriver } from "../pages/driver/Map"
 import { DriverHome } from "../pages/driver/Home";
 // import HomePagesche  from "../pages/driver/Schedule";
   
 
-import NotificationsPage from "../pages/driver/NotificationsPage";
 import { GetAllStudent } from "../pages/admin/Students/getAllStudent";
 import DriverSchedule from "../pages/driver/Schedule";
 
@@ -146,18 +145,18 @@ export const router = createBrowserRouter([
         path: path.DRIVER_TRIP,
         element: <MapDriver />,
       },
-      {
-        path: "/test",
-        element: <ScheduleAdminTable />,
-      },
+      // {
+      //   path: "/test",
+      //   element: <ScheduleAdminTable />,
+      // },
       {
         path: "*",
         element: <NotFoundPage />,
       },
-      {
-        path: path.DRIVER_NOTIFICATIONS,
-        element: <NotificationsPage />,
-      },
+      // {
+      //   path: path.DRIVER_NOTIFICATIONS,
+      //   element: <NotificationsPage />,
+      // },
     ],
   },
 ]);

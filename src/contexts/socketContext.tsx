@@ -9,17 +9,29 @@ import {
     type ReactNode,
 } from "react";
 import { io, type Socket } from "socket.io-client";
+import { useApi } from "./apiConetxt";
 
+// c -> s
 interface SocketEvents {
     joinNotificationRoom: (accessToken: string) => void;
     joinTripRoom: (tripId: string) => void;
     NewNotification: (notification: any) => void;
     LiveLocationUpdate: (location: { lat: number; lng: number }) => void;
     SystemAlert: (message: string) => void;
+    UpdateLocation: (location: { lat: number; lng: number }) => void;
 }
 
+
+interface NotificationType {
+    type: string;
+    message: string;
+    data?: string;
+    timestamp: Date;
+}
+
+// s -> c
 interface SocketEmits {
-    NewNotification: (notification: any) => void;
+    NewNotification: (notification: NotificationType) => void;
     LiveLocationUpdate: (location: { lat: number; lng: number }) => void;
     SystemAlert: (message: string) => void;
     UpdateLocation: (location: { lat: number; lng: number }) => void;
@@ -47,6 +59,7 @@ export const SocketProvider = ({
     options?: any;
     children: ReactNode;
 }) => {
+    const api = useApi();
     const [connected, setConnected] = useState(false);
     const socketRef = useRef<Socket<SocketEmits, SocketEvents> | null>(null);
     const [socket, setSocket] = useState<Socket<SocketEmits, SocketEvents> | null>(null);
@@ -79,6 +92,16 @@ export const SocketProvider = ({
             s.disconnect();
         };
     }, [options, url]);
+
+
+    useEffect(() => {
+        if (!socket || !connected) return;
+
+        const accessToken = api?.securityData?.accessToken;
+        if (accessToken) {
+            socket.emit("joinNotificationRoom", accessToken);
+        }
+    }, [socket, api, connected]);
 
     return (
         <SocketContext.Provider

@@ -1,9 +1,8 @@
-import { Card } from '../../components/uiItem/card.tsx';
-import { Button } from "../../components/uiItem/button.tsx";
-import { MapPin, Bus, User, Navigation, Bell, Clock, AlertCircle } from "lucide-react";
-import Map, { Layer, NavigationControl, Source, Popup, Marker } from "react-map-gl/mapbox";
+import { Bus, MapPin, Navigation, User } from "lucide-react";
 import { useState } from "react";
-import TeamLogo from "../../assets/vector_parent.png";
+import Map, { Marker, NavigationControl, Popup } from "react-map-gl/mapbox";
+import { Button } from "../../components/uiItem/button.tsx";
+import { Card } from '../../components/uiItem/card.tsx';
 
 const MAPBOX_TOKEN = "pk.eyJ1Ijoibmd1eWx1a3kxIiwiYSI6ImNtZ2Yxb2hoMjAzbW8yam9teHN1MGhiYXYifQ.5gyVRqeLYNO0lXUYIRgpJQ";
 

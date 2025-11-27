@@ -130,16 +130,29 @@
         "additionalProperties": false,
         "id": "StudentAssignment"
       },
-      "AnyObject": {
+      "RouteMeta": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "__": {
+          "Color": {
+            "type": "string"
+          },
+          "Headway": {
+            "type": "string"
+          },
+          "Distance": {
+            "type": "number"
+          },
+          "encodedPath": {},
+          "OperationTime": {
             "type": "string"
           }
         },
+        "required": [
+          "encodedPath"
+        ],
         "additionalProperties": false,
-        "id": "AnyObject"
+        "id": "RouteMeta"
       },
       "PaginationMetaData": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -214,26 +227,7 @@
             "$ref": "#/components/schemas/GeoLocation"
           },
           "metadata": {
-            "type": "object",
-            "properties": {
-              "Color": {
-                "type": "string"
-              },
-              "Headway": {
-                "type": "string"
-              },
-              "Distance": {
-                "type": "number"
-              },
-              "encodedPath": {},
-              "OperationTime": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "encodedPath"
-            ],
-            "additionalProperties": false
+            "$ref": "#/components/schemas/RouteMeta"
           }
         },
         "required": [
@@ -778,6 +772,59 @@
               }
             }
           },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
           "500": {
             "description": "Internal Server Error",
             "content": {
@@ -807,7 +854,12 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "JWTAuth": []
+          }
+        ]
       }
     },
     "/api/auth/admin/change-password": {
@@ -1834,7 +1886,7 @@
                     "$ref": "#/components/schemas/GeoLocation"
                   },
                   "meta": {
-                    "$ref": "#/components/schemas/AnyObject"
+                    "$ref": "#/components/schemas/RouteMeta"
                   },
                   "stopPointIds": {
                     "minItems": 1,
@@ -1849,6 +1901,7 @@
                   "name",
                   "startLocation",
                   "endLocation",
+                  "meta",
                   "stopPointIds"
                 ],
                 "additionalProperties": false
@@ -1906,7 +1959,13 @@
                                 "type": "number"
                               },
                               "meta": {
-                                "$ref": "#/components/schemas/AnyObject"
+                                "type": "object",
+                                "properties": {
+                                  "__": {
+                                    "type": "string"
+                                  }
+                                },
+                                "additionalProperties": false
                               }
                             },
                             "required": [
@@ -2057,26 +2116,7 @@
                           "$ref": "#/components/schemas/GeoLocation"
                         },
                         "metadata": {
-                          "type": "object",
-                          "properties": {
-                            "Color": {
-                              "type": "string"
-                            },
-                            "Headway": {
-                              "type": "string"
-                            },
-                            "Distance": {
-                              "type": "number"
-                            },
-                            "encodedPath": {},
-                            "OperationTime": {
-                              "type": "string"
-                            }
-                          },
-                          "required": [
-                            "encodedPath"
-                          ],
-                          "additionalProperties": false
+                          "$ref": "#/components/schemas/RouteMeta"
                         },
                         "stopPoints": {
                           "type": "array",
@@ -2239,7 +2279,7 @@
                     "type": "string"
                   },
                   "meta": {
-                    "$ref": "#/components/schemas/AnyObject"
+                    "$ref": "#/components/schemas/RouteMeta"
                   },
                   "stopPointIds": {
                     "minItems": 1,
@@ -3689,8 +3729,14 @@
                                   "type": "number"
                                 }
                               },
+                              "startTime": {
+                                "description": "HH:mm format",
+                                "type": "string"
+                              },
                               "startDate": {
-                                "description": "ISO 8601 date string",
+                                "type": "string"
+                              },
+                              "endDate": {
                                 "type": "string"
                               }
                             },
@@ -3700,6 +3746,7 @@
                               "bus",
                               "type",
                               "daysOfWeek",
+                              "startTime",
                               "startDate"
                             ],
                             "additionalProperties": false
@@ -4657,7 +4704,7 @@
         ]
       }
     },
-    "/api/drivers/": {
+    "/api/drivers/trip/{tripId}/students/{studentId}/dropoff": {
       "post": {
         "tags": [
           "DriverController"
@@ -5511,6 +5558,46 @@
                     "message": {
                       "type": "string",
                       "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "studentId": {
+                          "type": "string"
+                        },
+                        "routeId": {
+                          "type": "string"
+                        },
+                        "stopId": {
+                          "type": "string"
+                        },
+                        "direction": {
+                          "type": "string",
+                          "enum": [
+                            "PICKUP",
+                            "DROPOFF"
+                          ]
+                        },
+                        "effectiveFrom": {
+                          "type": "string"
+                        },
+                        "effectiveTo": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "studentId",
+                        "routeId",
+                        "stopId",
+                        "direction",
+                        "effectiveFrom"
+                      ],
+                      "additionalProperties": false
                     }
                   },
                   "required": []
@@ -5556,6 +5643,48 @@
           "StoppointsController"
         ],
         "summary": "Get all stoppoints",
+        "parameters": [
+          {
+            "name": "east",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "number"
+            }
+          },
+          {
+            "name": "north",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "number"
+            }
+          },
+          {
+            "name": "south",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "number"
+            }
+          },
+          {
+            "name": "west",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "number"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
