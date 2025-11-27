@@ -25,7 +25,7 @@ import { DriverHome } from "../pages/driver/Home";
   
 
 import { GetAllStudent } from "../pages/admin/Students/getAllStudent";
-import DriverSchedule from "../pages/driver/Schedule";
+import { DriverSchedule } from "../pages/driver/Schedule";
 
 export const path = {
   INDEX: "/",

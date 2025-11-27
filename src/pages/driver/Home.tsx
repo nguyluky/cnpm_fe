@@ -37,7 +37,7 @@ interface TripInfo {
   dropPoint: string;
 }
 
-// hàm format giờ từ ISO
+// hàm format giờ từ database vì Khắc Híu lười chuyển
 function formatStartTime(isoString: string) {
   if (!isoString) return "---";
   const [, timeMs] = isoString.split("T"); // "06:30:00.000Z"
@@ -59,8 +59,8 @@ export const DriverHome: React.FC = () => {
   } = useQuery({
     queryKey: ["driverSchedules"],
     queryFn: async () => {
-      const res = await api.api.getDriverSchedules();
-      const json = typeof (res as any).json === "function" ? await (res as any).json() : res;
+      const sche = await api.api.getDriverSchedules();
+      const json = typeof (sche as any).json === "function" ? await (sche as any).json() : sche;
       if (json.code !== 200 || !json.data?.data) {
         throw new Error(json.message || "API getDriverSchedules lỗi hoặc rỗng.");
       }
@@ -76,8 +76,8 @@ export const DriverHome: React.FC = () => {
   } = useQuery({
     queryKey: ["todaySchedules"],
     queryFn: async () => {
-      const res = await api.api.getTodaysSchedules();
-      const json = typeof (res as any).json === "function" ? await (res as any).json() : res;
+      const tdsche = await api.api.getTodaysSchedules();
+      const json = typeof (tdsche as any).json === "function" ? await (tdsche as any).json() : tdsche;
       if (json.code !== 200 || !json.data?.data) {
         // hôm nay không có ca => mảng rỗng
         return [] as TodaySchedule[];
@@ -110,7 +110,7 @@ export const DriverHome: React.FC = () => {
       } as TripInfo;
     });
 
-  // toast
+  // hiện tại để tạm xem thử có thêm thông tin học sinh cần đón trong tuyến được không
   const handlePickUp = (student: Student) => toast.success(`✅ Đã đón ${student.name}`);
   const handleAbsent = (student: Student) => toast.info(`📋 ${student.name} vắng mặt`);
 
@@ -121,7 +121,7 @@ export const DriverHome: React.FC = () => {
     <div className="p-6">
       <div className="space-y-6">
         <WelcomeBanner
-          driverName="Nguyễn Thành Luân"
+          driverName="Tài xế hư hỏng của tôi"
           vehicleId={licensePlateText}
           date={new Date().toLocaleDateString("vi-VN")}
         />
@@ -224,11 +224,11 @@ export const DriverHome: React.FC = () => {
             ))}
           </div>
 
-          {/* Sidebar */}
+          {/* Sidebar  */}  
           <div className="lg:col-span-1 space-y-6">
             <QuickInfoSidebar
-              electricCount={3}
-              studyCount={4}
+              electricCount={3}  //Để tạm dữ liệu ảo, khong cần thì xóa sau
+              studyCount={4}    //Để tạm dữ liệu ảo, khong cần thì xóa sau
               WorkCount={todaySchedules.length}
               routeInfo={{
                 vehicle: "Xe buýt",

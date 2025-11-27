@@ -1,145 +1,156 @@
-import React from "react";
-import { Badge } from "../../components/uiItem/badge";
-import { Card } from "../../components/uiItem/card";
-import { useApi } from "../../contexts/apiConetxt";
+import React, { useState, useMemo } from "react";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import viLocale from "@fullcalendar/core/locales/vi";
+import { CalendarDays } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { useApi } from "../../contexts/apiConetxt";
 
-// Kiểu dữ liệu mẫu
 interface ApiSchedule {
-  id: string;                           // scheduleId
+  id: string;
   route: { id: string; name: string };
-  bus: { licensePlate: string; model: string; capacity: number };
+  bus: { id: string; licensePlate: string };
   type: "MORNING" | "AFTERNOON";
-  daysOfWeek: number[];
-  startDate: string;
-  endDate: string;
-  status: string;
+  daysOfWeek: number[]; // 1–7
+  startTime: string; // "06:30"
+  startDate: string; // ISO
+  endDate: string; // ISO
 }
 
-interface TodaySchedule {
-  scheduleId: string;
-  tripId: string;
-  date: string;       // ngày thực tế
-  status: string;     // ACTIVE,...
-  type: "DISPATH" | "RETURN";
-  startTime: string;
-}
-
-function getDaysOfWeekText(days: number[]) {
-  const dayNames = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
-  return days.map((day) => dayNames[day]).join(", ");
-}
-
-function getScheduleTypeColor(type: string) {
-  return type === "MORNING"
-    ? "bg-orange-50 text-orange-600 border-orange-300"
-    : "bg-purple-50 text-purple-600 border-purple-300";
-}
-
-export default function DriverSchedule() {
+export const DriverSchedule: React.FC = () => {
   const api = useApi();
+  const [currentDate, setCurrentDate] = useState(new Date());
 
-  // Lấy tất cả lịch xe đã phân, route, bus...
-  const { data: schedules, error, isLoading } = useQuery({
-    queryKey: ["driverSchedules"],
+  const { data: schedules = [], isLoading, error } = useQuery<ApiSchedule[]>({
+    queryKey: ["driverSchedules-calendar"],
     queryFn: async () => {
-      const result = await api.api.getDriverSchedules();
-      const d = typeof result.json === "function" ? await result.json() : result;
-      if (d.code !== 200 || !d.data?.data) throw new Error(d.message || "API lỗi");
-      return d.data.data;
+      const res = await api.api.getDriverSchedules();
+      const json = typeof (res as any).json === "function" ? await (res as any).json() : res;
+      if (json.code !== 200 || !json.data?.data) {
+        throw new Error(json.message || "API getDriverSchedules lỗi hoặc rỗng");
+      }
+      return json.data.data as ApiSchedule[];
     },
   });
 
-  // Lấy các ca hôm nay, gồm scheduleId và thông tin ca trong ngày
-  const { data: todaySchedules, error: errorToday, isLoading: isTodayLoading } = useQuery({
-    queryKey: ["todaysSchedules"],
-    queryFn: async () => {
-      const result = await api.api.getTodaysSchedules();
-      const d = typeof result.json === "function" ? await result.json() : result;
-      if (d.code !== 200 || !d.data?.data) throw new Error(d.message || "API lỗi");
-      return d.data.data;
-    },
-  });
+  // util: parse ISO date "2025-11-01T00:00:00.000Z" -> Date (local, bỏ time)
+  const toLocalDateOnly = (iso: string) => {
+    const d = new Date(iso);
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  };
 
-  // Map dữ liệu lịch hôm nay với lịch đầy đủ
-  const overviewSchedules = (todaySchedules || []).map((today) => {
-    const full = (schedules || []).find((sch) => sch.id === today.scheduleId);
+  // util: lặp qua từng ngày từ start tới end
+  const eachDay = (start: Date, end: Date): Date[] => {
+    const days: Date[] = [];
+    const cur = new Date(start.getTime());
+    while (cur <= end) {
+      days.push(new Date(cur.getTime()));
+      cur.setDate(cur.getDate() + 1);
+    }
+    return days;
+  };
+
+  // util: convert daysOfWeek (1–7) -> set dễ check
+  const buildDaysOfWeekSet = (days: number[]) => new Set(days);
+
+  // util: build time string "YYYY-MM-DDTHH:mm:ss"
+  const buildDateTime = (date: Date, timeHHmm: string) => {
+    const [h, m] = timeHHmm.split(":");
+    const yyyy = date.getFullYear();
+    const mm = `${date.getMonth() + 1}`.padStart(2, "0");
+    const dd = `${date.getDate()}`.padStart(2, "0");
+    const hh = h.padStart(2, "0");
+    const mi = m.padStart(2, "0");
+    // ví dụ hiển thị 1 giờ, có thể cộng thêm 1h nếu muốn
     return {
-      ...full,
-      ...today,
-      route: full?.route ?? { name: "---" },
-      bus: full?.bus ?? { licensePlate: "---", model: "---", capacity: "---" },
-      type: full?.type ?? "MORNING"
+      start: `${yyyy}-${mm}-${dd}T${hh}:${mi}:00`,
+      end: `${yyyy}-${mm}-${dd}T${hh}:${mi}:00`,
     };
-  });
+  };
+
+  const events = useMemo(() => {
+    if (!schedules.length) return [];
+
+    const allEvents: any[] = [];
+
+    schedules.forEach((sch) => {
+      const startDate = toLocalDateOnly(sch.startDate);
+      const endDate = toLocalDateOnly(sch.endDate);
+      const daysSet = buildDaysOfWeekSet(sch.daysOfWeek); // 1–7
+
+      const days = eachDay(startDate, endDate);
+
+      days.forEach((day) => {
+        // JS: 0–6 (CN–T7) => API: 1–7 (T2–CN)
+        const jsDay = day.getDay(); // 0–6
+        const apiDay = jsDay === 0 ? 7 : jsDay; // đổi 0->7, còn lại giữ nguyên
+
+        if (!daysSet.has(apiDay)) return;
+
+        const { start, end } = buildDateTime(day, sch.startTime);
+
+        allEvents.push({
+          id: `${sch.id}-${start}`,
+          title: sch.route.name, // chỉ cần tên tuyến
+          start,
+          end,
+          backgroundColor: sch.type === "MORNING" ? "#FEF3C7" : "#EDE9FE",
+          borderColor: sch.type === "MORNING" ? "#FBBF24" : "#8B5CF6",
+          textColor: "#1E1E1E",
+        });
+      });
+    });
+
+    return allEvents;
+  }, [schedules]);
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Tổng quan lịch trình hôm nay</h1>
-        <p className="text-gray-600">Các ca, tuyến, thông tin xe đầy đủ.</p>
+    <div className="p-6 space-y-6">
+      {/* Header */}
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-semibold text-slate-900 flex items-center gap-2">
+          <CalendarDays className="text-purple-600" />
+          Lịch làm việc tổng quan
+        </h1>
       </div>
 
-      {(isLoading || isTodayLoading) && <p>Đang tải dữ liệu...</p>}
-      {(error || errorToday) && (
-        <Card className="p-8 text-center text-red-500">
-          Lỗi API: {error?.message || errorToday?.message}
-        </Card>
-      )}
+      {isLoading && <p>Đang tải lịch làm việc...</p>}
+      {error && <p className="text-red-500">Lỗi tải lịch: {(error as Error).message}</p>}
 
-      <div className="space-y-6">
-        {overviewSchedules.map((schedule) => (
-          <Card key={schedule.scheduleId || schedule.id} className="p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex-1">
-                <h3 className="text-xl font-semibold mb-2">{schedule.route.name}</h3>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-4">
-                    <Badge className={`px-4 py-1 rounded-full border font-semibold ${getScheduleTypeColor(schedule.type)}`}>
-                      {schedule.type === "MORNING" ? "Ca sáng" : "Ca chiều"}
-                    </Badge>
-                    <span className="text-sm text-gray-600">
-                      Ngày trong tuần: {getDaysOfWeekText(schedule.daysOfWeek ?? [])}
-                    </span>
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    <p>Giờ bắt đầu: {schedule.startTime ?? (schedule.startDate ? new Date(schedule.startDate).toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) : "---")}</p>
-                    <p>Ngày làm việc: {schedule.date ?? (schedule.startDate ? new Date(schedule.startDate).toLocaleDateString("vi-VN") : "---")}</p>
-                    <p>Ngày kết thúc: {schedule.endDate ? new Date(schedule.endDate).toLocaleDateString("vi-VN") : "---"}</p>
-                    <p>Trạng thái: {schedule.status || "---"}</p>
-                  </div>
-                </div>
-              </div>
+      {/* Lịch */}
+      <div className="bg-white rounded-xl shadow p-4">
+        <FullCalendar
+          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+          initialView="timeGridWeek"
+          locale={viLocale}
+          nowIndicator
+          events={events}
+          height="80vh"
+          slotMinTime="05:00:00"
+          slotMaxTime="19:00:00"
+          allDaySlot={false}
+          initialDate={currentDate}
+          headerToolbar={{
+            left: "prev,next today",
+            center: "title",
+            right: "dayGridMonth,timeGridWeek,timeGridDay",
+          }}
+          buttonText={{
+            today: "Hôm nay",
+            month: "Tháng",
+            week: "Tuần",
+            day: "Ngày",
+          }}
+          eventContent={(arg) => (
+            <div className="p-1">
+              <div className="font-semibold text-sm">{arg.event.title}</div>
+              <div className="text-xs text-slate-600">{arg.timeText}</div>
             </div>
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h4 className="font-medium mb-3">Thông tin xe</h4>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                <div>
-                  <span className="text-gray-600">Biển số:</span>
-                  <span className="ml-2 font-medium">{schedule.bus.licensePlate}</span>
-                </div>
-                <div>
-                  <span className="text-gray-600">Loại xe:</span>
-                  <span className="ml-2">{schedule.bus.model}</span>
-                </div>
-                <div>
-                  <span className="text-gray-600">Sức chứa:</span>
-                  <span className="ml-2">{schedule.bus.capacity} chỗ</span>
-                </div>
-              </div>
-            </div>
-          </Card>
-        ))}
-
-        {overviewSchedules.length === 0 && (
-          <Card className="p-8 text-center">
-            <div className="text-gray-500">
-              <p className="text-lg mb-2">Chưa có lịch trình nào cho hôm nay</p>
-              <p className="text-sm">Liên hệ quản lý để được phân lịch</p>
-            </div>
-          </Card>
-        )}
+          )}
+        />
       </div>
     </div>
   );
-}
+};
