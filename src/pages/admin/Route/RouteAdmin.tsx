@@ -1,14 +1,13 @@
-import { Card } from '../../../components/uiItem/card.tsx';
-import { Button } from '../../../components/uiItem/button.tsx';
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, MapPin, MinusIcon, Pencil, Search } from "lucide-react";
-import Map, { Layer, Source, type MapRef } from "react-map-gl/mapbox";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Route, Clock } from "lucide-react";
-import type { PaginationMetaData, RouteData } from '../../../api/data-contracts.ts';
-import { useApi } from '../../../contexts/apiConetxt.tsx';
-import { Pagination } from '../../../components/uiPart/Pagination.tsx';
-import mapboxgl from 'mapbox-gl';
 import { useQuery } from '@tanstack/react-query';
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Clock, MapPin, MinusIcon, Pencil, Route, Search } from "lucide-react";
+import mapboxgl from 'mapbox-gl';
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Map, { Layer, Source, type MapRef } from "react-map-gl/mapbox";
+import type { PaginationMetaData, RouteData } from '../../../api/data-contracts.ts';
+import { Button } from '../../../components/uiItem/button.tsx';
+import { Card } from '../../../components/uiItem/card.tsx';
+import { Pagination } from '../../../components/uiPart/Pagination.tsx';
+import { useApi } from '../../../contexts/apiConetxt.tsx';
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_API_KEY;
 
@@ -141,7 +140,7 @@ function AutoCompleteStopPointInput({
     useEffect(() => {
         const handler = setTimeout(() => {
             setDebouncedSearch(term);
-        }, 500); // debounce 300ms
+        }, 500); // debounce 500ms
 
         return () => {
             clearTimeout(handler);
@@ -264,8 +263,8 @@ function AutoCompleteStopPointInput({
 
                         if (data && data.length > 0) {
                             return <ul ref={listRef}>
-                                {data.map((stop, ixd) => (
-                                    <li key={stop.id} className={"px-4 py-2 hover:bg-gray-100 cursor-pointer " + (selectedItem == ixd ? " bg-gray-100" : "")}
+                                {data.map((stop, idx) => (
+                                    <li key={stop.id} className={"px-4 py-2 hover:bg-gray-100 cursor-pointer " + (selectedItem == idx ? " bg-gray-100" : "")}
                                         onMouseDown={(e) => {
                                             e.preventDefault(); // prevent blur event
                                             onChange(stop);
@@ -305,7 +304,7 @@ function CreateRouteForm({ onClose, }: { onClose?: () => void; }) {
                 Đóng
             </Button>
         </header>
-        <aside className="grid grid-cols-[1fr-auto] gap-4">
+        <aside className="grid grid-cols-[1fr_auto] gap-4">
             <div className="">
                 <label className="block mb-1 font-medium">Tên tuyến</label>
                 <input type="text" className="w-full border border-gray-300 rounded-lg p-2" placeholder="Nhập tên tuyến" />
@@ -368,14 +367,11 @@ function CreateRouteForm({ onClose, }: { onClose?: () => void; }) {
                 }
             </div>
             <Button
-                onClick={() => {
-                    // TODO: handle create route logic here
-
-
-                }}
-                className="bg-[#6366F1] text-white text-sm px-4 py-2 rounded-lg hover:bg-indigo-700"
+                disabled
+                title="Chức năng này đang được phát triển"
+                className="bg-[#6366F1] text-white text-sm px-4 py-2 rounded-lg opacity-60 cursor-not-allowed"
             >
-                Tạo tuyến
+                Tạo tuyến (chưa khả dụng)
             </Button>
         </aside>
     </>
