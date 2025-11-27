@@ -1,0 +1,15 @@
+{
+  "short_name": "Bus Tracker",
+  "name": "Bus Tracker Application",
+  "icons": [
+    {
+      "src": "vite.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
+}
