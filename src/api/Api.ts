@@ -11,13 +11,13 @@
  */
 
 import type {
-  AnyObject,
   BusData,
   BusInfo,
   BusMetadata,
   GeoLocation,
   PaginationMetaData,
   RouteData,
+  RouteMeta,
   StopPointsMeta,
   StudentInfoReqAssignmetStop,
   StudentMetadata,
@@ -26,7 +26,7 @@ import type {
 import { ContentType, HttpClient, type RequestParams } from "./http-client";
 
 export class Api<
-  SecurityDataType = unknown
+  SecurityDataType = unknown,
 > extends HttpClient<SecurityDataType> {
   /**
 
@@ -50,7 +50,7 @@ export class Api<
        */
       email: string;
     },
-    params: RequestParams = {}
+    params: RequestParams = {},
   ) =>
     this.request<
       {
@@ -114,7 +114,7 @@ export class Api<
       username: string;
       password: string;
     },
-    params: RequestParams = {}
+    params: RequestParams = {},
   ) =>
     this.request<
       {
@@ -172,7 +172,7 @@ export class Api<
     data: {
       refreshToken: string;
     },
-    params: RequestParams = {}
+    params: RequestParams = {},
   ) =>
     this.request<
       {
@@ -215,7 +215,8 @@ export class Api<
  * @tags AuthController
  * @name GetUserProfile
  * @summary Get User Profile
- * @request GET:/api/auth/profile*/
+ * @request GET:/api/auth/profile
+ * @secure*/
 
   /**
    */
@@ -232,21 +233,32 @@ export class Api<
         /** Human-readable error message */
         message?: string;
       },
-      {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-        /** Error class name */
-        name?: string;
-      }
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
     >({
       path: `/api/auth/profile`,
       method: "GET",
+      secure: true,
       format: "json",
       ...params,
     });
@@ -266,7 +278,7 @@ export class Api<
       email: string;
       password: string;
     },
-    params: RequestParams = {}
+    params: RequestParams = {},
   ) =>
     this.request<
       {
@@ -330,7 +342,7 @@ export class Api<
        */
       limit?: number;
     },
-    params: RequestParams = {}
+    params: RequestParams = {},
   ) =>
     this.request<
       {
@@ -388,79 +400,7 @@ export class Api<
  * @secure*/
 
   /**
-   *
-   * No description
-   *
-   * @tags BusesController
-   * @name UpdateABus
-   * @summary Update a bus
-   * @request PUT:/api/buses/{id}
-   * @secure*/
-
-  /**
    */
-
-  updateABus = (
-    id: string,
-    data: {
-      licensePlate: string;
-      capacity: number;
-      metadata: AnyObject;
-    },
-    params: RequestParams = {}
-  ) =>
-    this.request<
-      {
-        /**
-         * HTTP status code of the error
-         * @min 200
-         * @max 300
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-        data?: {
-          /**
-           * @format uuid
-           * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$
-           */
-          id: string;
-          licensePlate: string;
-          capacity: number;
-          metadata: AnyObject;
-        };
-      },
-      | {
-          /**
-           * HTTP status code of the error
-           * @min 400
-           * @max 599
-           */
-          code?: number;
-          /** Human-readable error message */
-          message?: string;
-        }
-      | {
-          /**
-           * HTTP status code of the error
-           * @min 400
-           * @max 599
-           */
-          code?: number;
-          /** Human-readable error message */
-          message?: string;
-          /** Error class name */
-          name?: string;
-        }
-    >({
-      path: `/api/buses/${id}`,
-      method: "PUT",
-      body: data,
-      secure: true,
-      type: ContentType.Json,
-      format: "json",
-      ...params,
-    });
 
   createANewBus = (
     data: {
@@ -468,7 +408,7 @@ export class Api<
       capacity: number;
       metadata: BusMetadata;
     },
-    params: RequestParams = {}
+    params: RequestParams = {},
   ) =>
     this.request<
       {
@@ -745,7 +685,7 @@ export class Api<
        */
       limit?: number;
     },
-    params: RequestParams = {}
+    params: RequestParams = {},
   ) =>
     this.request<
       {
@@ -810,14 +750,14 @@ export class Api<
       name: string;
       startLocation: GeoLocation;
       endLocation: GeoLocation;
-      meta?: AnyObject;
+      meta: RouteMeta;
       /**
        * @maxItems 50
        * @minItems 1
        */
       stopPointIds: string[];
     },
-    params: RequestParams = {}
+    params: RequestParams = {},
   ) =>
     this.request<
       {
@@ -841,7 +781,9 @@ export class Api<
             name: string;
             location: GeoLocation;
             sequence: number;
-            meta: AnyObject;
+            meta: {
+              __?: string;
+            };
           }[];
           /**
            * @format date-time
@@ -914,13 +856,7 @@ export class Api<
           name: string;
           startLocation: GeoLocation;
           endLocation: GeoLocation;
-          metadata: {
-            Color?: string;
-            Headway?: string;
-            Distance?: number;
-            encodedPath: any;
-            OperationTime?: string;
-          };
+          metadata: RouteMeta;
           stopPoints: {
             /**
              * @format uuid
@@ -985,14 +921,14 @@ export class Api<
     id: string,
     data: {
       name: string;
-      meta?: AnyObject;
+      meta?: RouteMeta;
       /**
        * @maxItems 50
        * @minItems 1
        */
       stopPointIds: string[];
     },
-    params: RequestParams = {}
+    params: RequestParams = {},
   ) =>
     this.request<
       {
@@ -1134,7 +1070,7 @@ export class Api<
        */
       limit?: number;
     },
-    params: RequestParams = {}
+    params: RequestParams = {},
   ) =>
     this.request<
       {
@@ -1246,7 +1182,7 @@ export class Api<
       /** @default "MORNING" */
       type: "MORNING" | "AFTERNOON";
     },
-    params: RequestParams = {}
+    params: RequestParams = {},
   ) =>
     this.request<
       {
@@ -1439,7 +1375,7 @@ export class Api<
       routeId?: string;
       times?: TimeTable[];
     },
-    params: RequestParams = {}
+    params: RequestParams = {},
   ) =>
     this.request<
       {
@@ -1636,8 +1572,10 @@ export class Api<
             bus: BusInfo;
             type: "MORNING" | "AFTERNOON";
             daysOfWeek: number[];
-            /** ISO 8601 date string */
+            /** HH:mm format */
+            startTime: string;
             startDate: string;
+            endDate?: string;
           }[];
         };
       },
@@ -1821,7 +1759,7 @@ export class Api<
   markStoppointAsArrived = (
     tripId: string,
     spId: string,
-    params: RequestParams = {}
+    params: RequestParams = {},
   ) =>
     this.request<
       {
@@ -1884,7 +1822,7 @@ export class Api<
   markStoppointAsDeparted = (
     tripId: string,
     spId: string,
-    params: RequestParams = {}
+    params: RequestParams = {},
   ) =>
     this.request<
       {
@@ -2007,7 +1945,7 @@ export class Api<
   pickupStudent = (
     tripId: string,
     studentId: string,
-    params: RequestParams = {}
+    params: RequestParams = {},
   ) =>
     this.request<
       {
@@ -2061,7 +1999,7 @@ export class Api<
  * @tags DriverController
  * @name DropoffStudent
  * @summary Dropoff student
- * @request POST:/api/drivers/
+ * @request POST:/api/drivers/trip/{tripId}/students/{studentId}/dropoff
  * @secure*/
 
   /**
@@ -2070,7 +2008,7 @@ export class Api<
   dropoffStudent = (
     tripId: string,
     studentId: string,
-    params: RequestParams = {}
+    params: RequestParams = {},
   ) =>
     this.request<
       {
@@ -2111,7 +2049,7 @@ export class Api<
           name?: string;
         }
     >({
-      path: `/api/drivers/`,
+      path: `/api/drivers/trip/${tripId}/students/${studentId}/dropoff`,
       method: "POST",
       secure: true,
       format: "json",
@@ -2136,7 +2074,7 @@ export class Api<
       latitude: number;
       longitude: number;
     },
-    params: RequestParams = {}
+    params: RequestParams = {},
   ) =>
     this.request<
       {
@@ -2437,6 +2375,15 @@ export class Api<
         code?: number;
         /** Human-readable error message */
         message?: string;
+        data?: {
+          id: string;
+          studentId: string;
+          routeId: string;
+          stopId: string;
+          direction: "PICKUP" | "DROPOFF";
+          effectiveFrom: string;
+          effectiveTo?: string;
+        };
       },
       {
         /**
@@ -2471,7 +2418,16 @@ export class Api<
   /**
    */
 
-  getAllStoppoints = (params: RequestParams = {}) =>
+  getAllStoppoints = (
+    query?: {
+      east?: number;
+      north?: number;
+      south?: number;
+      west?: number;
+      name?: string;
+    },
+    params: RequestParams = {},
+  ) =>
     this.request<
       {
         /**
@@ -2521,6 +2477,7 @@ export class Api<
     >({
       path: `/api/stoppoints/stoppoints`,
       method: "GET",
+      query: query,
       secure: true,
       format: "json",
       ...params,
@@ -2544,7 +2501,7 @@ export class Api<
       location: GeoLocation;
       meta: StopPointsMeta;
     },
-    params: RequestParams = {}
+    params: RequestParams = {},
   ) =>
     this.request<
       {
@@ -2683,7 +2640,7 @@ export class Api<
       location: GeoLocation;
       meta: StopPointsMeta;
     },
-    params: RequestParams = {}
+    params: RequestParams = {},
   ) =>
     this.request<
       {

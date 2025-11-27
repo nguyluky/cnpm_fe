@@ -23,8 +23,8 @@ export const ApiProvider = ({ children }: { children: React.ReactNode }) => {
   const api = useState(
     () =>
       new Api<SecurityData>({
-        // baseUrl: "http://localhost:3000",
-        baseUrl: 'https://api.nguyluky.site',
+        baseUrl: "http://localhost:3000",
+        // baseUrl: 'https://api.nguyluky.site',
         securityWorker: (securityData) => {
           if (securityData && securityData.accessToken) {
             return {

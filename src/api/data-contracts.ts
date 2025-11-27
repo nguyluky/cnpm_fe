@@ -43,8 +43,12 @@ export interface StudentAssignment {
   effectiveTo: string;
 }
 
-export interface AnyObject {
-  __?: string;
+export interface RouteMeta {
+  Color?: string;
+  Headway?: string;
+  Distance?: number;
+  encodedPath: any;
+  OperationTime?: string;
 }
 
 export interface PaginationMetaData {
@@ -74,13 +78,7 @@ export interface RouteData {
   name: string;
   startLocation: GeoLocation;
   endLocation: GeoLocation;
-  metadata: {
-    Color?: string;
-    Headway?: string;
-    Distance?: number;
-    encodedPath: any;
-    OperationTime?: string;
-  };
+  metadata: RouteMeta;
 }
 
 export interface TimeTable {

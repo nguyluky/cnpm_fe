@@ -17,7 +17,7 @@ import { StopsPointsPage } from "../pages/stopPoint";
 // import { AddSchedulePage } from "../pages/admin/test_ui1"
 import { DriverLayout } from "../layouts/DriverLayout"
 import { RootLayout } from "../layouts/RootLayout"
-import ScheduleAdminTable from "../pages/admin/test_ui"
+// import ScheduleAdminTable from "../pages/admin/test_ui"
 // import DriverNotifications from "../pages/driver/Notifications"
 import { MapDriver } from "../pages/driver/Map"
 
@@ -142,10 +142,10 @@ export const router = createBrowserRouter([
         path: path.DRIVER_TRIP,
         element: <MapDriver />,
       },
-      {
-        path: "/test",
-        element: <ScheduleAdminTable />,
-      },
+      // {
+      //   path: "/test",
+      //   element: <ScheduleAdminTable />,
+      // },
       {
         path: "*",
         element: <NotFoundPage />,

@@ -1,15 +1,31 @@
 import { Card } from '../../../components/uiItem/card.tsx';
 import { Button } from '../../../components/uiItem/button.tsx';
-import { MapPin, Search } from "lucide-react";
-import Map, { Layer, NavigationControl, Source, type MapRef } from "react-map-gl/mapbox";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, MapPin, MinusIcon, Pencil, Search } from "lucide-react";
+import Map, { Layer, Source, type MapRef } from "react-map-gl/mapbox";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-const MAPBOX_TOKEN = "pk.eyJ1Ijoibmd1eWx1a3kxIiwiYSI6ImNtZ2Yxb2hoMjAzbW8yam9teHN1MGhiYXYifQ.5gyVRqeLYNO0lXUYIRgpJQ";
 import { Route, Clock } from "lucide-react";
-import type { PaginationMetaData, RouteData, StopPointsData } from '../../../api/data-contracts.ts';
+import type { PaginationMetaData, RouteData } from '../../../api/data-contracts.ts';
 import { useApi } from '../../../contexts/apiConetxt.tsx';
 import { Pagination } from '../../../components/uiPart/Pagination.tsx';
 import mapboxgl from 'mapbox-gl';
-import CreateRouteModal from './createRoute';
+import { useQuery } from '@tanstack/react-query';
+
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_API_KEY;
+
+interface StopPointsData {
+    id: string;
+    name: string;
+    location: {
+        latitude: number;
+        longitude: number;
+    };
+    meta: {
+        addressNo?: string;
+        street?: string;
+        ward?: string;
+        zone?: string;
+    };
+}
 
 // Hàm helper để ghép địa chỉ
 const getFullAddress = (meta: StopPointsData['meta']) => {
@@ -64,21 +80,21 @@ function RouteInfoCard({ route, isSelected, onClick }: {
         className={`p-4 rounded-xl border bg-white cursor-pointer hover:shadow-sm transition-shadow` + (isSelected ? ' border-red-500 shadow-md' : ' border-gray-200')}
         onClick={onClick}
     >
-<div className="flex flex-wrap items-center justify-between gap-3 mb-2">
-    <div className="flex items-center gap-3">
-        <span 
-            className="flex shrink-0 w-3 h-3 rounded-full" 
-            style={{ backgroundColor: route.metadata.Color || '#000000' }}
-        />
-        <h3 className="font-semibold text-base">
-            Tuyến {route.name}
-        </h3>
-    </div>
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
+            <div className="flex items-center gap-3">
+                <span
+                    className="flex shrink-0 w-3 h-3 rounded-full"
+                    style={{ backgroundColor: route.metadata.Color || '#000000' }}
+                />
+                <h3 className="font-semibold text-base">
+                    Tuyến {route.name}
+                </h3>
+            </div>
 
-    <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full whitespace-nowrap">
-        Hoạt động
-    </span>
-</div>
+            <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full whitespace-nowrap">
+                Hoạt động
+            </span>
+        </div>
 
         {/* flex-col để hiển thị theo chiều dọc */}
         <div className="flex flex-col gap-2 text-sm text-gray-600">
@@ -98,7 +114,271 @@ function RouteInfoCard({ route, isSelected, onClick }: {
 
         </div>
     </Card>
+}
 
+
+function AutoCompleteStopPointInput({
+    onChange,
+    value,
+    moveUp,
+    moveDown,
+    remove,
+}: {
+    onChange: (stopPoint: StopPointsData | null) => void;
+    value: StopPointsData | null;
+    moveUp?: () => void;
+    moveDown?: () => void;
+    remove?: () => void;
+}) {
+
+    const { api } = useApi();
+    const [term, setTerm] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
+    const [selectedItem, setSelectedItem] = useState<number>(0);
+    const listRef = useRef<HTMLUListElement>(null);
+    const [onFocus, setOnFocus] = useState(false);
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedSearch(term);
+        }, 500); // debounce 300ms
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [term]);
+
+    const { data, isLoading } = useQuery({
+        queryKey: ['stop-point-suggestions', debouncedSearch],
+        queryFn: async () => {
+            const response = await api.getAllStoppoints({
+                name: debouncedSearch,
+            });
+            return response.data?.data?.data || [];
+        },
+        enabled: debouncedSearch.length > 0,
+    })
+
+    useEffect(() => {
+        setSelectedItem(0);
+    }, [data]);
+
+    useEffect(() => {
+        if (listRef.current) {
+            const selectedElement = listRef.current.children[selectedItem] as HTMLElement;
+            if (selectedElement) {
+                selectedElement.scrollIntoView({ block: 'nearest', behavior: 'smooth' });// Scroll to the selected item
+            }
+        }
+    }, [selectedItem]);
+
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            setSelectedItem((prev) => (data && data.length > 0) ? (prev + 1) % data.length : 0);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            setSelectedItem((prev) => (data && data.length > 0) ? (prev - 1 + data.length) % data.length : 0);
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (data && data.length > 0) {
+                onChange(data[selectedItem]);
+                setTerm("");
+                setDebouncedSearch("");
+            }
+        }
+    }
+
+    return value ? (
+        <div className="flex items-center gap-2 mb-2 border border-gray-300 rounded-lg bg-gray-50">
+            <div className="flex-1 p-2">
+                <p className="font-medium">{value.name}</p>
+                <p className="text-sm text-gray-500">{getFullAddress(value.meta)}</p>
+            </div>
+
+            <div>
+
+                {
+                    // move up down buttons
+                }
+                <button
+                    className="text-gray-500 hover:text-gray-700 focus:outline-none cursor-pointer p-2"
+                    onClick={moveUp}
+                >
+                    <ArrowUp className="w-4 h-4" />
+                </button>
+                <button
+                    className="text-gray-500 hover:text-gray-700 focus:outline-none cursor-pointer p-2"
+                    onClick={moveDown}
+                >
+                    <ArrowDown className="w-4 h-4" />
+                </button>
+
+                {
+                    // nút chỉnh sửa
+                }
+
+                <button
+                    onClick={() => {
+                        onChange(null);
+                    }}
+                    className="text-gray-500 hover:text-gray-700 focus:outline-none cursor-pointer p-2"
+                >
+                    <Pencil className="w-4 h-4" />
+                </button>
+            </div>
+        </div>
+    ) :
+        <label className=" flex items-center gap-2 mb-2 border border-gray-300 rounded-lg p-2 bg-white relative">
+            <input type="text" className=" w-full border-0 focus:ring-0 outline-none " placeholder="Nhập điểm dừng"
+                autoFocus
+                value={term}
+                onChange={(e) => setTerm(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onFocus={() => setOnFocus(true)}
+                onBlur={() => setOnFocus(false)}
+            />
+            <button className="text-gray-500 hover:text-gray-700 focus:outline-none cursor-pointer" onClick={remove}>
+                <MinusIcon className="w-4 h-4" />
+            </button>
+
+            {/* Dropdown gợi ý tự động (ví dụ tĩnh) */}
+            <div className={"absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto "
+                + (onFocus ? " block " : " hidden ")
+            }>
+                {
+                    (() => {
+
+                        if (debouncedSearch.length === 0) {
+                            return <div className="p-4 text-center text-gray-500">
+                                Nhập để tìm điểm dừng...
+                            </div>;
+                        }
+
+                        if (isLoading) {
+                            return <div className="p-4 text-center text-gray-500">
+                                Đang tải gợi ý...
+                            </div>;
+                        }
+
+                        if (data && data.length > 0) {
+                            return <ul ref={listRef}>
+                                {data.map((stop, ixd) => (
+                                    <li key={stop.id} className={"px-4 py-2 hover:bg-gray-100 cursor-pointer " + (selectedItem == ixd ? " bg-gray-100" : "")}
+                                        onMouseDown={(e) => {
+                                            e.preventDefault(); // prevent blur event
+                                            onChange(stop);
+                                            setTerm("");
+                                            setDebouncedSearch("");
+                                        }}
+                                    >
+                                        <p className="font-medium">{stop.name}</p>
+                                        <p className="text-sm text-gray-500">{getFullAddress(stop.meta)}</p>
+                                    </li>
+                                ))}
+                            </ul>;
+                        }
+
+                        return <div className="p-4 text-center text-gray-500">
+                            Không tìm thấy điểm dừng phù hợp.
+                        </div>;
+
+                    })()
+                }
+
+            </div>
+        </label>
+}
+
+
+function CreateRouteForm({ onClose, }: { onClose?: () => void; }) {
+    const [listStopPoints, setListStopPoints] = useState<(StopPointsData | null)[]>([]);
+
+    return <>
+        <header className="flex justify-between items-center">
+            <h2 className="text-lg font-semibold">Tạo tuyến đường mới</h2>
+            <Button
+                onClick={onClose}
+                className="bg-gray-300 text-gray-700 text-sm px-3 py-1 rounded-lg hover:bg-gray-400"
+            >
+                Đóng
+            </Button>
+        </header>
+        <aside className="grid grid-cols-[1fr-auto] gap-4">
+            <div className="">
+                <label className="block mb-1 font-medium">Tên tuyến</label>
+                <input type="text" className="w-full border border-gray-300 rounded-lg p-2" placeholder="Nhập tên tuyến" />
+            </div>
+            <div>
+                <label className="block mb-1 font-medium">Màu tuyến</label>
+                <input type="color" className="w-16 h-10 border border-gray-300 rounded-lg p-1" defaultValue="#3B82F6" />
+            </div>
+            <div className="col-span-2">
+                <label className="block mb-1 font-medium">Thời gian hoạt động</label>
+                <input type="text" className="w-full border border-gray-300 rounded-lg p-2" placeholder="Ví dụ: 07:00 - 17:00" />
+            </div>
+            <div className="col-span-2">
+                <label className="block mb-1 font-medium">Khoảng cách giữa các chuyến (Headway)</label>
+                <input type="text" className="w-full border border-gray-300 rounded-lg p-2" placeholder="Ví dụ: 15 phút" />
+            </div>
+            <div className="col-span-2">
+                <label className="block mb-1 font-medium">Điểm dừng</label>
+
+                <button
+                    onClick={() => {
+                        setListStopPoints([ null, ...listStopPoints,]);
+                    }}
+                    className="w-full border border-gray-300 border-dashed rounded-lg p-2 bg-gray-100 hover:bg-gray-200 mb-2">
+                    + Thêm điểm dừng
+                </button>
+
+                {
+                    listStopPoints.map((stop, idx) => (
+                        <AutoCompleteStopPointInput
+                            key={idx}
+                            value={stop}
+                            moveUp={() => {
+                                if (idx === 0) return;
+                                const newList = [...listStopPoints];
+                                const temp = newList[idx - 1];
+                                newList[idx - 1] = newList[idx];
+                                newList[idx] = temp;
+                                setListStopPoints(newList);
+                            }}
+                            moveDown={() => {
+                                if (idx === listStopPoints.length - 1) return;
+                                const newList = [...listStopPoints];
+                                const temp = newList[idx + 1];
+                                newList[idx + 1] = newList[idx];
+                                newList[idx] = temp;
+                                setListStopPoints(newList);
+                            }}
+                            onChange={(v) => {
+                                const newList = [...listStopPoints];
+                                newList[idx] = v;
+                                setListStopPoints(newList);
+                            }} 
+                            remove={() => {
+                                const newList = listStopPoints.filter((_, i) => i !== idx);
+                                setListStopPoints(newList);
+                            }}
+                        />
+                    ))
+                }
+            </div>
+            <Button
+                onClick={() => {
+                    // TODO: handle create route logic here
+
+
+                }}
+                className="bg-[#6366F1] text-white text-sm px-4 py-2 rounded-lg hover:bg-indigo-700"
+            >
+                Tạo tuyến
+            </Button>
+        </aside>
+    </>
 }
 
 export const RouteAdmin: React.FC = () => {
@@ -115,8 +395,9 @@ export const RouteAdmin: React.FC = () => {
     const [search, setSearch] = useState("");
     const [loadingStopPoints, setLoadingStopPoints] = useState(false);
     const [viewDirection, setViewDirection] = useState<[boolean, boolean]>([true, true]);
-    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-    
+    const [isCreate, setIsCreate] = useState(false);
+    const [showStopPointsList, setShowStopPointsList] = useState(false);
+
 
     const [viewState, setViewState] = useState({
         latitude: 10.771,
@@ -198,61 +479,71 @@ export const RouteAdmin: React.FC = () => {
     return (
         <div className="flex flex-col bg-[#E0E7FF] w-full h-screen">
             <div className="flex-1 mx-7 my-5 flex flex-col xl:flex-row gap-5 overflow-hidden">
-                {/* Left Column - Danh sách tuyến */}
+                {/* Left Column - Danh sách tuyến , tao*/}
                 <Card className="xl:w-96 w-full h-fit xl:h-full p-5 flex flex-col gap-4 overflow-hidden">
-                    <div className="flex justify-between items-center">
-                        <h2 className="text-lg font-semibold">Quản lý tuyến đường</h2>
-                          <Button
-                            onClick={() => setIsCreateModalOpen(true)}
-                            className="bg-[#6366F1] text-white text-sm px-4 py-2 rounded-lg hover:bg-indigo-700"
-                          >
-                            + Tạo tuyến mới
-                          </Button>
-                    </div>
-
                     {
-                        // search box
-                    }
-                    <div className="flex items-center">
-                        <div className="relative w-full">
-                            <input type="text" value={
-                                searchTerm
-                            }
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Search branch name..." required />
-                        </div>
-                        <button onClick={() => {
-                            setSearch(searchTerm);
-                        }} className="p-2.5 ms-2 text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
-                            <Search className="w-4 h-4" />
-                            <span className="sr-only">Search</span>
-                        </button>
-                    </div>
-
-
-                    <div className="overflow-y-auto flex-1">
-                        {loading ? (
-                            <div className="space-y-4">
-                                {Array.from({ length: 5 }).map((_, index) => (
-                                    <RouteCardSkeleton key={index} />
-                                ))}
-                            </div>
+                        isCreate ? (
+                            <CreateRouteForm onClose={() => setIsCreate(false)} />
                         ) : (
-                            <div className="flex flex-col gap-3">
-                                {allRoutes.map((route) => <RouteInfoCard key={route.id} route={route} isSelected={selectedRouteId === route.id} onClick={() => {
-                                    setSelectedRouteId(route.id);
-                                }} />)}
-                            </div>
-                        )}
-                    </div>
+                            <>
+                                <div className="flex justify-between items-center">
+                                    <h2 className="text-lg font-semibold">Quản lý tuyến đường</h2>
+                                    <Button
+                                        onClick={() => { 
+                                                setIsCreate(true); 
+                                                setShowStopPointsList(false); 
+                                                setSelectedRouteId(null);
+                                            }}
+                                        className="bg-[#6366F1] text-white text-sm px-4 py-2 rounded-lg hover:bg-indigo-700"
+                                    >
+                                        + Tạo tuyến mới
+                                    </Button>
+                                </div>
 
-                    <Pagination
-                        currentPage={page}
-                        totalPages={paginationMeta ? Math.ceil(paginationMeta.total / paginationMeta.limit) : 1}
-                        onPageChange={(newPage) => setPage(newPage)}
-                        pageSize={pageSize}
-                        onPageSizeChange={(newSize) => setPageSize(newSize)}
-                    />
+                                <div className="flex items-center">
+                                    <div className="relative w-full">
+                                        <input type="text" value={
+                                            searchTerm
+                                        }
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Search branch name..." required />
+                                    </div>
+                                    <button onClick={() => {
+                                        setSearch(searchTerm);
+                                    }}
+                                        className="p-2.5 ms-2 text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300">
+                                        <Search className="w-4 h-4" />
+                                        <span className="sr-only">Search</span>
+                                    </button>
+                                </div>
+
+
+                                <div className="overflow-y-auto flex-1">
+                                    {loading ? (
+                                        <div className="space-y-4">
+                                            {Array.from({ length: 5 }).map((_, index) => (
+                                                <RouteCardSkeleton key={index} />
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col gap-3">
+                                            {allRoutes.map((route) => <RouteInfoCard key={route.id} route={route} isSelected={selectedRouteId === route.id} onClick={() => {
+                                                setSelectedRouteId(route.id);
+                                            }} />)}
+                                        </div>
+                                    )}
+                                </div>
+
+                                <Pagination
+                                    currentPage={page}
+                                    totalPages={paginationMeta ? Math.ceil(paginationMeta.total / paginationMeta.limit) : 1}
+                                    onPageChange={(newPage) => setPage(newPage)}
+                                    pageSize={pageSize}
+                                    onPageSizeChange={(newSize) => setPageSize(newSize)}
+                                />
+                            </>
+                        )
+                    }
                 </Card>
 
                 {/* Right Column - Bản đồ + Thông tin */}
@@ -265,7 +556,7 @@ export const RouteAdmin: React.FC = () => {
                                 <span className="font-semibold text-xl">Tuyến {stopPoints[0]?.name} - {stopPoints[stopPoints.length - 1]?.name}</span>
                             </div>
 
-                            <div className="flex-1 rounded-lg overflow-hidden relative max-h-2/3">
+                            <div className="flex-1 rounded-lg overflow-hidden relative">
                                 <Map
                                     {...viewState}
                                     onMove={(evt) => setViewState(evt.viewState)}
@@ -364,7 +655,9 @@ export const RouteAdmin: React.FC = () => {
                                         />
                                     </Source>
 
-                                    <NavigationControl position="top-right" />
+                                    {
+                                        // <NavigationControl position="top-right" />
+                                    }
                                 </Map>
 
                                 {
@@ -383,6 +676,60 @@ export const RouteAdmin: React.FC = () => {
                                 </div>
 
                                 {
+                                    // overlay diem dừng
+                                }
+                                <div className={"absolute top-4 bg-white rounded-md shadow-md p-2 flex flex-col gap-2 transition-all duration-300 "
+                                    + (showStopPointsList ? "right-4" : "-right-96")
+                                }>
+                                    <h4 className="font-semibold text-sm text-gray-700 mb-2 flex justify-between">
+                                        <span>
+                                            Điểm đón ({
+                                                stopPoints.length
+                                            })
+                                        </span>
+                                        <button
+                                            onClick={() => {
+                                                setShowStopPointsList(!showStopPointsList);
+                                            }}
+                                            className="text-gray-400 hover:text-gray-600 focus:outline-none"
+                                        >
+                                            <ArrowRight className="w-4 h-4" />
+                                        </button>
+                                    </h4>
+                                    <div className="pl-4 overflow-y-auto max-h-100 ">
+                                        <ol className="text-gray-500 border-s border-gray-200 w-full relative">
+                                            {stopPoints.map((stop, idx) => (
+                                                <li className="mb-10 ms-6">
+                                                    <span className="absolute flex items-center justify-center w-8 h-8 bg-gray-100 rounded-full -start-4 ring-4 ring-white">
+                                                        {idx + 1}
+                                                    </span>
+                                                    <h3 className="font-medium text-lg text-gray-900">{
+                                                        stop.name
+                                                    }</h3>
+                                                    <p className="text-sm w-2xs">{
+                                                        getFullAddress(stop.meta)
+                                                    }</p>
+                                                </li>
+                                            ))}
+                                        </ol>
+                                    </div>
+                                </div>
+
+                                {
+                                    // nút bật danh sách điểm dừng
+                                }
+                                <div className={"absolute top-5 transition-all duration-300 " + (
+                                    !showStopPointsList ? "right-4" : "-right-8"
+                                )}>
+                                    <ArrowLeft className="w-6 h-6 bg-white rounded-full p-1 shadow-md cursor-pointer hover:bg-gray-100" onClick={() => {
+                                        setShowStopPointsList(true);
+                                    }} />
+                                </div>
+
+                                {
+                                    // overlay loading khi load điểm dừng
+                                }
+                                {
                                     loadingStopPoints && (
                                         <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
                                             <span className="loading loading-spinner loading-xl"></span>
@@ -390,65 +737,10 @@ export const RouteAdmin: React.FC = () => {
                                     )
                                 }
                             </div>
-
-                            {/* Danh sách điểm đón */}
-                            <div className="mt-4 space-y-2 overflow-y-auto h-1/3">
-                                <h4 className="font-semibold text-sm text-gray-700 mb-2 ">Điểm đón ({
-                                    stopPoints.length
-                                })</h4>
-                                {stopPoints.map((stop, idx) => (
-                                    <Card
-                                        key={stop.id}
-                                        className="p-3 flex items-center gap-3 bg-[#DDEDF4] border border-gray-200"
-                                        onClick={() => {
-                                            mapRef.current?.flyTo({
-                                                center: [stop.location.longitude, stop.location.latitude],
-                                                zoom: 16,
-                                            });
-                                        }}
-                                    >
-                                        <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                                            {idx + 1}
-                                        </div>
-                                        <div className="flex-1">
-                                            <p className="font-medium text-sm">{stop.name}</p>
-                                            <p className="text-xs text-gray-500">
-                                                {
-                                                    // Hiển thị địa chỉ nếu có, nếu không thì hiển thị kinh độ vĩ độ
-                                                }
-                                                {getFullAddress(stop.meta)}
-                                            </p>
-                                        </div>
-                                        {
-                                            // <p className="text-sm text-gray-600">
-                                            //     {idx === 0 && "07:00"}
-                                            //     {idx === 1 && "07:10"}
-                                            //     {idx === 2 && "07:20"}
-                                            // </p>
-
-                                        }
-                                    </Card>
-                                ))}
-                            </div>
                         </div>
                     </Card>
                 </div>
             </div>
-            {/* Modal Tạo tuyến đường mới */}
-            <CreateRouteModal
-                isOpen={isCreateModalOpen}
-                onClose={() => setIsCreateModalOpen(false)}
-                onSuccess={async () => {
-                    // after creating a route, reset to first page and refresh list
-                    try {
-                        setPage(1);
-                        await fetchRoutes(1, pageSize, search);
-                    } catch (err) {
-                        console.error('Error refreshing routes after create', err);
-                    }
-                }}
-            />
-
         </div>
     );
 }
