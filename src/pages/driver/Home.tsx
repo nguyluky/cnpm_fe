@@ -13,9 +13,9 @@ interface ApiSchedule {
   id: string;
   route: { id: string; name: string };
   bus: { id: string; licensePlate: string };
-  type: "MORNING" | "AFTERNOON";
+  type: "DISPATCH" | "RETURN";
   daysOfWeek: number[];
-  startTime: string;
+  startTime: string; // "16:00"
   startDate: string;
   endDate: string;
 }
@@ -25,7 +25,7 @@ interface TodaySchedule {
   tripId: string;
   date: string;
   static: "PLANNED" | "ONGOING" | "COMPLETED" | "CANCELLED";
-  type: "MORNING" | "AFTERNOON";
+  type: "DISPATCH" | "RETURN"; // đổi theo API mới
   startTime: string;
 }
 
@@ -37,12 +37,17 @@ interface TripInfo {
   dropPoint: string;
 }
 
+// map type của today -> ca (shift) ở UI
+function apiTypeToShift(t: "DISPATCH" | "RETURN"): "MORNING" | "AFTERNOON" {
+  return t === "DISPATCH" ? "MORNING" : "AFTERNOON";
+}
+
 // hàm format giờ từ database vì Khắc Híu lười chuyển
 function formatStartTime(isoString: string) {
   if (!isoString) return "---";
   const [, timeMs] = isoString.split("T"); // "06:30:00.000Z"
   const timePart = timeMs?.split(".")[0] ?? "";
-  return timePart; // "06:30:00"
+  return timePart.substring(0, 5) // "06:30"
 }
 
 export const DriverHome: React.FC = () => {
@@ -51,12 +56,12 @@ export const DriverHome: React.FC = () => {
   const [selectedShift, setSelectedShift] = React.useState<"MORNING" | "AFTERNOON">("MORNING");
   const [selectedTrip, setSelectedTrip] = React.useState<TripInfo | null>(null);
 
-  // 1) getDriverSchedules: để lấy licensePlate + route
+  // 1) getDriverSchedules
   const {
     data: driverSchedules = [],
     error: driverError,
     isLoading: isLoadingDriver,
-  } = useQuery({
+  } = useQuery<ApiSchedule[]>({
     queryKey: ["driverSchedules"],
     queryFn: async () => {
       const sche = await api.api.getDriverSchedules();
@@ -68,37 +73,39 @@ export const DriverHome: React.FC = () => {
     },
   });
 
-  // 2) getTodaysSchedules: chỉ ca hôm nay
+  // 2) getTodaysSchedules
   const {
     data: todaySchedules = [],
     error: todayError,
     isLoading: isLoadingToday,
-  } = useQuery({
+  } = useQuery<TodaySchedule[]>({
     queryKey: ["todaySchedules"],
     queryFn: async () => {
       const tdsche = await api.api.getTodaysSchedules();
       const json = typeof (tdsche as any).json === "function" ? await (tdsche as any).json() : tdsche;
       if (json.code !== 200 || !json.data?.data) {
-        // hôm nay không có ca => mảng rỗng
         return [] as TodaySchedule[];
       }
       return json.data.data as TodaySchedule[];
     },
   });
 
-  // lọc schedule theo ca để lấy biển số
-  const currentShiftSchedules: ApiSchedule[] = driverSchedules.filter(
-    (sch) => sch.type === selectedShift
-  );
+  // chọn schedule để lấy biển số: ưu tiên schedule hôm nay, không phụ thuộc ca
+  const firstToday = todaySchedules[0];
+  const scheduleForToday = firstToday
+    ? driverSchedules.find((s) => s.id === firstToday.scheduleId)
+    : driverSchedules[0];
+
+
 
   const licensePlateText =
-    currentShiftSchedules[0]?.bus?.licensePlate
-      ? `Xe buýt: ${currentShiftSchedules[0].bus.licensePlate}`
+    scheduleForToday?.bus?.licensePlate
+      ? `Xe buýt: ${scheduleForToday.bus.licensePlate}`
       : "---";
 
-  // join todaySchedules với driverSchedules theo scheduleId
+  // join todaySchedules với driverSchedules theo scheduleId + map theo ca đang chọn
   const todayShiftTrips: TripInfo[] = todaySchedules
-    .filter((t) => t.type === selectedShift) // ca sáng / chiều
+    .filter((t) => apiTypeToShift(t.type) === selectedShift)
     .map((t) => {
       const sched = driverSchedules.find((s) => s.id === t.scheduleId);
       return {
@@ -109,6 +116,7 @@ export const DriverHome: React.FC = () => {
         dropPoint: "---",
       } as TripInfo;
     });
+
 
   // hiện tại để tạm xem thử có thêm thông tin học sinh cần đón trong tuyến được không
   const handlePickUp = (student: Student) => toast.success(`✅ Đã đón ${student.name}`);
@@ -138,11 +146,10 @@ export const DriverHome: React.FC = () => {
                   setSelectedShift("MORNING");
                   setSelectedTrip(null);
                 }}
-                className={`px-4 py-2 rounded-lg border font-medium cursor-pointer ${
-                  selectedShift === "MORNING"
-                    ? "bg-orange-500 text-white border-orange-600"
-                    : "bg-white text-gray-700"
-                }`}
+                className={`px-4 py-2 rounded-lg border font-medium cursor-pointer ${selectedShift === "MORNING"
+                  ? "bg-orange-500 text-white border-orange-600"
+                  : "bg-white text-gray-700"
+                  }`}
               >
                 Ca sáng
               </button>
@@ -151,11 +158,10 @@ export const DriverHome: React.FC = () => {
                   setSelectedShift("AFTERNOON");
                   setSelectedTrip(null);
                 }}
-                className={`px-4 py-2 rounded-lg border font-medium cursor-pointer ${
-                  selectedShift === "AFTERNOON"
-                    ? "bg-purple-600 text-white border-purple-700"
-                    : "bg-white text-gray-700"
-                }`}
+                className={`px-4 py-2 rounded-lg border font-medium cursor-pointer ${selectedShift === "AFTERNOON"
+                  ? "bg-purple-600 text-white border-purple-700"
+                  : "bg-white text-gray-700"
+                  }`}
               >
                 Ca chiều
               </button>
@@ -170,9 +176,8 @@ export const DriverHome: React.FC = () => {
             {todayShiftTrips.map((tripInfo, index) => (
               <Card
                 key={tripInfo.id}
-                className={`p-5 mb-4 cursor-pointer ${
-                  selectedTrip?.id === tripInfo.id ? "bg-gray-100" : ""
-                }`}
+                className={`p-5 mb-4 cursor-pointer ${selectedTrip?.id === tripInfo.id ? "bg-gray-100" : ""
+                  }`}
                 onClick={() => setSelectedTrip(tripInfo)}
               >
                 <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
@@ -182,31 +187,27 @@ export const DriverHome: React.FC = () => {
                     <Sunset className="w-5 h-5 text-purple-500" />
                   )}
                   <span>
-                    {`Lịch làm việc hôm nay - ${
-                      selectedShift === "MORNING" ? "Ca sáng" : "Ca chiều"
-                    }`}
+                    {`Lịch làm việc hôm nay - ${selectedShift === "MORNING" ? "Ca sáng" : "Ca chiều"
+                      }`}
                   </span>
                 </h2>
 
                 <div
-                  className={`flex justify-between p-4 rounded-lg border mb-5 ${
-                    selectedShift === "MORNING"
-                      ? "bg-orange-50 border-orange-200"
-                      : "bg-purple-50 border-purple-200"
-                  }`}
+                  className={`flex justify-between p-4 rounded-lg border mb-5 ${selectedShift === "MORNING"
+                    ? "bg-orange-50 border-orange-200"
+                    : "bg-purple-50 border-purple-200"
+                    }`}
                 >
                   <div className="flex items-center gap-2">
                     <Clock
-                      className={`h-5 w-5 ${
-                        selectedShift === "MORNING" ? "text-orange-600" : "text-purple-600"
-                      }`}
+                      className={`h-5 w-5 ${selectedShift === "MORNING" ? "text-orange-600" : "text-purple-600"
+                        }`}
                     />
                     <span className="font-medium">{tripInfo.time}</span>
                   </div>
                   <MapPin
-                    className={`h-5 w-5 ${
-                      selectedShift === "MORNING" ? "text-orange-600" : "text-purple-600"
-                    }`}
+                    className={`h-5 w-5 ${selectedShift === "MORNING" ? "text-orange-600" : "text-purple-600"
+                      }`}
                   />
                 </div>
 
@@ -224,7 +225,7 @@ export const DriverHome: React.FC = () => {
             ))}
           </div>
 
-          {/* Sidebar  */}  
+          {/* Sidebar  */}
           <div className="lg:col-span-1 space-y-6">
             <QuickInfoSidebar
               electricCount={3}  //Để tạm dữ liệu ảo, khong cần thì xóa sau
@@ -232,9 +233,7 @@ export const DriverHome: React.FC = () => {
               WorkCount={todaySchedules.length}
               routeInfo={{
                 vehicle: "Xe buýt",
-                vehicleId:
-                  currentShiftSchedules[0]?.bus?.licensePlate ??
-                  "---",
+                vehicleId: licensePlateText,
                 route: selectedTrip?.location ?? "---",
                 time: selectedTrip?.time ?? "---",
               }}
