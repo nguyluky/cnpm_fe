@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Clock, MapPin, MinusIcon, Pencil, Route, Search } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Clock, MapPin, Minus, MinusIcon, Pencil, Route, Search } from "lucide-react";
 import mapboxgl from 'mapbox-gl';
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Map, { Layer, Source, type MapRef } from "react-map-gl/mapbox";
@@ -8,6 +8,7 @@ import { Button } from '../../../components/uiItem/button.tsx';
 import { Card } from '../../../components/uiItem/card.tsx';
 import { Pagination } from '../../../components/uiPart/Pagination.tsx';
 import { useApi } from '../../../contexts/apiConetxt.tsx';
+import { AutoComplete } from '../../../components/uiPart/AutoComplete.tsx';
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_API_KEY;
 
@@ -129,166 +130,50 @@ function AutoCompleteStopPointInput({
     moveDown?: () => void;
     remove?: () => void;
 }) {
-
     const { api } = useApi();
-    const [term, setTerm] = useState("");
-    const [debouncedSearch, setDebouncedSearch] = useState("");
-    const [selectedItem, setSelectedItem] = useState<number>(0);
-    const listRef = useRef<HTMLUListElement>(null);
-    const [onFocus, setOnFocus] = useState(false);
 
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            setDebouncedSearch(term);
-        }, 500); // debounce 500ms
+    return (
+        <AutoComplete
+            value={value}
+            onChange={onChange}
 
-        return () => {
-            clearTimeout(handler);
-        };
-    }, [term]);
+            fetchData={async (term) => {
+                const res = await api.getAllStoppoints({ name: term });
+                return res.data?.data?.data ?? [];
+            }}
 
-    const { data, isLoading } = useQuery({
-        queryKey: ['stop-point-suggestions', debouncedSearch],
-        queryFn: async () => {
-            const response = await api.getAllStoppoints({
-                name: debouncedSearch,
-            });
-            return response.data?.data?.data || [];
-        },
-        enabled: debouncedSearch.length > 0,
-    })
+            getDisplayValue={(stop) => stop.name}
 
-    useEffect(() => {
-        setSelectedItem(0);
-    }, [data]);
+            renderItem={(stop, isSelected) => (
+                <div className={`px-4 py-2 ${isSelected ? "bg-gray-100" : ""}`}>
+                    <p className="font-medium">{stop.name}</p>
+                    <p className="text-sm text-gray-500">{getFullAddress(stop.meta)}</p>
+                </div>
+            )}
 
-    useEffect(() => {
-        if (listRef.current) {
-            const selectedElement = listRef.current.children[selectedItem] as HTMLElement;
-            if (selectedElement) {
-                selectedElement.scrollIntoView({ block: 'nearest', behavior: 'smooth' });// Scroll to the selected item
+            rightSlot={
+                <div className="flex">
+                    {moveUp && (
+                        <button className="p-2" onClick={moveUp}>
+                            <ArrowUp className="w-4 h-4" />
+                        </button>
+                    )}
+                    {moveDown && (
+                        <button className="p-2" onClick={moveDown}>
+                            <ArrowDown className="w-4 h-4" />
+                        </button>
+                    )}
+                    {remove && (
+                        <button className="p-2" onClick={remove}>
+                            <Minus className="w-4 h-4" />
+                        </button>
+                    )}
+                </div>
             }
-        }
-    }, [selectedItem]);
-
-
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            setSelectedItem((prev) => (data && data.length > 0) ? (prev + 1) % data.length : 0);
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            setSelectedItem((prev) => (data && data.length > 0) ? (prev - 1 + data.length) % data.length : 0);
-        } else if (e.key === 'Enter') {
-            e.preventDefault();
-            if (data && data.length > 0) {
-                onChange(data[selectedItem]);
-                setTerm("");
-                setDebouncedSearch("");
-            }
-        }
-    }
-
-    return value ? (
-        <div className="flex items-center gap-2 mb-2 border border-gray-300 rounded-lg bg-gray-50">
-            <div className="flex-1 p-2">
-                <p className="font-medium">{value.name}</p>
-                <p className="text-sm text-gray-500">{getFullAddress(value.meta)}</p>
-            </div>
-
-            <div>
-
-                {
-                    // move up down buttons
-                }
-                <button
-                    className="text-gray-500 hover:text-gray-700 focus:outline-none cursor-pointer p-2"
-                    onClick={moveUp}
-                >
-                    <ArrowUp className="w-4 h-4" />
-                </button>
-                <button
-                    className="text-gray-500 hover:text-gray-700 focus:outline-none cursor-pointer p-2"
-                    onClick={moveDown}
-                >
-                    <ArrowDown className="w-4 h-4" />
-                </button>
-
-                {
-                    // nút chỉnh sửa
-                }
-
-                <button
-                    onClick={() => {
-                        onChange(null);
-                    }}
-                    className="text-gray-500 hover:text-gray-700 focus:outline-none cursor-pointer p-2"
-                >
-                    <Pencil className="w-4 h-4" />
-                </button>
-            </div>
-        </div>
-    ) :
-        <label className=" flex items-center gap-2 mb-2 border border-gray-300 rounded-lg p-2 bg-white relative">
-            <input type="text" className=" w-full border-0 focus:ring-0 outline-none " placeholder="Nhập điểm dừng"
-                autoFocus
-                value={term}
-                onChange={(e) => setTerm(e.target.value)}
-                onKeyDown={handleKeyDown}
-                onFocus={() => setOnFocus(true)}
-                onBlur={() => setOnFocus(false)}
-            />
-            <button className="text-gray-500 hover:text-gray-700 focus:outline-none cursor-pointer" onClick={remove}>
-                <MinusIcon className="w-4 h-4" />
-            </button>
-
-            {/* Dropdown gợi ý tự động (ví dụ tĩnh) */}
-            <div className={"absolute top-full left-0 right-0 bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto "
-                + (onFocus ? " block " : " hidden ")
-            }>
-                {
-                    (() => {
-
-                        if (debouncedSearch.length === 0) {
-                            return <div className="p-4 text-center text-gray-500">
-                                Nhập để tìm điểm dừng...
-                            </div>;
-                        }
-
-                        if (isLoading) {
-                            return <div className="p-4 text-center text-gray-500">
-                                Đang tải gợi ý...
-                            </div>;
-                        }
-
-                        if (data && data.length > 0) {
-                            return <ul ref={listRef}>
-                                {data.map((stop, idx) => (
-                                    <li key={stop.id} className={"px-4 py-2 hover:bg-gray-100 cursor-pointer " + (selectedItem == idx ? " bg-gray-100" : "")}
-                                        onMouseDown={(e) => {
-                                            e.preventDefault(); // prevent blur event
-                                            onChange(stop);
-                                            setTerm("");
-                                            setDebouncedSearch("");
-                                        }}
-                                    >
-                                        <p className="font-medium">{stop.name}</p>
-                                        <p className="text-sm text-gray-500">{getFullAddress(stop.meta)}</p>
-                                    </li>
-                                ))}
-                            </ul>;
-                        }
-
-                        return <div className="p-4 text-center text-gray-500">
-                            Không tìm thấy điểm dừng phù hợp.
-                        </div>;
-
-                    })()
-                }
-
-            </div>
-        </label>
+        />
+    );
 }
+
 
 
 function CreateRouteForm({ onClose, }: { onClose?: () => void; }) {
