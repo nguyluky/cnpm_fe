@@ -11,8 +11,8 @@ export interface QuickInfoProps {
   routeInfo: {
     vehicle: string;
     vehicleId: string;
-    pickupPoint: string | undefined;
-    dropPoint: string | undefined;
+    route: string | undefined;
+    // dropPoint: string | undefined;
     time: string | undefined;
   };
 }
@@ -124,18 +124,17 @@ export const QuickInfoSidebar: React.FC<QuickInfoProps> = ({
 
         <div className="space-y-3 text-sm">
           <div>
-            <p className="text-slate-500 mb-1">Điểm đón</p>
+            <p className="text-slate-500 mb-1">Tuyến đường</p>
             <p className="text-slate-900 font-medium">
-              {routeInfo.pickupPoint || "—"}
+              {routeInfo.route || "—"}
             </p>
           </div>
-
-          <div>
+          {/* <div>
             <p className="text-slate-500 mb-1">Điểm trả</p>
             <p className="text-slate-900 font-medium">
               {routeInfo.dropPoint || "—"}
             </p>
-          </div>
+          </div> */}
 
           <div>
             <p className="text-slate-500 mb-1">Xe buýt</p>

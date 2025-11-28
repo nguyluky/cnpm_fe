@@ -1614,7 +1614,7 @@ export class Api<
  *
  * @tags DriverController
  * @name GetTripById
- * @summary Get trip by ID
+ * @summary Get trip by IDFend
  * @request GET:/api/drivers/trip/{id}
  * @secure*/
 
@@ -3122,6 +3122,360 @@ export class Api<
       path: `/api/students/${id}`,
       method: "DELETE",
       secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags UsersController
+ * @name GetAllUsers
+ * @summary Get All Users
+ * @request GET:/api/users/*/
+
+  /**
+   */
+
+  getAllUsers = (
+    query?: {
+      /** Search term to filter results */
+      search?: string;
+      /**
+       * Page number, minimum is 1
+       * @min 1
+       * @default 1
+       */
+      page?: number;
+      /**
+       * Number of items per page, minimum is 1 and maximum is 100
+       * @min 1
+       * @max 100
+       * @default 10
+       */
+      limit?: number;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          data: {
+            id: string;
+            username: string;
+            roles: string;
+            email: string;
+            createdAt: string;
+            updatedAt: string;
+          }[];
+          meta: PaginationMetaData;
+        };
+      },
+      any
+    >({
+      path: `/api/users/`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags UsersController
+ * @name CreateNewUser
+ * @summary Create New User
+ * @request POST:/api/users/*/
+
+  /**
+   */
+
+  createNewUser = (
+    data: {
+      username: string;
+      email: string;
+      password: string;
+      rules: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+      },
+      {
+        /**
+         * HTTP status code of the error
+         * @min 400
+         * @max 599
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        /** Error class name */
+        name?: string;
+      }
+    >({
+      path: `/api/users/`,
+      method: "POST",
+      body: data,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags UsersController
+ * @name GetAllRoles
+ * @summary Get All Roles
+ * @request GET:/api/users/roles*/
+
+  /**
+   */
+
+  getAllRoles = (params: RequestParams = {}) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          data: {
+            id: number;
+            name: string;
+            permissions: string[];
+          }[];
+          total: number;
+        };
+      },
+      any
+    >({
+      path: `/api/users/roles`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags UsersController
+ * @name GetAllPermissions
+ * @summary Get All Permissions
+ * @request GET:/api/users/permissions*/
+
+  /**
+   */
+
+  getAllPermissions = (params: RequestParams = {}) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          data: {
+            id: number;
+            name: string;
+          }[];
+          total: number;
+        };
+      },
+      any
+    >({
+      path: `/api/users/permissions`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags UsersController
+ * @name CreatePermission
+ * @summary Create Permission
+ * @request POST:/api/users/permission*/
+
+  /**
+   */
+
+  createPermission = (
+    data: {
+      name: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          id: number;
+          name: string;
+        };
+      },
+      {
+        /**
+         * HTTP status code of the error
+         * @min 400
+         * @max 599
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        /** Error class name */
+        name?: string;
+      }
+    >({
+      path: `/api/users/permission`,
+      method: "POST",
+      body: data,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags UsersController
+ * @name AddPermissionToRole
+ * @summary Add Permission to Role
+ * @request POST:/api/users/role/permission*/
+
+  /**
+   */
+
+  addPermissionToRole = (
+    data: {
+      roleId: number;
+      permissions: string[];
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          id: number;
+          name: string;
+          permissions: string[];
+        };
+      },
+      {
+        /**
+         * HTTP status code of the error
+         * @min 400
+         * @max 599
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        /** Error class name */
+        name?: string;
+      }
+    >({
+      path: `/api/users/role/permission`,
+      method: "POST",
+      body: data,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags UsersController
+ * @name RemovePermissionFromRole
+ * @summary Remove Permission from Role
+ * @request DELETE:/api/users/role/permission*/
+
+  /**
+   */
+
+  removePermissionFromRole = (
+    data: {
+      roleId: number;
+      permissions: string[];
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          id: number;
+          name: string;
+          permissions: string[];
+        };
+      },
+      {
+        /**
+         * HTTP status code of the error
+         * @min 400
+         * @max 599
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        /** Error class name */
+        name?: string;
+      }
+    >({
+      path: `/api/users/role/permission`,
+      method: "DELETE",
+      body: data,
+      type: ContentType.Json,
       format: "json",
       ...params,
     });

@@ -15,7 +15,7 @@ const queryClient = new QueryClient()
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <>
-            <SocketProvider url={"http://localhost:3000"}>
+            <SocketProvider url={"http://localhost:3000/notifications"}>
                 <QueryClientProvider client={queryClient}>
                     <ToastContainer />
                     <RouterProvider router={router} />
