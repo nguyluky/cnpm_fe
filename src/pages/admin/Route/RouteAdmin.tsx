@@ -142,7 +142,12 @@ function AutoCompleteStopPointInput({
                 return res.data?.data?.data ?? [];
             }}
 
-            getDisplayValue={(stop) => stop.name}
+            renderDisplay={(stop) => (
+                <div className="px-4 py-2">
+                    <p className="font-medium">{stop.name}</p>
+                    <p className="text-sm text-gray-500">{getFullAddress(stop.meta)}</p>
+                </div>
+            )}
 
             renderItem={(stop, isSelected) => (
                 <div className={`px-4 py-2 ${isSelected ? "bg-gray-100" : ""}`}>
@@ -153,21 +158,33 @@ function AutoCompleteStopPointInput({
 
             rightSlot={
                 <div className="flex">
-                    {moveUp && (
-                        <button className="p-2" onClick={moveUp}>
-                            <ArrowUp className="w-4 h-4" />
-                        </button>
-                    )}
-                    {moveDown && (
-                        <button className="p-2" onClick={moveDown}>
-                            <ArrowDown className="w-4 h-4" />
-                        </button>
-                    )}
-                    {remove && (
-                        <button className="p-2" onClick={remove}>
-                            <Minus className="w-4 h-4" />
-                        </button>
-                    )}
+                    {
+                        value ? (
+                            <>
+                                {moveUp && (
+                                    <button className="p-2" onClick={moveUp}>
+                                        <ArrowUp className="w-4 h-4" />
+                                    </button>
+                                )}
+                                {moveDown && (
+                                    <button className="p-2" onClick={moveDown}>
+                                        <ArrowDown className="w-4 h-4" />
+                                    </button>
+                                )}
+                                <button className="p-2" onClick={() => onChange(null)}>
+                                    <Pencil className="w-4 h-4" />
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                {remove && (
+                                    <button className="p-2" onClick={remove}>
+                                        <Minus className="w-4 h-4" />
+                                    </button>
+                                )}
+                            </>
+                        )
+                    }
                 </div>
             }
         />
@@ -211,7 +228,7 @@ function CreateRouteForm({ onClose, }: { onClose?: () => void; }) {
 
                 <button
                     onClick={() => {
-                        setListStopPoints([ null, ...listStopPoints,]);
+                        setListStopPoints([null, ...listStopPoints,]);
                     }}
                     className="w-full border border-gray-300 border-dashed rounded-lg p-2 bg-gray-100 hover:bg-gray-200 mb-2">
                     + Thêm điểm dừng
@@ -242,7 +259,7 @@ function CreateRouteForm({ onClose, }: { onClose?: () => void; }) {
                                 const newList = [...listStopPoints];
                                 newList[idx] = v;
                                 setListStopPoints(newList);
-                            }} 
+                            }}
                             remove={() => {
                                 const newList = listStopPoints.filter((_, i) => i !== idx);
                                 setListStopPoints(newList);
@@ -370,11 +387,11 @@ export const RouteAdmin: React.FC = () => {
                                 <div className="flex justify-between items-center">
                                     <h2 className="text-lg font-semibold">Quản lý tuyến đường</h2>
                                     <Button
-                                        onClick={() => { 
-                                                setIsCreate(true); 
-                                                setShowStopPointsList(false); 
-                                                setSelectedRouteId(null);
-                                            }}
+                                        onClick={() => {
+                                            setIsCreate(true);
+                                            setShowStopPointsList(false);
+                                            setSelectedRouteId(null);
+                                        }}
                                         className="bg-[#6366F1] text-white text-sm px-4 py-2 rounded-lg hover:bg-indigo-700"
                                     >
                                         + Tạo tuyến mới

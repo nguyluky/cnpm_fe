@@ -5,8 +5,9 @@ export interface AutoCompleteProps<T> {
     onChange: (value: T | null) => void;
     
     fetchData: (term: string) => Promise<T[]>;
-    getDisplayValue: (item: T) => string;
+    renderDisplay: (item: T) => React.ReactNode;
     renderItem: (item: T, isSelected: boolean) => React.ReactNode;
+    autoFocus?: boolean;
 
     placeholder?: string;
     debounceMs?: number;
@@ -17,11 +18,12 @@ export function AutoComplete<T>({
     value,
     onChange,
     fetchData,
-    getDisplayValue,
+    renderDisplay,
     renderItem,
     placeholder = "Nhập để tìm...",
     debounceMs = 400,
-    rightSlot
+    rightSlot,
+    autoFocus = false,
 }: AutoCompleteProps<T>) {
 
     const [term, setTerm] = useState("");
@@ -42,11 +44,6 @@ export function AutoComplete<T>({
 
     // call API khi debounceTerm thay đổi
     useEffect(() => {
-        if (!debouncedTerm) {
-            setData([]);
-            return;
-        }
-
         setLoading(true);
         fetchData(debouncedTerm)
             .then(setData)
@@ -81,18 +78,12 @@ export function AutoComplete<T>({
 
     if (value) {
         return (
-            <div className="flex items-center justify-between border p-2 rounded-lg bg-gray-50 mb-2">
+            <div className="flex items-center justify-between border p-2 rounded-lg bg-gray-50 border-gray-300 mb-2">
                 <div>
-                    <p className="font-medium">{getDisplayValue(value)}</p>
+                    <p className="font-medium">{renderDisplay(value)}</p>
                 </div>
                 <div className="flex gap-1">
                     {rightSlot}
-                    <button
-                        onClick={() => onChange(null)}
-                        className="p-2 text-gray-500 hover:text-gray-700"
-                    >
-                        ✏️
-                    </button>
                 </div>
             </div>
         );
@@ -101,7 +92,7 @@ export function AutoComplete<T>({
     return (
         <label className="flex items-center gap-2 border p-2 rounded-lg relative bg-white border-gray-300 mb-2">
             <input
-                autoFocus
+                autoFocus={autoFocus}
                 value={term}
                 onChange={(e) => setTerm(e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -118,10 +109,6 @@ export function AutoComplete<T>({
                     onFocus ? "block" : "hidden"
                 }`}
             >
-                {term.length === 0 && (
-                    <div className="p-4 text-center text-gray-500">Nhập để tìm...</div>
-                )}
-
                 {loading && (
                     <div className="p-4 text-center text-gray-500">Đang tải...</div>
                 )}
@@ -135,7 +122,9 @@ export function AutoComplete<T>({
                                     selectedItem === idx ? "bg-gray-100" : ""
                                 }`}
                                 onMouseDown={(e) => {
+                                    // dùng onMouseDown để tránh bị blur trước khi onClick
                                     e.preventDefault();
+                                    e.stopPropagation();
                                     onChange(item);
                                     setTerm("");
                                     setDebouncedTerm("");
