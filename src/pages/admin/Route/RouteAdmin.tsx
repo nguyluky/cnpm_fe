@@ -1,14 +1,13 @@
-import { useQuery } from '@tanstack/react-query';
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Clock, MapPin, Minus, MinusIcon, Pencil, Route, Search } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Clock, MapPin, Minus, Pencil, Route, Search } from "lucide-react";
 import mapboxgl from 'mapbox-gl';
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Map, { Layer, Source, type MapRef } from "react-map-gl/mapbox";
 import type { PaginationMetaData, RouteData } from '../../../api/data-contracts.ts';
 import { Button } from '../../../components/uiItem/button.tsx';
 import { Card } from '../../../components/uiItem/card.tsx';
+import { AutoComplete } from '../../../components/uiPart/AutoComplete.tsx';
 import { Pagination } from '../../../components/uiPart/Pagination.tsx';
 import { useApi } from '../../../contexts/apiConetxt.tsx';
-import { AutoComplete } from '../../../components/uiPart/AutoComplete.tsx';
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_API_KEY;
 

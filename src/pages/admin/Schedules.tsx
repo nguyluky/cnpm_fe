@@ -131,7 +131,7 @@ function EditAndCreateScheduleModal({
                 });
                 return response.data.data!;
             } else {
-                const response = await api.api.updateASchedule(defaultValue!.id, {
+                await api.api.updateASchedule(defaultValue!.id, {
                     driverId: formData.driverId,
                     busId: formData.busId,
                     routeId: formData.routeId,
@@ -140,6 +140,7 @@ function EditAndCreateScheduleModal({
                     endDate: formData.endDate,
                     type: formData.type,
                 });
+
                 return formData as any;
             }
         },
