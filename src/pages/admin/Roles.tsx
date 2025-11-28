@@ -14,7 +14,6 @@ function AutoCompletePermissions({
     allPermissions?: Array<{ id: number; name: string }>;
     loading?: boolean;
 }) {
-    const api = useApi();
     const [showDropdown, setShowDropdown] = useState(false);
     const [index, setIndex] = useState(0);
     const listRef = useRef<HTMLDivElement>(null);
@@ -274,7 +273,7 @@ export function Roles() {
     const api = useApi();
     const { openModal } = useModal();
 
-    const { data: roles, isLoading, error, refetch } = useQuery({
+    const { data: roles, isLoading, error } = useQuery({
         queryKey: ['roles'],
         queryFn: async () => {
             const response = await api.api.getAllRoles();

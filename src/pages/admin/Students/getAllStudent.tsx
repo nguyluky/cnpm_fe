@@ -37,7 +37,6 @@ interface StudentData {
 }
 
 export const GetAllStudent: React.FC = () => {
-    const { securityData } = useApi();
     const [students, setStudents] = useState<StudentData[]>([]);
     const [loading, setLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
