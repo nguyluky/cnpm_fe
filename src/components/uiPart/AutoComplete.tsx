@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 
 export interface AutoCompleteProps<T> {
     value: T | null;
@@ -34,6 +34,8 @@ export function AutoComplete<T>({
     const [onFocus, setOnFocus] = useState(false);
 
     const listRef = useRef<HTMLUListElement>(null);
+
+    const id = useId();
 
     // debounce
     useEffect(() => {
@@ -80,7 +82,7 @@ export function AutoComplete<T>({
         return (
             <div className="flex items-center justify-between border p-2 rounded-lg bg-gray-50 border-gray-300 mb-2">
                 <div>
-                    <p className="font-medium">{renderDisplay(value)}</p>
+                    {renderDisplay(value)}
                 </div>
                 <div className="flex gap-1">
                     {rightSlot}
@@ -90,8 +92,9 @@ export function AutoComplete<T>({
     }
 
     return (
-        <label className="flex items-center gap-2 border p-2 rounded-lg relative bg-white border-gray-300 mb-2">
+        <div className="flex items-center gap-2 border p-2 rounded-lg relative bg-white border-gray-300 mb-2">
             <input
+                id={id}
                 autoFocus={autoFocus}
                 value={term}
                 onChange={(e) => setTerm(e.target.value)}
@@ -142,7 +145,7 @@ export function AutoComplete<T>({
                     </div>
                 )}
             </div>
-        </label>
+        </div>
     );
 }
 

@@ -82,7 +82,7 @@ export interface RouteData {
 }
 
 export interface TimeTable {
-  dayOfWeek: string[];
+  dayOfWeek: number[];
   /**
    * @format time
    * @pattern ^(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?$

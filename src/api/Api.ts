@@ -1090,7 +1090,16 @@ export class Api<
              */
             id: string;
             bus: BusData;
-            times: TimeTable[];
+            driver: {
+              /**
+               * @format uuid
+               * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$
+               */
+              id: string;
+              name: string;
+              email: string;
+            };
+            times: TimeTable;
             route: RouteData;
             meta: any;
             /**
@@ -1103,13 +1112,7 @@ export class Api<
              * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
              */
             endDate: string;
-            /**
-             * @format time
-             * @pattern ^(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?$
-             */
-            startTime: string;
-            /** @default "MORNING" */
-            type: "MORNING" | "AFTERNOON";
+            type: "DISPATCH" | "RETURN";
           }[];
           meta: PaginationMetaData;
         };
@@ -1162,7 +1165,7 @@ export class Api<
       busId: string;
       routeId: string;
       driverId: string;
-      times: TimeTable[];
+      times: TimeTable;
       meta?: any;
       /**
        * @format date-time
@@ -1174,13 +1177,7 @@ export class Api<
        * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
        */
       endDate: string;
-      /**
-       * @format date-time
-       * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-       */
-      startTime: string;
-      /** @default "MORNING" */
-      type: "MORNING" | "AFTERNOON";
+      type: "DISPATCH" | "RETURN";
     },
     params: RequestParams = {},
   ) =>
@@ -1201,7 +1198,16 @@ export class Api<
            */
           id: string;
           bus: BusData;
-          times: TimeTable[];
+          driver: {
+            /**
+             * @format uuid
+             * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$
+             */
+            id: string;
+            name: string;
+            email: string;
+          };
+          times: TimeTable;
           route: RouteData;
           meta: any;
           /**
@@ -1214,13 +1220,7 @@ export class Api<
            * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
            */
           endDate: string;
-          /**
-           * @format time
-           * @pattern ^(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?$
-           */
-          startTime: string;
-          /** @default "MORNING" */
-          type: "MORNING" | "AFTERNOON";
+          type: "DISPATCH" | "RETURN";
         };
       },
       | {
@@ -1285,7 +1285,16 @@ export class Api<
            */
           id: string;
           bus: BusData;
-          times: TimeTable[];
+          driver: {
+            /**
+             * @format uuid
+             * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$
+             */
+            id: string;
+            name: string;
+            email: string;
+          };
+          times: TimeTable;
           route: RouteData;
           meta: any;
           /**
@@ -1298,13 +1307,7 @@ export class Api<
            * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
            */
           endDate: string;
-          /**
-           * @format time
-           * @pattern ^(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?$
-           */
-          startTime: string;
-          /** @default "MORNING" */
-          type: "MORNING" | "AFTERNOON";
+          type: "DISPATCH" | "RETURN";
         };
       },
       | {
@@ -1356,24 +1359,18 @@ export class Api<
       driverId?: string;
       meta?: any;
       /**
-       * @format time
-       * @pattern ^(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?$
-       */
-      startTime?: string;
-      /**
-       * @format date
-       * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+       * @format date-time
+       * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
        */
       startDate?: string;
       /**
-       * @format date
-       * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+       * @format date-time
+       * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
        */
       endDate?: string;
-      /** @default "MORNING" */
-      type: "MORNING" | "AFTERNOON";
+      type?: "DISPATCH" | "RETURN";
       routeId?: string;
-      times?: TimeTable[];
+      times?: TimeTable;
     },
     params: RequestParams = {},
   ) =>
@@ -1614,7 +1611,7 @@ export class Api<
  *
  * @tags DriverController
  * @name GetTripById
- * @summary Get trip by IDFend
+ * @summary Get trip by ID
  * @request GET:/api/drivers/trip/{id}
  * @secure*/
 
@@ -3154,6 +3151,7 @@ export class Api<
        * @default 10
        */
       limit?: number;
+      role?: string;
     },
     params: RequestParams = {},
   ) =>
@@ -3171,7 +3169,7 @@ export class Api<
           data: {
             id: string;
             username: string;
-            roles: string;
+            roles: string[];
             email: string;
             createdAt: string;
             updatedAt: string;
@@ -3204,7 +3202,7 @@ export class Api<
       username: string;
       email: string;
       password: string;
-      rules: string;
+      roles: string[];
     },
     params: RequestParams = {},
   ) =>
@@ -3236,6 +3234,56 @@ export class Api<
       method: "POST",
       body: data,
       type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags UsersController
+ * @name GetUserById
+ * @summary Get User by ID
+ * @request GET:/api/users/{id}*/
+
+  /**
+   */
+
+  getUserById = (id: string, params: RequestParams = {}) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          id: string;
+          username: string;
+          roles: string[];
+          email: string;
+          createdAt: string;
+          updatedAt: string;
+        };
+      },
+      {
+        /**
+         * HTTP status code of the error
+         * @min 400
+         * @max 599
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        /** Error class name */
+        name?: string;
+      }
+    >({
+      path: `/api/users/${id}`,
+      method: "GET",
       format: "json",
       ...params,
     });
@@ -3419,61 +3467,6 @@ export class Api<
     >({
       path: `/api/users/role/permission`,
       method: "POST",
-      body: data,
-      type: ContentType.Json,
-      format: "json",
-      ...params,
-    });
-  /**
-
- * No description
- *
- * @tags UsersController
- * @name RemovePermissionFromRole
- * @summary Remove Permission from Role
- * @request DELETE:/api/users/role/permission*/
-
-  /**
-   */
-
-  removePermissionFromRole = (
-    data: {
-      roleId: number;
-      permissions: string[];
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<
-      {
-        /**
-         * HTTP status code of the error
-         * @min 200
-         * @max 300
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-        data?: {
-          id: number;
-          name: string;
-          permissions: string[];
-        };
-      },
-      {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-        /** Error class name */
-        name?: string;
-      }
-    >({
-      path: `/api/users/role/permission`,
-      method: "DELETE",
       body: data,
       type: ContentType.Json,
       format: "json",

@@ -247,7 +247,7 @@
           "dayOfWeek": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "number"
             }
           },
           "departureTime": {
@@ -1252,9 +1252,7 @@
             "required": true,
             "schema": {
               "$schema": "https://json-schema.org/draft/2020-12/schema",
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+              "type": "string"
             }
           }
         ],
@@ -2661,11 +2659,30 @@
                               "bus": {
                                 "$ref": "#/components/schemas/BusData"
                               },
+                              "driver": {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "string",
+                                    "format": "uuid",
+                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "email": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "name",
+                                  "email"
+                                ],
+                                "additionalProperties": false
+                              },
                               "times": {
-                                "type": "array",
-                                "items": {
-                                  "$ref": "#/components/schemas/TimeTable"
-                                }
+                                "$ref": "#/components/schemas/TimeTable"
                               },
                               "route": {
                                 "$ref": "#/components/schemas/RouteData"
@@ -2681,29 +2698,23 @@
                                 "format": "date-time",
                                 "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
                               },
-                              "startTime": {
-                                "type": "string",
-                                "format": "time",
-                                "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?$"
-                              },
                               "type": {
-                                "default": "MORNING",
                                 "type": "string",
                                 "enum": [
-                                  "MORNING",
-                                  "AFTERNOON"
+                                  "DISPATCH",
+                                  "RETURN"
                                 ]
                               }
                             },
                             "required": [
                               "id",
                               "bus",
+                              "driver",
                               "times",
                               "route",
                               "meta",
                               "startDate",
                               "endDate",
-                              "startTime",
                               "type"
                             ],
                             "additionalProperties": false
@@ -2807,10 +2818,7 @@
                     "type": "string"
                   },
                   "times": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/TimeTable"
-                    }
+                    "$ref": "#/components/schemas/TimeTable"
                   },
                   "meta": {},
                   "startDate": {
@@ -2823,17 +2831,11 @@
                     "format": "date-time",
                     "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
                   },
-                  "startTime": {
-                    "type": "string",
-                    "format": "date-time",
-                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
-                  },
                   "type": {
-                    "default": "MORNING",
                     "type": "string",
                     "enum": [
-                      "MORNING",
-                      "AFTERNOON"
+                      "DISPATCH",
+                      "RETURN"
                     ]
                   }
                 },
@@ -2844,7 +2846,6 @@
                   "times",
                   "startDate",
                   "endDate",
-                  "startTime",
                   "type"
                 ],
                 "additionalProperties": false
@@ -2884,11 +2885,30 @@
                         "bus": {
                           "$ref": "#/components/schemas/BusData"
                         },
+                        "driver": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "email": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name",
+                            "email"
+                          ],
+                          "additionalProperties": false
+                        },
                         "times": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/TimeTable"
-                          }
+                          "$ref": "#/components/schemas/TimeTable"
                         },
                         "route": {
                           "$ref": "#/components/schemas/RouteData"
@@ -2904,29 +2924,23 @@
                           "format": "date-time",
                           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
                         },
-                        "startTime": {
-                          "type": "string",
-                          "format": "time",
-                          "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?$"
-                        },
                         "type": {
-                          "default": "MORNING",
                           "type": "string",
                           "enum": [
-                            "MORNING",
-                            "AFTERNOON"
+                            "DISPATCH",
+                            "RETURN"
                           ]
                         }
                       },
                       "required": [
                         "id",
                         "bus",
+                        "driver",
                         "times",
                         "route",
                         "meta",
                         "startDate",
                         "endDate",
-                        "startTime",
                         "type"
                       ],
                       "additionalProperties": false
@@ -3048,11 +3062,30 @@
                         "bus": {
                           "$ref": "#/components/schemas/BusData"
                         },
+                        "driver": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string",
+                              "format": "uuid",
+                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "email": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name",
+                            "email"
+                          ],
+                          "additionalProperties": false
+                        },
                         "times": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/TimeTable"
-                          }
+                          "$ref": "#/components/schemas/TimeTable"
                         },
                         "route": {
                           "$ref": "#/components/schemas/RouteData"
@@ -3068,29 +3101,23 @@
                           "format": "date-time",
                           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
                         },
-                        "startTime": {
-                          "type": "string",
-                          "format": "time",
-                          "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?$"
-                        },
                         "type": {
-                          "default": "MORNING",
                           "type": "string",
                           "enum": [
-                            "MORNING",
-                            "AFTERNOON"
+                            "DISPATCH",
+                            "RETURN"
                           ]
                         }
                       },
                       "required": [
                         "id",
                         "bus",
+                        "driver",
                         "times",
                         "route",
                         "meta",
                         "startDate",
                         "endDate",
-                        "startTime",
                         "type"
                       ],
                       "additionalProperties": false
@@ -3209,42 +3236,30 @@
                     "type": "string"
                   },
                   "meta": {},
-                  "startTime": {
-                    "type": "string",
-                    "format": "time",
-                    "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?$"
-                  },
                   "startDate": {
                     "type": "string",
-                    "format": "date",
-                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
                   },
                   "endDate": {
                     "type": "string",
-                    "format": "date",
-                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
                   },
                   "type": {
-                    "default": "MORNING",
                     "type": "string",
                     "enum": [
-                      "MORNING",
-                      "AFTERNOON"
+                      "DISPATCH",
+                      "RETURN"
                     ]
                   },
                   "routeId": {
                     "type": "string"
                   },
                   "times": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/TimeTable"
-                    }
+                    "$ref": "#/components/schemas/TimeTable"
                   }
                 },
-                "required": [
-                  "type"
-                ],
                 "additionalProperties": false
               }
             }
@@ -3258,9 +3273,7 @@
             "required": true,
             "schema": {
               "$schema": "https://json-schema.org/draft/2020-12/schema",
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+              "type": "string"
             }
           }
         ],
@@ -7299,6 +7312,14 @@
               "minimum": 1,
               "maximum": 100
             }
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -7336,7 +7357,10 @@
                                 "type": "string"
                               },
                               "roles": {
-                                "type": "string"
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
                               },
                               "email": {
                                 "type": "string"
@@ -7398,15 +7422,18 @@
                   "password": {
                     "type": "string"
                   },
-                  "rules": {
-                    "type": "string"
+                  "roles": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
                   }
                 },
                 "required": [
                   "username",
                   "email",
                   "password",
-                  "rules"
+                  "roles"
                 ],
                 "additionalProperties": false
               }
@@ -7441,6 +7468,116 @@
           },
           "500": {
             "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "tags": [
+          "UsersController"
+        ],
+        "summary": "Get User by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "username": {
+                          "type": "string"
+                        },
+                        "roles": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string"
+                        },
+                        "updatedAt": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "username",
+                        "roles",
+                        "email",
+                        "createdAt",
+                        "updatedAt"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -7794,120 +7931,8 @@
               }
             }
           },
-          "403": {
-            "description": "Conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$schema": "http://json-schema.org/draft-07/schema#",
-                  "title": "ApiErrorResponse",
-                  "type": "object",
-                  "properties": {
-                    "code": {
-                      "type": "integer",
-                      "description": "HTTP status code of the error",
-                      "minimum": 400,
-                      "maximum": 599
-                    },
-                    "message": {
-                      "type": "string",
-                      "description": "Human-readable error message"
-                    },
-                    "name": {
-                      "type": "string",
-                      "description": "Error class name"
-                    }
-                  },
-                  "required": []
-                }
-              }
-            }
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "UsersController"
-        ],
-        "summary": "Remove Permission from Role",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$schema": "https://json-schema.org/draft/2020-12/schema",
-                "type": "object",
-                "properties": {
-                  "roleId": {
-                    "type": "number"
-                  },
-                  "permissions": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "required": [
-                  "roleId",
-                  "permissions"
-                ],
-                "additionalProperties": false
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$schema": "http://json-schema.org/draft-07/schema#",
-                  "type": "object",
-                  "properties": {
-                    "code": {
-                      "type": "integer",
-                      "description": "HTTP status code of the error",
-                      "minimum": 200,
-                      "maximum": 300
-                    },
-                    "message": {
-                      "type": "string",
-                      "description": "Human-readable error message"
-                    },
-                    "data": {
-                      "$schema": "https://json-schema.org/draft/2020-12/schema",
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "number"
-                        },
-                        "name": {
-                          "type": "string"
-                        },
-                        "permissions": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          }
-                        }
-                      },
-                      "required": [
-                        "id",
-                        "name",
-                        "permissions"
-                      ],
-                      "additionalProperties": false
-                    }
-                  },
-                  "required": []
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Conflict",
+          "404": {
+            "description": "Resource not found",
             "content": {
               "application/json": {
                 "schema": {
