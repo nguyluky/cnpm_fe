@@ -28,6 +28,7 @@ import { GetAllStudent } from "../pages/admin/Students/getAllStudent";
 import NotificationsPage from "../pages/driver/NotificationsPage";
 import { Roles } from "../pages/admin/Roles";
 import { DriverSchedule } from "../pages/driver/Schedule";
+import { GetStopPointPage } from "../pages/parent/getStopPointPage";
 
 export const path = {
     INDEX: "/",
@@ -47,6 +48,7 @@ export const path = {
     PARENT: "/parent",
     PARENT_NOTIFICATIONS: "/parent/notifications",
     PARENT_CHILD_INFO: "/parent/child-info",
+    PARENT_STOP_POINT: "/parent/stop-point",
 
     DRIVER: "/driver",
     DRIVER_SCHEDULE: "/driver/schedule",
@@ -85,6 +87,10 @@ export const router = createBrowserRouter([
                         path: path.PARENT_CHILD_INFO,
                         element: <StudentPage />,
                     },
+                    {
+                            path: path.PARENT_STOP_POINT,
+                            element: <GetStopPointPage />,
+                    }
                 ],
             },
             {
