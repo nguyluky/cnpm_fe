@@ -6,7 +6,7 @@ import { SocketProvider } from "../contexts/socketContext";
 
 export function RootLayout() {
     return <ApiProvider>
-        <SocketProvider url={"http://localhost:3000"}>
+        <SocketProvider url={ import.meta.env.VITE_API_BASE_URL || "http://localhost:3000" }>
             <ModalProvider>
                 <Outlet />
             </ModalProvider>
