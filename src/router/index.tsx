@@ -19,11 +19,15 @@ import { DriverLayout } from "../layouts/DriverLayout"
 import { RootLayout } from "../layouts/RootLayout"
 // import ScheduleAdminTable from "../pages/admin/test_ui"
 // import DriverNotifications from "../pages/driver/Notifications"
-import { MapDriver } from "../pages/driver/Map";
+import { MapDriver } from "../pages/driver/Map"
+import { DriverHome } from "../pages/driver/Home";
+// import HomePagesche  from "../pages/driver/Schedule";
+  
 
 import { GetAllStudent } from "../pages/admin/Students/getAllStudent";
 import NotificationsPage from "../pages/driver/NotificationsPage";
 import { Roles } from "../pages/admin/Roles";
+import { DriverSchedule } from "../pages/driver/Schedule";
 
 export const path = {
     INDEX: "/",
@@ -161,5 +165,81 @@ export const router = createBrowserRouter([
                 element: <NotificationsPage />,
             },
         ],
-    },
+      },
+      {
+        path: path.ADMIN,
+        element: <AdminLayout />,
+        children: [
+          {
+            index: true,
+            element: <Overview />,
+          },
+          {
+            path: path.ADMIN_BUSES,
+            element: <Buss />,
+          },
+          {
+            path: path.ADMIN_BUS_MANAGEMENT,
+            element: <Bus />,
+          },
+          {
+            path: path.ADMIN_STUDENTS_MANAGEMENT,
+            element: <GetAllStudent />,
+          },
+          {
+            path: path.ADMIN_STOPS_POINTS,
+            element: <StopsPointsPage />,
+          },
+          {
+            path: path.ADMIN_STUDENTS,
+            element: <Student />,
+          },
+          {
+            path: path.ADMIN_SCHEDULES,
+            element: <Schedules />,
+          },
+          {
+            path: path.ADMIN_ROUTES,
+            element: <RouteAdmin />,
+          },
+        ],
+      },
+      {
+        path: path.DRIVER,
+        element: <DriverLayout />,
+        children: [
+          {
+              index: true,
+              element: <DriverHome />
+          },
+          {
+              path: path.DRIVER_SCHEDULE,
+              element: <DriverSchedule />
+          },
+          // {
+          //     path: path.DRIVER_QR_ROLL_CALL,
+          //     element: <QRRollCall />
+          // },
+          // ... other driver routes
+        ],
+      },
+      {
+        path: path.DRIVER_TRIP,
+        element: <MapDriver />,
+      },
+      // {
+      //   path: "/test",
+      //   element: <ScheduleAdminTable />,
+      // },
+      {
+        path: "*",
+        element: <NotFoundPage />,
+      },
+      // {
+      //   path: path.DRIVER_NOTIFICATIONS,
+      //   element: <NotificationsPage />,
+      // },
+    ],
+  },
+>>>>>>> aceadffbd237cd91289fad76854d2d058a5deb41
 ]);
