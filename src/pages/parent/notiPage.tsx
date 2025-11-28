@@ -1,6 +1,6 @@
 // import { Card } from '../../components/uiItem/card.tsx';
 import { Button } from "../../components/uiItem/button.tsx";
-import { Bell, ChevronLeft, CheckCircle2 } from "lucide-react";
+import { Bell } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useSocketIo } from "../../hooks/useSocketIo.ts";
 

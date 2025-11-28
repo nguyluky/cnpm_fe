@@ -21,7 +21,7 @@ interface ApiSchedule {
 
 export const DriverSchedule: React.FC = () => {
   const api = useApi();
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate, _] = useState(new Date());
 
   const { data: schedules = [], isLoading, error } = useQuery<ApiSchedule[]>({
     queryKey: ["driverSchedules-calendar"],
