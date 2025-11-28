@@ -130,17 +130,29 @@ export const router = createBrowserRouter([
                 ],
             },
             {
+                path: path.DRIVER_TRIP,
+                element: <MapDriver />,
+            },
+            {
+                path: "*",
+                element: <NotFoundPage />,
+            },
+            {
+                path: path.DRIVER_NOTIFICATIONS,
+                element: <NotificationsPage />,
+            },
+            {
                 path: path.DRIVER,
                 element: <DriverLayout />,
                 children: [
-                    // {
-                    //     index: true,
-                    //     element: <DriverHome />
-                    // },
-                    // {
-                    //     path: path.DRIVER_SCHEDULE,
-                    //     element: <DriverSchedule />
-                    // },
+                    {
+                        index: true,
+                        element: <DriverHome />
+                    },
+                    {
+                        path: path.DRIVER_SCHEDULE,
+                        element: <DriverSchedule />
+                    },
                     // {
                     //     path: path.DRIVER_QR_ROLL_CALL,
                     //     element: <QRRollCall />
@@ -152,84 +164,11 @@ export const router = createBrowserRouter([
                 path: path.DRIVER_TRIP,
                 element: <MapDriver />,
             },
-            // {
-            //   path: "/test",
-            //   element: <ScheduleAdminTable />,
-            // },
             {
                 path: "*",
                 element: <NotFoundPage />,
             },
-            {
-                path: path.DRIVER_NOTIFICATIONS,
-                element: <NotificationsPage />,
-            },
         ],
-    },
-    {
-        path: path.ADMIN,
-        element: <AdminLayout />,
-        children: [
-            {
-                index: true,
-                element: <Overview />,
-            },
-            {
-                path: path.ADMIN_BUSES,
-                element: <Buss />,
-            },
-            {
-                path: path.ADMIN_BUS_MANAGEMENT,
-                element: <Bus />,
-            },
-            {
-                path: path.ADMIN_STUDENTS_MANAGEMENT,
-                element: <GetAllStudent />,
-            },
-            {
-                path: path.ADMIN_STOPS_POINTS,
-                element: <StopsPointsPage />,
-            },
-            {
-                path: path.ADMIN_STUDENTS,
-                element: <Student />,
-            },
-            {
-                path: path.ADMIN_SCHEDULES,
-                element: <Schedules />,
-            },
-            {
-                path: path.ADMIN_ROUTES,
-                element: <RouteAdmin />,
-            },
-        ],
-    },
-    {
-        path: path.DRIVER,
-        element: <DriverLayout />,
-        children: [
-            {
-                index: true,
-                element: <DriverHome />
-            },
-            {
-                path: path.DRIVER_SCHEDULE,
-                element: <DriverSchedule />
-            },
-            // {
-            //     path: path.DRIVER_QR_ROLL_CALL,
-            //     element: <QRRollCall />
-            // },
-            // ... other driver routes
-        ],
-    },
-    {
-        path: path.DRIVER_TRIP,
-        element: <MapDriver />,
-    },
-    {
-        path: "*",
-        element: <NotFoundPage />,
     },
 ],
 );
