@@ -30,11 +30,11 @@ interface TodaySchedule {
 }
 
 interface TripInfo {
-    id: number | string;
-    location: string;
-    time: string;
-    students: Student[];
-    dropPoint: string;
+  id: number | string;
+  location: string;
+  time: string;
+  students: Student[];
+  dropPoint: string;
 }
 
 // map type của today -> ca (shift) ở UI
@@ -47,7 +47,7 @@ function formatStartTime(isoString: string) {
   if (!isoString) return "---";
   const [, timeMs] = isoString.split("T"); // "06:30:00.000Z"
   const timePart = timeMs?.split(".")[0] ?? "";
-  return timePart.substring(0, 5) // "06:30"
+  return timePart.substring(0, 5); // "06:30"
 }
 
 export const DriverHome: React.FC = () => {
@@ -96,8 +96,6 @@ export const DriverHome: React.FC = () => {
     ? driverSchedules.find((s) => s.id === firstToday.scheduleId)
     : driverSchedules[0];
 
-
-
   const licensePlateText =
     scheduleForToday?.bus?.licensePlate
       ? `Xe buýt: ${scheduleForToday.bus.licensePlate}`
@@ -116,7 +114,6 @@ export const DriverHome: React.FC = () => {
         dropPoint: "---",
       } as TripInfo;
     });
-
 
   // hiện tại để tạm xem thử có thêm thông tin học sinh cần đón trong tuyến được không
   const handlePickUp = (student: Student) => toast.success(`✅ Đã đón ${student.name}`);
@@ -146,10 +143,11 @@ export const DriverHome: React.FC = () => {
                   setSelectedShift("MORNING");
                   setSelectedTrip(null);
                 }}
-                className={`px-4 py-2 rounded-lg border font-medium cursor-pointer ${selectedShift === "MORNING"
-                  ? "bg-orange-500 text-white border-orange-600"
-                  : "bg-white text-gray-700"
-                  }`}
+                className={`px-4 py-2 rounded-lg border font-medium cursor-pointer ${
+                  selectedShift === "MORNING"
+                    ? "bg-orange-500 text-white border-orange-600"
+                    : "bg-white text-gray-700"
+                }`}
               >
                 Ca sáng
               </button>
@@ -158,26 +156,24 @@ export const DriverHome: React.FC = () => {
                   setSelectedShift("AFTERNOON");
                   setSelectedTrip(null);
                 }}
-                className={`px-4 py-2 rounded-lg border font-medium cursor-pointer ${selectedShift === "AFTERNOON"
-                  ? "bg-purple-600 text-white border-purple-700"
-                  : "bg-white text-gray-700"
-                  }`}
+                className={`px-4 py-2 rounded-lg border font-medium cursor-pointer ${
+                  selectedShift === "AFTERNOON"
+                    ? "bg-purple-600 text-white border-purple-700"
+                    : "bg-white text-gray-700"
+                }`}
               >
                 Ca chiều
               </button>
             </div>
 
             {/* nếu hôm nay không có ca cho shift đang chọn */}
-            {todayShiftTrips.length === 0 && !isLoading && (
-              <p>Hôm nay không có ca cho khung giờ này</p>
-            )}
+            {todayShiftTrips.length === 0 && !isLoading && <p>Hôm nay không có ca cho khung giờ này</p>}
 
             {/* danh sách ca hôm nay */}
             {todayShiftTrips.map((tripInfo, index) => (
               <Card
                 key={tripInfo.id}
-                className={`p-5 mb-4 cursor-pointer ${selectedTrip?.id === tripInfo.id ? "bg-gray-100" : ""
-                  }`}
+                className={`p-5 mb-4 cursor-pointer ${selectedTrip?.id === tripInfo.id ? "bg-gray-100" : ""}`}
                 onClick={() => setSelectedTrip(tripInfo)}
               >
                 <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
@@ -186,178 +182,23 @@ export const DriverHome: React.FC = () => {
                   ) : (
                     <Sunset className="w-5 h-5 text-purple-500" />
                   )}
-                  <span>
-                    {`Lịch làm việc hôm nay - ${selectedShift === "MORNING" ? "Ca sáng" : "Ca chiều"
-                      }`}
-                  </span>
+                  <span>{`Lịch làm việc hôm nay - ${selectedShift === "MORNING" ? "Ca sáng" : "Ca chiều"}`}</span>
                 </h2>
 
                 <div
-                  className={`flex justify-between p-4 rounded-lg border mb-5 ${selectedShift === "MORNING"
-                    ? "bg-orange-50 border-orange-200"
-                    : "bg-purple-50 border-purple-200"
-                    }`}
+                  className={`flex justify-between p-4 rounded-lg border mb-5 ${
+                    selectedShift === "MORNING" ? "bg-orange-50 border-orange-200" : "bg-purple-50 border-purple-200"
+                  }`}
                 >
                   <div className="flex items-center gap-2">
-                    <Clock
-                      className={`h-5 w-5 ${selectedShift === "MORNING" ? "text-orange-600" : "text-purple-600"
-                        }`}
-                    />
+                    <Clock className={`h-5 w-5 ${selectedShift === "MORNING" ? "text-orange-600" : "text-purple-600"}`} />
                     <span className="font-medium">{tripInfo.time}</span>
                   </div>
-                  <MapPin
-                    className={`h-5 w-5 ${selectedShift === "MORNING" ? "text-orange-600" : "text-purple-600"
-                      }`}
-                  />
+                  <MapPin className={`h-5 w-5 ${selectedShift === "MORNING" ? "text-orange-600" : "text-purple-600"}`} />
                 </div>
 
-    // lọc schedule theo ca để lấy biển số
-    const currentShiftSchedules: ApiSchedule[] = driverSchedules.filter(
-        (sch) => sch.type === selectedShift
-    );
-
-    const licensePlateText =
-        currentShiftSchedules[0]?.bus?.licensePlate
-            ? `Xe buýt: ${currentShiftSchedules[0].bus.licensePlate}`
-            : "---";
-
-    // join todaySchedules với driverSchedules theo scheduleId
-    const todayShiftTrips: TripInfo[] = todaySchedules
-        .filter((t) => t.type === selectedShift) // ca sáng / chiều
-        .map((t) => {
-            const sched = driverSchedules.find((s) => s.id === t.scheduleId);
-            return {
-                id: t.tripId,
-                location: sched?.route?.name || "Chưa có tên tuyến",
-                time: formatStartTime(t.startTime),
-                students: [],
-                dropPoint: "---",
-            } as TripInfo;
-        });
-
-    // hiện tại để tạm xem thử có thêm thông tin học sinh cần đón trong tuyến được không
-    const handlePickUp = (student: Student) => toast.success(`✅ Đã đón ${student.name}`);
-    const handleAbsent = (student: Student) => toast.info(`📋 ${student.name} vắng mặt`);
-
-    const isLoading = isLoadingDriver || isLoadingToday;
-    const error = driverError || todayError;
-
-    return (
-        <div className="p-6">
-            <div className="space-y-6">
-                <WelcomeBanner
-                    driverName="Tài xế hư hỏng của tôi"
-                    vehicleId={licensePlateText}
-                    date={new Date().toLocaleDateString("vi-VN")}
-                />
-
-                {isLoading && <p>Đang tải dữ liệu...</p>}
-                {error && <p style={{ color: "red" }}>Lỗi API: {(error as Error).message}</p>}
-
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="lg:col-span-2 space-y-6">
-                        {/* nút chọn ca */}
-                        <div className="flex gap-3 mb-2">
-                            <button
-                                onClick={() => {
-                                    setSelectedShift("MORNING");
-                                    setSelectedTrip(null);
-                                }}
-                                className={`px-4 py-2 rounded-lg border font-medium cursor-pointer ${selectedShift === "MORNING"
-                                        ? "bg-orange-500 text-white border-orange-600"
-                                        : "bg-white text-gray-700"
-                                    }`}
-                            >
-                                Ca sáng
-                            </button>
-                            <button
-                                onClick={() => {
-                                    setSelectedShift("AFTERNOON");
-                                    setSelectedTrip(null);
-                                }}
-                                className={`px-4 py-2 rounded-lg border font-medium cursor-pointer ${selectedShift === "AFTERNOON"
-                                        ? "bg-purple-600 text-white border-purple-700"
-                                        : "bg-white text-gray-700"
-                                    }`}
-                            >
-                                Ca chiều
-                            </button>
-                        </div>
-
-                        {/* nếu hôm nay không có ca cho shift đang chọn */}
-                        {todayShiftTrips.length === 0 && !isLoading && (
-                            <p>Hôm nay không có ca cho khung giờ này</p>
-                        )}
-
-                        {/* danh sách ca hôm nay */}
-                        {todayShiftTrips.map((tripInfo, index) => (
-                            <Card
-                                key={tripInfo.id}
-                                className={`p-5 mb-4 cursor-pointer ${selectedTrip?.id === tripInfo.id ? "bg-gray-100" : ""
-                                    }`}
-                                onClick={() => setSelectedTrip(tripInfo)}
-                            >
-                                <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                                    {selectedShift === "MORNING" ? (
-                                        <Sun className="w-5 h-5 text-orange-500" />
-                                    ) : (
-                                        <Sunset className="w-5 h-5 text-purple-500" />
-                                    )}
-                                    <span>
-                                        {`Lịch làm việc hôm nay - ${selectedShift === "MORNING" ? "Ca sáng" : "Ca chiều"
-                                            }`}
-                                    </span>
-                                </h2>
-
-                                <div
-                                    className={`flex justify-between p-4 rounded-lg border mb-5 ${selectedShift === "MORNING"
-                                            ? "bg-orange-50 border-orange-200"
-                                            : "bg-purple-50 border-purple-200"
-                                        }`}
-                                >
-                                    <div className="flex items-center gap-2">
-                                        <Clock
-                                            className={`h-5 w-5 ${selectedShift === "MORNING" ? "text-orange-600" : "text-purple-600"
-                                                }`}
-                                        />
-                                        <span className="font-medium">{tripInfo.time}</span>
-                                    </div>
-                                    <MapPin
-                                        className={`h-5 w-5 ${selectedShift === "MORNING" ? "text-orange-600" : "text-purple-600"
-                                            }`}
-                                    />
-                                </div>
-
-                                <div className="space-y-3">
-                                    <TripCard
-                                        index={index + 1}
-                                        location={tripInfo.location}
-                                        time={tripInfo.time}
-                                        students={tripInfo.students}
-                                        onPickUp={handlePickUp}
-                                        onAbsent={handleAbsent}
-                                    />
-                                </div>
-                            </Card>
-                        ))}
-                    </div>
-
-                    {/* Sidebar  */}
-                    <div className="lg:col-span-1 space-y-6">
-                        <QuickInfoSidebar
-                            electricCount={3}  //Để tạm dữ liệu ảo, khong cần thì xóa sau
-                            studyCount={4}    //Để tạm dữ liệu ảo, khong cần thì xóa sau
-                            WorkCount={todaySchedules.length}
-                            routeInfo={{
-                                vehicle: "Xe buýt",
-                                vehicleId:
-                                    currentShiftSchedules[0]?.bus?.licensePlate ??
-                                    "---",
-                                route: selectedTrip?.location ?? "---",
-                                time: selectedTrip?.time ?? "---",
-                            }}
-                        />
-                    </div>
+                <div className="space-y-3">
+                  <TripCard index={index + 1} location={tripInfo.location} time={tripInfo.time} students={tripInfo.students} onPickUp={handlePickUp} onAbsent={handleAbsent} />
                 </div>
               </Card>
             ))}
@@ -366,8 +207,8 @@ export const DriverHome: React.FC = () => {
           {/* Sidebar  */}
           <div className="lg:col-span-1 space-y-6">
             <QuickInfoSidebar
-              electricCount={3}  //Để tạm dữ liệu ảo, khong cần thì xóa sau
-              studyCount={4}    //Để tạm dữ liệu ảo, khong cần thì xóa sau
+              electricCount={3} //Để tạm dữ liệu ảo, khong cần thì xóa sau
+              studyCount={4} //Để tạm dữ liệu ảo, khong cần thì xóa sau
               WorkCount={todaySchedules.length}
               routeInfo={{
                 vehicle: "Xe buýt",
@@ -378,5 +219,7 @@ export const DriverHome: React.FC = () => {
             />
           </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 };
