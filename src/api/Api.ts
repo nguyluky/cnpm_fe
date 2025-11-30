@@ -684,6 +684,11 @@ export class Api<
        * @default 10
        */
       limit?: number;
+      stopId?: string;
+      /**
+       * Stop point IDs to filter by (comma-separated)
+       
+       */
     },
     params: RequestParams = {},
   ) =>

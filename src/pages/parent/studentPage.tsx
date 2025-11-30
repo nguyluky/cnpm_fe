@@ -3,6 +3,7 @@ import { Baby, School, Calendar, User, X, ChevronRight, Mars, Venus, MapPin } fr
 import { useApi } from "../../contexts/apiConetxt";
 import { useNavigate } from "react-router-dom";
 import { path } from "../../router";
+import type { StudentInfoReqAssignmetStop } from "../../api/data-contracts";
 
 interface Student {
     id: string;
@@ -20,8 +21,19 @@ interface Student {
     };
 }
 
+interface StudentAssignment {
+    studentId: string;
+    name: string;
+    assignment: {
+        pickupStop?: StudentInfoReqAssignmetStop;
+        dropoffStop?: StudentInfoReqAssignmetStop;
+    };
+}
+// api: getStudentInfoForParent()
+
 export function StudentPage() {
     const [students, setStudents] = useState<Student[]>([]);
+    const [studentAssignment, setStudentAssignment] = useState<StudentAssignment>();
     const [loading, setLoading] = useState(true);
     const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
     const {api} = useApi();
@@ -42,48 +54,25 @@ export function StudentPage() {
         }
     };
 
+    const fetchStudentAssignment = async(studentId: string) => {
+        if (!studentId) return;
+        try {
+            const data = await api.getStudentInfoForParent(studentId);
+            if (data.data.data) {
+                setStudentAssignment(data.data.data);
+            }
+        } catch (error) {
+            console.error("Failed to fetch student assignment:", error);
+        }
+    };
+
     useEffect(() => {
         fetchStudents();
-        // const fetchStudents = async () => {
-        //     setLoading(true);
-        //     const mockData: Student[] = [
-        //         {
-        //             id: "stu_001",
-        //             name: "Dương Tùng Thiện",
-        //             meta: {
-        //                 class: "6A1",
-        //                 gender: "Nam",
-        //                 birthday: "15/03/2014",
-        //                 nickname: "Con trai ngoan của mẹ",
-        //                 studentCode: "HS123456",
-        //                 address: "Số 123, đường ABC, Quận 1, TP.HCM",
-        //                 parentName: "Dương Thị Hồng",
-        //                 phone: "0901234567"
-        //             }
-        //         },
-        //         {
-        //             id: "stu_002",
-        //             name: "Dương Minh Anh",
-        //             meta: {
-        //                 class: "4A2",
-        //                 gender: "Nữ",
-        //                 birthday: "22/11/2016",
-        //                 nickname: "Công chúa nhỏ nhà mình",
-        //                 studentCode: "HS123457",
-        //                 address: "Số 123, đường ABC, Quận 1, TP.HCM",
-        //                 parentName: "Dương Thị Hồng",
-        //                 phone: "0901234567"
-        //             }
-        //         }
-        //     ];
-
-        //     setTimeout(() => {
-        //         setStudents(mockData);
-        //         setLoading(false);
-        //     }, 800);
-        // };
-        // fetchStudents();
     }, []);
+
+    useEffect(() => {
+        fetchStudentAssignment(selectedStudent?.id || "");
+    }, [selectedStudent]);
 
     if (loading) {
         return (
@@ -199,8 +188,20 @@ export function StudentPage() {
                                         label="Giới tính"
                                         value={<span className={`text-2xl font-bold ${selectedStudent.meta.gender === "Nam" ? "text-blue-600" : "text-pink-600"}`}>{selectedStudent.meta.gender}</span>}
                                     />
-                                    {selectedStudent.meta.gender && (
-                                        <InfoRow icon={<MapPin className="w-6 h-6 text-green-600" />} label="Điểm đón" value={"**************"} onClick={() => {navigate(path.PARENT_STOP_POINT)}} />
+                                    {studentAssignment?.assignment.pickupStop ? (
+                                        <InfoRow
+                                            icon={<MapPin className="w-6 h-6 text-green-600" />}
+                                            label="Điểm đón"
+                                            value={studentAssignment.assignment.pickupStop.name}
+                                            onClick={() => { navigate(`${path.PARENT_STOP_POINT}?studentId=${selectedStudent.id}`); }}
+                                        />
+                                    ) : (
+                                        <InfoRow
+                                            icon={<MapPin className="w-6 h-6 text-green-600" />}
+                                            label="Điểm đón"
+                                            value={<span className="text-sm text-gray-500">Chưa có điểm đón</span>}
+                                            onClick={() => { navigate(`${path.PARENT_STOP_POINT}?studentId=${selectedStudent.id}`); }}
+                                        />
                                     )}
                                 </div>
 

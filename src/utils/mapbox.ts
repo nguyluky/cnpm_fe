@@ -1,24 +1,26 @@
 import axios from "axios";
 
-const MAPBOX_ACCESS_TOKEN = (import.meta as any).env?.VITE_MAPBOX_API_KEY;
-
 export type MapboxSuggestion = {
     name: string;
     coordinates: [number, number];
 };
 
-export const fetchMapboxSuggestions = async (query: string, limit = 5): Promise<MapboxSuggestion[]> => {
+export const fetchMapboxSuggestions = async (query: string, limit = 1): Promise<MapboxSuggestion[]> => {
     if (!query) return [];
-    // Add country=vn to limit results to Vietnam; limit and types help narrow results
-    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_ACCESS_TOKEN}&country=vn&limit=${limit}&types=place,address,locality,region`;
+    // OpenStreetMap Nominatim API URL
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=${limit}&countrycodes=vn`;
     try {
-        const response = await axios.get(url);
-        return (response.data.features || []).map((feature: any) => ({
-            name: feature.place_name,
-            coordinates: feature.geometry.coordinates as [number, number],
+        const response = await axios.get(url, {
+            headers: {
+                "User-Agent": "YourAppName/1.0 (your.email@example.com)", // Replace with your app details
+            },
+        });
+        return (response.data || []).map((result: any) => ({
+            name: result.display_name,
+            coordinates: [parseFloat(result.lon), parseFloat(result.lat)] as [number, number],
         }));
     } catch (error) {
-        console.error("Error fetching Mapbox suggestions:", error);
+        console.error("Error fetching OpenStreetMap suggestions:", error);
         return [];
     }
 };

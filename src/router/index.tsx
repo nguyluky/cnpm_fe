@@ -23,12 +23,13 @@ import { MapDriver } from "../pages/driver/Map"
 import { DriverHome } from "../pages/driver/Home";
 // import HomePagesche  from "../pages/driver/Schedule";
 
-
 import { GetAllStudent } from "../pages/admin/Students/getAllStudent";
 import NotificationsPage from "../pages/driver/NotificationsPage";
 import { Roles } from "../pages/admin/Roles";
 import { DriverSchedule } from "../pages/driver/Schedule";
 import { GetStopPointPage } from "../pages/parent/getStopPointPage";
+import { ChooseRoutePage } from "../pages/parent/ChooseRoutePage";
+import {ConfirmSelectionPage} from "../pages/parent/ConfirmSelectionPage";
 
 export const path = {
     INDEX: "/",
@@ -49,6 +50,8 @@ export const path = {
     PARENT_NOTIFICATIONS: "/parent/notifications",
     PARENT_CHILD_INFO: "/parent/child-info",
     PARENT_STOP_POINT: "/parent/stop-point",
+    PARENT_CHOOSE_ROUTE: "/parent/choose-route",
+    PARENT_ASSIGN_ROUTE: "/parent/assign-route",
 
     DRIVER: "/driver",
     DRIVER_SCHEDULE: "/driver/schedule",
@@ -90,7 +93,16 @@ export const router = createBrowserRouter([
                     {
                             path: path.PARENT_STOP_POINT,
                             element: <GetStopPointPage />,
+                    },
+                    {
+                        path: path.PARENT_CHOOSE_ROUTE,
+                        element: <ChooseRoutePage />,
+                    },
+                    {
+                        path: path.PARENT_ASSIGN_ROUTE,
+                        element: <ConfirmSelectionPage />,
                     }
+
                 ],
             },
             {
