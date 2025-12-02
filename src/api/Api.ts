@@ -684,11 +684,8 @@ export class Api<
        * @default 10
        */
       limit?: number;
+      /** Filter by stop ID, split by comma for multiple IDs */
       stopId?: string;
-      /**
-       * Stop point IDs to filter by (comma-separated)
-       
-       */
     },
     params: RequestParams = {},
   ) =>
@@ -1074,6 +1071,10 @@ export class Api<
        * @default 10
        */
       limit?: number;
+      /** Filter schedules by bus ID */
+      busId?: string;
+      /** Filter schedules by route ID */
+      routeId?: string;
     },
     params: RequestParams = {},
   ) =>
@@ -2422,6 +2423,7 @@ export class Api<
 
   getAllStoppoints = (
     query?: {
+      isUse?: boolean;
       east?: number;
       north?: number;
       south?: number;
@@ -3247,56 +3249,6 @@ export class Api<
  * No description
  *
  * @tags UsersController
- * @name GetUserById
- * @summary Get User by ID
- * @request GET:/api/users/{id}*/
-
-  /**
-   */
-
-  getUserById = (id: string, params: RequestParams = {}) =>
-    this.request<
-      {
-        /**
-         * HTTP status code of the error
-         * @min 200
-         * @max 300
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-        data?: {
-          id: string;
-          username: string;
-          roles: string[];
-          email: string;
-          createdAt: string;
-          updatedAt: string;
-        };
-      },
-      {
-        /**
-         * HTTP status code of the error
-         * @min 400
-         * @max 599
-         */
-        code?: number;
-        /** Human-readable error message */
-        message?: string;
-        /** Error class name */
-        name?: string;
-      }
-    >({
-      path: `/api/users/${id}`,
-      method: "GET",
-      format: "json",
-      ...params,
-    });
-  /**
-
- * No description
- *
- * @tags UsersController
  * @name GetAllRoles
  * @summary Get All Roles
  * @request GET:/api/users/roles*/
@@ -3474,6 +3426,56 @@ export class Api<
       method: "POST",
       body: data,
       type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags UsersController
+ * @name GetUserById
+ * @summary Get User by ID
+ * @request GET:/api/users/{id}*/
+
+  /**
+   */
+
+  getUserById = (id: string, params: RequestParams = {}) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          id: string;
+          username: string;
+          roles: string[];
+          email: string;
+          createdAt: string;
+          updatedAt: string;
+        };
+      },
+      {
+        /**
+         * HTTP status code of the error
+         * @min 400
+         * @max 599
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        /** Error class name */
+        name?: string;
+      }
+    >({
+      path: `/api/users/${id}`,
+      method: "GET",
       format: "json",
       ...params,
     });

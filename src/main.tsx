@@ -5,12 +5,11 @@ import './index.css'
 import { router } from './router/index.tsx';
 import { ToastContainer } from './components/uiPart/ToastContainer.tsx';
 import {
-    QueryClient,
     QueryClientProvider,
 } from '@tanstack/react-query'
 import { SocketProvider } from './contexts/socketContext.tsx';
+import { queryClient } from './utils/queryClient.ts';
 
-const queryClient = new QueryClient()
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>

@@ -596,7 +596,9 @@ export const RouteAdmin: React.FC = () => {
                                     <div className="pl-4 overflow-y-auto max-h-100 ">
                                         <ol className="text-gray-500 border-s border-gray-200 w-full relative">
                                             {stopPoints.map((stop, idx) => (
-                                                <li className="mb-10 ms-6">
+                                                <li className="mb-10 ms-6" onClick={() => {
+                                                    console.log("Clicked stop point:", stop.id, selectedRouteId);
+                                                }} key={stop.id}>
                                                     <span className="absolute flex items-center justify-center w-8 h-8 bg-gray-100 rounded-full -start-4 ring-4 ring-white">
                                                         {idx + 1}
                                                     </span>

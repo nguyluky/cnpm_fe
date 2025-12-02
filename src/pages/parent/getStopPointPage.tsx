@@ -46,7 +46,7 @@ export function GetStopPointPage() {
     const studentId = searchParams.get('studentId');
 
     const navigate = useNavigate();
-    const RADIUS_METERS = 1000; // Adjust radius as needed
+    const RADIUS_METERS = 2000; // Adjust radius as needed
 
     const calculateBounds = (lat: number, lng: number, radius: number) => {
         const earthRadius = 6371000; // Earth radius in meters
@@ -98,6 +98,7 @@ export function GetStopPointPage() {
                     north: bounds.north,
                     south: bounds.south,
                     west: bounds.west,
+                    isUse: true,
                 });
 
                 const stopPointsData = response.data.data?.data || [];

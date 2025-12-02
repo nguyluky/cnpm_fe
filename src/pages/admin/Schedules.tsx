@@ -5,6 +5,7 @@ import type { BusData, RouteData, TimeTable } from "../../api/data-contracts";
 import { AutoComplete } from "../../components/uiPart/AutoComplete";
 import { useApi } from "../../contexts/apiConetxt";
 import { useModal } from "../../contexts/modalContext";
+import { cachedCallback } from "../../utils/cacheCallback";
 
 
 interface ScheduleInfo {
@@ -73,13 +74,23 @@ function EditAndCreateScheduleModal({
 
     const queryFnDrivers = async (s: string) => {
         setCounter(e => e + 1);
-        const response = await api.api.getAllUsers({
-            role: 'driver',
-            search: s
-        })
+        const getAllUser = cachedCallback(
+            (search: string) => ['users', 'driver', search],
+            async (search: string) => await api.api.getAllUsers({
+                role: 'driver',
+                search: search
+            })
+        )
+
+        const getUserById = cachedCallback(
+            (id: string) => ['user-by-id', id],
+            async (id: string) => await api.api.getUserById(id)
+        )
+
+        const response = await getAllUser(s);
         const data = response.data.data?.data || [];
         if (s == "" && formData.driverId != "") {
-            const response = await api.api.getUserById(formData.driverId);
+            const response = await getUserById(formData.driverId);
             data.push(response.data.data!);
         }
         setDriverData(data);
@@ -89,12 +100,24 @@ function EditAndCreateScheduleModal({
 
     const queryFnBuses = async (s: string) => {
         setCounter(e => e + 1);
-        const response = await api.api.getAllBuses({
-            search: s
-        })
+
+        const getAllBuses = cachedCallback(
+            (search: string) => ['buses', search],
+            async (search: string) => await api.api.getAllBuses({
+                search: search
+            })
+        )
+
+        const getBusById = cachedCallback(
+            (id: string) => ['bus-by-id', id],
+            async (id: string) => await api.api.getBusById(id)
+        )
+
+
+        const response = await getAllBuses(s);
         const data = response.data.data?.data || [];
         if (s == "" && formData.busId != "") {
-            const response = await api.api.getBusById(formData.busId);
+            const response = await getBusById(formData.busId);
             data.push(response.data.data!);
         }
         setBusData(data);
@@ -104,12 +127,23 @@ function EditAndCreateScheduleModal({
 
     const queryFnRoutes = async (s: string) => {
         setCounter(e => e + 1);
-        const response = await api.api.getAllRoutes({
-            search: s
-        })
+
+        const getAllRoutes = cachedCallback(
+            (search: string) => ['routes', search],
+            async (search: string) => await api.api.getAllRoutes({
+                search: search
+            })
+        )
+        
+        const getRouteById = cachedCallback(
+            (id: string) => ['route-by-id', id],
+            async (id: string) => await api.api.getRouteById(id)
+        )
+
+        const response = await getAllRoutes(s);
         const data = response.data.data?.data || [];
         if (s == "" && formData.routeId != "") {
-            const response = await api.api.getRouteById(formData.routeId);
+            const response = await getRouteById(formData.routeId);
             data.push(response.data.data!);
         }
         setRouteData(data);
@@ -404,7 +438,7 @@ export const Schedules = () => {
             return response.data.data;
 
             // Mock data for now
-        }
+        },
     });
 
     const schedules = data?.data;
@@ -519,7 +553,7 @@ export const Schedules = () => {
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="flex items-center">
                                             <Clock className="mr-2 text-gray-400" size={16} />
-                                            <span className="text-sm text-gray-900">{ schedule.times.departureTime }</span>
+                                            <span className="text-sm text-gray-900">{schedule.times.departureTime}</span>
                                         </div>
                                     </td>
                                     <td className="px-6 py-4">

@@ -1755,6 +1755,15 @@
               "minimum": 1,
               "maximum": 100
             }
+          },
+          {
+            "name": "stopId",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "description": "Filter by stop ID, split by comma for multiple IDs",
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -2620,6 +2629,24 @@
               "type": "number",
               "minimum": 1,
               "maximum": 100
+            }
+          },
+          {
+            "name": "busId",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "description": "Filter schedules by bus ID",
+              "type": "string"
+            }
+          },
+          {
+            "name": "routeId",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "description": "Filter schedules by route ID",
+              "type": "string"
             }
           }
         ],
@@ -5658,6 +5685,14 @@
         "summary": "Get all stoppoints",
         "parameters": [
           {
+            "name": "isUse",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "boolean"
+            }
+          },
+          {
             "name": "east",
             "in": "query",
             "schema": {
@@ -6716,35 +6751,6 @@
               }
             }
           },
-          "404": {
-            "description": "Resource not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$schema": "http://json-schema.org/draft-07/schema#",
-                  "title": "ApiErrorResponse",
-                  "type": "object",
-                  "properties": {
-                    "code": {
-                      "type": "integer",
-                      "description": "HTTP status code of the error",
-                      "minimum": 400,
-                      "maximum": 599
-                    },
-                    "message": {
-                      "type": "string",
-                      "description": "Human-readable error message"
-                    },
-                    "name": {
-                      "type": "string",
-                      "description": "Error class name"
-                    }
-                  },
-                  "required": []
-                }
-              }
-            }
-          },
           "500": {
             "description": "Internal Server Error",
             "content": {
@@ -7498,116 +7504,6 @@
         }
       }
     },
-    "/api/users/{id}": {
-      "get": {
-        "tags": [
-          "UsersController"
-        ],
-        "summary": "Get User by ID",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$schema": "https://json-schema.org/draft/2020-12/schema",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$schema": "http://json-schema.org/draft-07/schema#",
-                  "type": "object",
-                  "properties": {
-                    "code": {
-                      "type": "integer",
-                      "description": "HTTP status code of the error",
-                      "minimum": 200,
-                      "maximum": 300
-                    },
-                    "message": {
-                      "type": "string",
-                      "description": "Human-readable error message"
-                    },
-                    "data": {
-                      "$schema": "https://json-schema.org/draft/2020-12/schema",
-                      "type": "object",
-                      "properties": {
-                        "id": {
-                          "type": "string"
-                        },
-                        "username": {
-                          "type": "string"
-                        },
-                        "roles": {
-                          "type": "array",
-                          "items": {
-                            "type": "string"
-                          }
-                        },
-                        "email": {
-                          "type": "string"
-                        },
-                        "createdAt": {
-                          "type": "string"
-                        },
-                        "updatedAt": {
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "id",
-                        "username",
-                        "roles",
-                        "email",
-                        "createdAt",
-                        "updatedAt"
-                      ],
-                      "additionalProperties": false
-                    }
-                  },
-                  "required": []
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Resource not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$schema": "http://json-schema.org/draft-07/schema#",
-                  "title": "ApiErrorResponse",
-                  "type": "object",
-                  "properties": {
-                    "code": {
-                      "type": "integer",
-                      "description": "HTTP status code of the error",
-                      "minimum": 400,
-                      "maximum": 599
-                    },
-                    "message": {
-                      "type": "string",
-                      "description": "Human-readable error message"
-                    },
-                    "name": {
-                      "type": "string",
-                      "description": "Error class name"
-                    }
-                  },
-                  "required": []
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/users/roles": {
       "get": {
         "tags": [
@@ -7922,6 +7818,116 @@
                         "id",
                         "name",
                         "permissions"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "tags": [
+          "UsersController"
+        ],
+        "summary": "Get User by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "username": {
+                          "type": "string"
+                        },
+                        "roles": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string"
+                        },
+                        "updatedAt": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "username",
+                        "roles",
+                        "email",
+                        "createdAt",
+                        "updatedAt"
                       ],
                       "additionalProperties": false
                     }
