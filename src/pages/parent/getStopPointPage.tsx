@@ -79,6 +79,25 @@ export function GetStopPointPage() {
         return earthRadius * c;
     };
 
+    const searchStopPointsByName = async () => {
+        // Find stop points by name if no suggestions found
+        try {
+            console.log("Searching stop points by name:", searchTerm);
+            setIsLoading(true);
+            const response = await api.getAllStoppoints ();
+            const data = response.data.data?.data || [];
+            const filteredStopPoints = data.filter((stopPoint) =>
+                stopPoint.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            setStopPoints(filteredStopPoints);
+            console.log("Found stop points by name:", filteredStopPoints);
+        } catch (error) {
+            console.error("Error fetching stop points by name:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
     const handleSearchSubmit = async (e: FormEvent) => {
         e.preventDefault(); // Prevent default form submission behavior
 
@@ -88,6 +107,7 @@ export function GetStopPointPage() {
         setSuggestions(results);
 
         if (results.length > 0) {
+            console.log("Mapbox suggestions found:", results);
             const [lng, lat] = results[0].coordinates; // Use the first suggestion as the center point
             const bounds = calculateBounds(lat, lng, RADIUS_METERS);
 
@@ -110,12 +130,18 @@ export function GetStopPointPage() {
                     return distanceA - distanceB;
                 });
 
-                setStopPoints(sortedStopPoints);
+                if (sortedStopPoints.length !== 0) {
+                    setStopPoints(sortedStopPoints);
+                } else {
+                    searchStopPointsByName();
+                }
             } catch (error) {
                 console.error("Error fetching stop points within bounds:", error);
             } finally {
                 setIsLoading(false);
             }
+        } else {
+            searchStopPointsByName();
         }
     };
 
