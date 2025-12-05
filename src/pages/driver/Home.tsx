@@ -1,9 +1,7 @@
 import React from "react";
 import { WelcomeBanner } from "../../components/uiPart/WelcomeBanner";
-import { TripCard } from "../../components/uiPart/TripCard";
 import { QuickInfoSidebar } from "../../components/uiPart/QuickInfoSidebar";
 import { Card } from "../../components/uiItem/card";
-import { toast } from "sonner";
 import { Clock, MapPin, Sun, Sunset } from "lucide-react";
 import type { Student } from "../../components/uiPart/TripCard";
 import { useApi } from "../../contexts/apiConetxt";
@@ -167,7 +165,7 @@ export const DriverHome: React.FC = () => {
                         {todayShiftTrips.length === 0 && !isLoading && <p>Hôm nay không có ca cho khung giờ này</p>}
 
                         {/* danh sách ca hôm nay */}
-                        {todayShiftTrips.map((tripInfo, index) => (
+                        {todayShiftTrips.map((tripInfo) => (
                             <Card
                                 key={tripInfo.id}
                                 className={`p-5 mb-4 cursor-pointer ${selectedTrip?.id === tripInfo.id ? "bg-gray-100" : ""}`}

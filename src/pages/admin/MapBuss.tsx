@@ -1,4 +1,4 @@
-import { Bus, MapPin, Navigation, Pointer, User } from "lucide-react";
+import { Bus, MapPin } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Map, { Layer, type MapRef, Marker, NavigationControl, Source } from "react-map-gl/mapbox";
 import { Button } from "../../components/uiItem/button.tsx";
@@ -40,7 +40,7 @@ export const Buss: React.FC = () => {
     const { api } = useApi();
     const { socket, connected } = useSocketIo();
 
-    const { data: tripInfos, isLoading } = useQuery({
+    const { data: tripInfos } = useQuery({
         queryKey: ['all-trip-today'],
         queryFn: async () => {
             const response = await api.getAllTripsForToday();

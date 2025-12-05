@@ -26,7 +26,7 @@ export function ChooseRoutePage() {
     const [routes, setRoutes] = useState<RouteData[]>([]);
     const [schedules, setSchedules] = useState<ScheduleData[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [isFullScreen, setFullScreen] = useState(false);
+    const [isFullScreen] = useState(false);
 
     const { api } = useApi();
     const navigate = useNavigate();
@@ -59,6 +59,7 @@ export function ChooseRoutePage() {
             }
         };
         fetchRoutes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [api, stopPointId]);
 
     const handleSearchSubmit = async (e: FormEvent) => {

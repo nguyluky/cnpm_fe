@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useApi } from '../../contexts/apiConetxt';
-import type { GeoLocation, RouteData, StudentMetadata } from '../../api/data-contracts';
+import type { GeoLocation, RouteData } from '../../api/data-contracts';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { path } from '../../router';
 import { MapPin, Navigation, PersonStanding, AlertCircle, CheckCircle } from 'lucide-react';
@@ -77,6 +77,7 @@ export function ConfirmSelectionPage() {
 		};
 
 		fetchData();
+	// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [stopPointId, routeId, api]);
 
 	const handleConfirmation = async () => {
