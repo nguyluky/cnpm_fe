@@ -58,6 +58,7 @@ export function StudentPage() {
         if (!studentId) return;
         try {
             const data = await api.getStudentInfoForParent(studentId);
+            console.log("Student assignment data:", data);
             if (data.data.data) {
                 setStudentAssignment(data.data.data);
             }
