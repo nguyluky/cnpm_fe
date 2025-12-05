@@ -81,6 +81,29 @@ export interface RouteData {
   metadata: RouteMeta;
 }
 
+export interface RouteInfo {
+  id: string;
+  name: string;
+}
+
+export interface DriverData {
+  /**
+   * @format uuid
+   * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$
+   */
+  id: string;
+  name: string;
+  email: string;
+}
+
+export interface StopPointTrip {
+  id: string;
+  name: string;
+  location: number[];
+  sequence: number;
+  status: "PENDING" | "ARRIVED" | "DONE" | "SKIPPED";
+}
+
 export interface TimeTable {
   dayOfWeek: number[];
   /**

@@ -14,11 +14,14 @@ import type {
   BusData,
   BusInfo,
   BusMetadata,
+  DriverData,
   GeoLocation,
   PaginationMetaData,
   RouteData,
+  RouteInfo,
   RouteMeta,
   StopPointsMeta,
+  StopPointTrip,
   StudentInfoReqAssignmetStop,
   StudentMetadata,
   TimeTable,
@@ -1046,6 +1049,49 @@ export class Api<
  * No description
  *
  * @tags SchedulesController
+ * @name GetAllTripsForToday
+ * @summary Get all trips for today
+ * @request GET:/api/schedules/trip/today*/
+
+  /**
+   */
+
+  getAllTripsForToday = (params: RequestParams = {}) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          data: {
+            scheduleId: string;
+            tripId: string;
+            sattus: "PLANNED" | "ONGOING" | "COMPLETED" | "CANCELLED";
+            route: RouteInfo;
+            bus: BusInfo;
+            driver: DriverData;
+            stops: StopPointTrip[];
+          }[];
+          total: number;
+        };
+      },
+      any
+    >({
+      path: `/api/schedules/trip/today`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags SchedulesController
  * @name GetAllSchedules
  * @summary Get all schedules
  * @request GET:/api/schedules/
@@ -1096,15 +1142,7 @@ export class Api<
              */
             id: string;
             bus: BusData;
-            driver: {
-              /**
-               * @format uuid
-               * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$
-               */
-              id: string;
-              name: string;
-              email: string;
-            };
+            driver: DriverData;
             times: TimeTable;
             route: RouteData;
             meta: any;
@@ -1204,15 +1242,7 @@ export class Api<
            */
           id: string;
           bus: BusData;
-          driver: {
-            /**
-             * @format uuid
-             * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$
-             */
-            id: string;
-            name: string;
-            email: string;
-          };
+          driver: DriverData;
           times: TimeTable;
           route: RouteData;
           meta: any;
@@ -1291,15 +1321,7 @@ export class Api<
            */
           id: string;
           bus: BusData;
-          driver: {
-            /**
-             * @format uuid
-             * @pattern ^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$
-             */
-            id: string;
-            name: string;
-            email: string;
-          };
+          driver: DriverData;
           times: TimeTable;
           route: RouteData;
           meta: any;
@@ -1506,7 +1528,7 @@ export class Api<
             tripId: string;
             date: string;
             static: "PLANNED" | "ONGOING" | "COMPLETED" | "CANCELLED";
-            type: "DISPATH" | "RETURN";
+            type: "DISPATCH" | "RETURN";
             startTime: string;
           }[];
           total: number;
@@ -1568,12 +1590,9 @@ export class Api<
         data?: {
           data: {
             id: string;
-            route: {
-              id: string;
-              name: string;
-            };
+            route: RouteInfo;
             bus: BusInfo;
-            type: "MORNING" | "AFTERNOON";
+            type: "DISPATCH" | "RETURN";
             daysOfWeek: number[];
             /** HH:mm format */
             startTime: string;
@@ -1645,13 +1664,7 @@ export class Api<
             startTime: string;
           };
           bus: BusInfo;
-          stops: {
-            id: string;
-            name: string;
-            location: number[];
-            sequence: number;
-            status: "PENDING" | "ARRIVED" | "DONE" | "SKIPPED";
-          }[];
+          stops: StopPointTrip[];
         };
       },
       | {

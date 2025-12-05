@@ -240,6 +240,87 @@
         "additionalProperties": false,
         "id": "RouteData"
       },
+      "RouteInfo": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "additionalProperties": false,
+        "id": "RouteInfo"
+      },
+      "DriverData": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email"
+        ],
+        "additionalProperties": false,
+        "id": "DriverData"
+      },
+      "StopPointTrip": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "location": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "sequence": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "ARRIVED",
+              "DONE",
+              "SKIPPED"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "location",
+          "sequence",
+          "status"
+        ],
+        "additionalProperties": false,
+        "id": "StopPointTrip"
+      },
       "TimeTable": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -2592,6 +2673,102 @@
         ]
       }
     },
+    "/api/schedules/trip/today": {
+      "get": {
+        "tags": [
+          "SchedulesController"
+        ],
+        "summary": "Get all trips for today",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "scheduleId": {
+                                "type": "string"
+                              },
+                              "tripId": {
+                                "type": "string"
+                              },
+                              "sattus": {
+                                "type": "string",
+                                "enum": [
+                                  "PLANNED",
+                                  "ONGOING",
+                                  "COMPLETED",
+                                  "CANCELLED"
+                                ]
+                              },
+                              "route": {
+                                "$ref": "#/components/schemas/RouteInfo"
+                              },
+                              "bus": {
+                                "$ref": "#/components/schemas/BusInfo"
+                              },
+                              "driver": {
+                                "$ref": "#/components/schemas/DriverData"
+                              },
+                              "stops": {
+                                "type": "array",
+                                "items": {
+                                  "$ref": "#/components/schemas/StopPointTrip"
+                                }
+                              }
+                            },
+                            "required": [
+                              "scheduleId",
+                              "tripId",
+                              "sattus",
+                              "route",
+                              "bus",
+                              "driver",
+                              "stops"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "total": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "data",
+                        "total"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/schedules/": {
       "get": {
         "tags": [
@@ -2687,26 +2864,7 @@
                                 "$ref": "#/components/schemas/BusData"
                               },
                               "driver": {
-                                "type": "object",
-                                "properties": {
-                                  "id": {
-                                    "type": "string",
-                                    "format": "uuid",
-                                    "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
-                                  },
-                                  "name": {
-                                    "type": "string"
-                                  },
-                                  "email": {
-                                    "type": "string"
-                                  }
-                                },
-                                "required": [
-                                  "id",
-                                  "name",
-                                  "email"
-                                ],
-                                "additionalProperties": false
+                                "$ref": "#/components/schemas/DriverData"
                               },
                               "times": {
                                 "$ref": "#/components/schemas/TimeTable"
@@ -2913,26 +3071,7 @@
                           "$ref": "#/components/schemas/BusData"
                         },
                         "driver": {
-                          "type": "object",
-                          "properties": {
-                            "id": {
-                              "type": "string",
-                              "format": "uuid",
-                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
-                            },
-                            "name": {
-                              "type": "string"
-                            },
-                            "email": {
-                              "type": "string"
-                            }
-                          },
-                          "required": [
-                            "id",
-                            "name",
-                            "email"
-                          ],
-                          "additionalProperties": false
+                          "$ref": "#/components/schemas/DriverData"
                         },
                         "times": {
                           "$ref": "#/components/schemas/TimeTable"
@@ -3090,26 +3229,7 @@
                           "$ref": "#/components/schemas/BusData"
                         },
                         "driver": {
-                          "type": "object",
-                          "properties": {
-                            "id": {
-                              "type": "string",
-                              "format": "uuid",
-                              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
-                            },
-                            "name": {
-                              "type": "string"
-                            },
-                            "email": {
-                              "type": "string"
-                            }
-                          },
-                          "required": [
-                            "id",
-                            "name",
-                            "email"
-                          ],
-                          "additionalProperties": false
+                          "$ref": "#/components/schemas/DriverData"
                         },
                         "times": {
                           "$ref": "#/components/schemas/TimeTable"
@@ -3604,7 +3724,7 @@
                               "type": {
                                 "type": "string",
                                 "enum": [
-                                  "DISPATH",
+                                  "DISPATCH",
                                   "RETURN"
                                 ]
                               },
@@ -3738,20 +3858,7 @@
                                 "type": "string"
                               },
                               "route": {
-                                "type": "object",
-                                "properties": {
-                                  "id": {
-                                    "type": "string"
-                                  },
-                                  "name": {
-                                    "type": "string"
-                                  }
-                                },
-                                "required": [
-                                  "id",
-                                  "name"
-                                ],
-                                "additionalProperties": false
+                                "$ref": "#/components/schemas/RouteInfo"
                               },
                               "bus": {
                                 "$ref": "#/components/schemas/BusInfo"
@@ -3759,8 +3866,8 @@
                               "type": {
                                 "type": "string",
                                 "enum": [
-                                  "MORNING",
-                                  "AFTERNOON"
+                                  "DISPATCH",
+                                  "RETURN"
                                 ]
                               },
                               "daysOfWeek": {
@@ -3948,41 +4055,7 @@
                         "stops": {
                           "type": "array",
                           "items": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "string"
-                              },
-                              "name": {
-                                "type": "string"
-                              },
-                              "location": {
-                                "type": "array",
-                                "items": {
-                                  "type": "number"
-                                }
-                              },
-                              "sequence": {
-                                "type": "number"
-                              },
-                              "status": {
-                                "type": "string",
-                                "enum": [
-                                  "PENDING",
-                                  "ARRIVED",
-                                  "DONE",
-                                  "SKIPPED"
-                                ]
-                              }
-                            },
-                            "required": [
-                              "id",
-                              "name",
-                              "location",
-                              "sequence",
-                              "status"
-                            ],
-                            "additionalProperties": false
+                            "$ref": "#/components/schemas/StopPointTrip"
                           }
                         }
                       },

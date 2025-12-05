@@ -116,10 +116,6 @@ export const DriverHome: React.FC = () => {
             } as TripInfo;
         });
 
-    // hiện tại để tạm xem thử có thêm thông tin học sinh cần đón trong tuyến được không
-    const handlePickUp = (student: Student) => toast.success(`✅ Đã đón ${student.name}`);
-    const handleAbsent = (student: Student) => toast.info(`📋 ${student.name} vắng mặt`);
-
     const isLoading = isLoadingDriver || isLoadingToday;
     const error = driverError || todayError;
 
@@ -199,10 +195,6 @@ export const DriverHome: React.FC = () => {
                                         <span className="font-medium">{tripInfo.time}</span>
                                     </div>
                                     <MapPin className={`h-5 w-5 ${selectedShift === "MORNING" ? "text-orange-600" : "text-purple-600"}`} />
-                                </div>
-
-                                <div className="space-y-3">
-                                    <TripCard index={index + 1} location={tripInfo.location} time={tripInfo.time} students={tripInfo.students} onPickUp={handlePickUp} onAbsent={handleAbsent} />
                                 </div>
                             </Card>
                         ))}

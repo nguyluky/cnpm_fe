@@ -32,12 +32,12 @@ interface NotificationType {
 // s -> c
 interface SocketEmits {
     NewNotification: (notification: NotificationType) => void;
-    LiveLocationUpdate: (location: { lat: number; lng: number }) => void;
+    LiveLocationUpdate: (location: { lat: number; lng: number }, tripId: string) => void;
     SystemAlert: (message: string) => void;
     UpdateLocation: (location: { lat: number; lng: number }) => void;
     Success: () => void;
+    Error: (message: string) => void;
 }
-
 
 interface SocketContextValue {
     socket: Socket<SocketEmits, SocketEvents> | null;

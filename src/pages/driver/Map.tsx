@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import * as turf from '@turf/turf';
 import { MapPin } from "lucide-react";
@@ -223,7 +223,7 @@ export function MapDriver() {
         if (lastPos) {
             if (turf.distance(turf.point(lastPos), turf.point([longitude, latitude]), { units: 'meters' }) > 5) {
                 lastUserPos.current = [longitude, latitude];
-                if (tripInfo.status === "ONGOING" && updateTripPosition.status !== "pending") 
+                if (tripInfo.status === "ONGOING" && updateTripPosition.status !== "pending")
                     updateTripPosition.mutate({ longitude: userPos[0], latitude: userPos[1] });
             }
         } {
@@ -614,6 +614,10 @@ export function MapDriver() {
                         <Layer
                             id="completed-line"
                             type="line"
+                            layout={{
+                                'line-join': 'round',
+                                'line-cap': 'round',
+                            }}
                             paint={{
                                 "line-color": "#0f172a",      // màu tối
                                 "line-width": 6
