@@ -14,10 +14,8 @@ import { BusLocationPage } from "../pages/parent/busLocationPage";
 import { NotiPage } from "../pages/parent/notiPage";
 import { StudentPage } from "../pages/parent/studentPage";
 import { StopsPointsPage } from "../pages/stopPoint";
-// import { AddSchedulePage } from "../pages/admin/test_ui1"
 import { DriverLayout } from "../layouts/DriverLayout";
 import { RootLayout } from "../layouts/RootLayout";
-// import DriverNotifications from "../pages/driver/Notifications"
 import { MapDriver } from "../pages/driver/Map";
 
 import { GetAllStudent } from "../pages/admin/Students/getAllStudent";
@@ -49,7 +47,6 @@ export const path = {
 };
 
 export const router = createBrowserRouter([
-  // provider api for all routes
   {
     path: "/",
     element: <RootLayout />,

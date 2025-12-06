@@ -14,13 +14,14 @@ const queryClient = new QueryClient()
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
-        <>
-            <SocketProvider url={"http://localhost:3000/notifications"}>
-                <QueryClientProvider client={queryClient}>
-                    <ToastContainer />
-                    <RouterProvider router={router} />
-                </QueryClientProvider>
-            </SocketProvider>
-        </>
+            // Provide Socket Context
+        // NOTE: Adjust the URL as needed for your backend
+        // You can set VITE_API_BASE_URL in your .env file
+        <SocketProvider url={import.meta.env.VITE_API_BASE_URL || "http://localhost:3000"}>
+            <QueryClientProvider client={queryClient}>
+                <ToastContainer />
+                <RouterProvider router={router} />
+            </QueryClientProvider>
+        </SocketProvider>
     </StrictMode>,
 )
