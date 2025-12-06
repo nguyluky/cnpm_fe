@@ -6,6 +6,7 @@ import { Search } from 'lucide-react';
 import type { MapLayerMouseEvent } from 'mapbox-gl';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { GeoLocation, StopPointsMeta } from '../../api/data-contracts';
+const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_API_KEY || '';
 
 interface StopPointsData {
     id: string;
@@ -648,7 +649,7 @@ export function StopsPointsPage() {
                 <Map
                     ref={mapRef} // <--- Gắn ref vào Map
                     {...viewState}
-                    mapboxAccessToken={ import.meta.env.VITE_MAPBOX_ACCESS_TOKEN }
+                    mapboxAccessToken={MAPBOX_TOKEN}
                     mapStyle="mapbox://styles/mapbox/streets-v9"
                     onMove={evt => setViewState(evt.viewState)}
                     onMoveEnd={updateVisiblePoints} // <--- Gọi hàm lọc khi DỪNG di chuyển

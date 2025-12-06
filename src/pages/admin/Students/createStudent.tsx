@@ -41,6 +41,19 @@ export const CreateStudentModal: React.FC<CreateStudentModalProps> = ({
     } as StudentMetadata,
   });
 
+  function generateUUID() {
+    if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+      // @ts-ignore
+      return crypto.randomUUID();
+    }
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+      const r = (Math.random() * 16) | 0;
+      const v = c === "x" ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
+  }
+
+
   // Reset form when modal closes
   const resetForm = () => {
     setFormData({
@@ -73,7 +86,7 @@ export const CreateStudentModal: React.FC<CreateStudentModalProps> = ({
         },
         body: JSON.stringify({
           name: formData.name,
-          userId: formData.userId,
+          userId: generateUUID(),
           metadata: {
             gender: formData.metadata.gender || undefined,
             birthday: formData.metadata.birthday || undefined,
@@ -139,11 +152,11 @@ export const CreateStudentModal: React.FC<CreateStudentModalProps> = ({
             {/* User ID */}
             <div className="flex flex-col">
               <label className="text-sm font-medium text-gray-700 mb-1">
-                User ID (UUID) <span className="text-red-500">*</span>
+                User ID (UUID) <span className="text-red-500"> xàm</span>
               </label>
               <input
                 type="text"
-                required
+                // required
                 placeholder="497f6eca-6276-4993-bfeb-53cbbbba6f08"
                 value={formData.userId}
                 onChange={(e) =>

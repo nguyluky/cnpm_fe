@@ -130,16 +130,29 @@
         "additionalProperties": false,
         "id": "StudentAssignment"
       },
-      "AnyObject": {
+      "RouteMeta": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
         "properties": {
-          "__": {
+          "Color": {
+            "type": "string"
+          },
+          "Headway": {
+            "type": "string"
+          },
+          "Distance": {
+            "type": "number"
+          },
+          "encodedPath": {},
+          "OperationTime": {
             "type": "string"
           }
         },
+        "required": [
+          "encodedPath"
+        ],
         "additionalProperties": false,
-        "id": "AnyObject"
+        "id": "RouteMeta"
       },
       "PaginationMetaData": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -214,26 +227,7 @@
             "$ref": "#/components/schemas/GeoLocation"
           },
           "metadata": {
-            "type": "object",
-            "properties": {
-              "Color": {
-                "type": "string"
-              },
-              "Headway": {
-                "type": "string"
-              },
-              "Distance": {
-                "type": "number"
-              },
-              "encodedPath": {},
-              "OperationTime": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "encodedPath"
-            ],
-            "additionalProperties": false
+            "$ref": "#/components/schemas/RouteMeta"
           }
         },
         "required": [
@@ -246,6 +240,87 @@
         "additionalProperties": false,
         "id": "RouteData"
       },
+      "RouteInfo": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "additionalProperties": false,
+        "id": "RouteInfo"
+      },
+      "DriverData": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email"
+        ],
+        "additionalProperties": false,
+        "id": "DriverData"
+      },
+      "StopPointTrip": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "location": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "sequence": {
+            "type": "number"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "ARRIVED",
+              "DONE",
+              "SKIPPED"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "location",
+          "sequence",
+          "status"
+        ],
+        "additionalProperties": false,
+        "id": "StopPointTrip"
+      },
       "TimeTable": {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "type": "object",
@@ -253,7 +328,7 @@
           "dayOfWeek": {
             "type": "array",
             "items": {
-              "type": "string"
+              "type": "number"
             }
           },
           "departureTime": {
@@ -1258,9 +1333,7 @@
             "required": true,
             "schema": {
               "$schema": "https://json-schema.org/draft/2020-12/schema",
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+              "type": "string"
             }
           }
         ],
@@ -1763,6 +1836,15 @@
               "minimum": 1,
               "maximum": 100
             }
+          },
+          {
+            "name": "stopId",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "description": "Filter by stop ID, split by comma for multiple IDs",
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -1892,7 +1974,7 @@
                     "$ref": "#/components/schemas/GeoLocation"
                   },
                   "meta": {
-                    "$ref": "#/components/schemas/AnyObject"
+                    "$ref": "#/components/schemas/RouteMeta"
                   },
                   "stopPointIds": {
                     "minItems": 1,
@@ -1907,6 +1989,7 @@
                   "name",
                   "startLocation",
                   "endLocation",
+                  "meta",
                   "stopPointIds"
                 ],
                 "additionalProperties": false
@@ -1964,7 +2047,13 @@
                                 "type": "number"
                               },
                               "meta": {
-                                "$ref": "#/components/schemas/AnyObject"
+                                "type": "object",
+                                "properties": {
+                                  "__": {
+                                    "type": "string"
+                                  }
+                                },
+                                "additionalProperties": false
                               }
                             },
                             "required": [
@@ -2115,26 +2204,7 @@
                           "$ref": "#/components/schemas/GeoLocation"
                         },
                         "metadata": {
-                          "type": "object",
-                          "properties": {
-                            "Color": {
-                              "type": "string"
-                            },
-                            "Headway": {
-                              "type": "string"
-                            },
-                            "Distance": {
-                              "type": "number"
-                            },
-                            "encodedPath": {},
-                            "OperationTime": {
-                              "type": "string"
-                            }
-                          },
-                          "required": [
-                            "encodedPath"
-                          ],
-                          "additionalProperties": false
+                          "$ref": "#/components/schemas/RouteMeta"
                         },
                         "stopPoints": {
                           "type": "array",
@@ -2297,7 +2367,7 @@
                     "type": "string"
                   },
                   "meta": {
-                    "$ref": "#/components/schemas/AnyObject"
+                    "$ref": "#/components/schemas/RouteMeta"
                   },
                   "stopPointIds": {
                     "minItems": 1,
@@ -2603,6 +2673,102 @@
         ]
       }
     },
+    "/api/schedules/trip/today": {
+      "get": {
+        "tags": [
+          "SchedulesController"
+        ],
+        "summary": "Get all trips for today",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "scheduleId": {
+                                "type": "string"
+                              },
+                              "tripId": {
+                                "type": "string"
+                              },
+                              "sattus": {
+                                "type": "string",
+                                "enum": [
+                                  "PLANNED",
+                                  "ONGOING",
+                                  "COMPLETED",
+                                  "CANCELLED"
+                                ]
+                              },
+                              "route": {
+                                "$ref": "#/components/schemas/RouteInfo"
+                              },
+                              "bus": {
+                                "$ref": "#/components/schemas/BusInfo"
+                              },
+                              "driver": {
+                                "$ref": "#/components/schemas/DriverData"
+                              },
+                              "stops": {
+                                "type": "array",
+                                "items": {
+                                  "$ref": "#/components/schemas/StopPointTrip"
+                                }
+                              }
+                            },
+                            "required": [
+                              "scheduleId",
+                              "tripId",
+                              "sattus",
+                              "route",
+                              "bus",
+                              "driver",
+                              "stops"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "total": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "data",
+                        "total"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/schedules/": {
       "get": {
         "tags": [
@@ -2640,6 +2806,24 @@
               "type": "number",
               "minimum": 1,
               "maximum": 100
+            }
+          },
+          {
+            "name": "busId",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "description": "Filter schedules by bus ID",
+              "type": "string"
+            }
+          },
+          {
+            "name": "routeId",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "description": "Filter schedules by route ID",
+              "type": "string"
             }
           }
         ],
@@ -2679,11 +2863,11 @@
                               "bus": {
                                 "$ref": "#/components/schemas/BusData"
                               },
+                              "driver": {
+                                "$ref": "#/components/schemas/DriverData"
+                              },
                               "times": {
-                                "type": "array",
-                                "items": {
-                                  "$ref": "#/components/schemas/TimeTable"
-                                }
+                                "$ref": "#/components/schemas/TimeTable"
                               },
                               "route": {
                                 "$ref": "#/components/schemas/RouteData"
@@ -2699,29 +2883,23 @@
                                 "format": "date-time",
                                 "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
                               },
-                              "startTime": {
-                                "type": "string",
-                                "format": "time",
-                                "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?$"
-                              },
                               "type": {
-                                "default": "MORNING",
                                 "type": "string",
                                 "enum": [
-                                  "MORNING",
-                                  "AFTERNOON"
+                                  "DISPATCH",
+                                  "RETURN"
                                 ]
                               }
                             },
                             "required": [
                               "id",
                               "bus",
+                              "driver",
                               "times",
                               "route",
                               "meta",
                               "startDate",
                               "endDate",
-                              "startTime",
                               "type"
                             ],
                             "additionalProperties": false
@@ -2825,10 +3003,7 @@
                     "type": "string"
                   },
                   "times": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/TimeTable"
-                    }
+                    "$ref": "#/components/schemas/TimeTable"
                   },
                   "meta": {},
                   "startDate": {
@@ -2841,17 +3016,11 @@
                     "format": "date-time",
                     "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
                   },
-                  "startTime": {
-                    "type": "string",
-                    "format": "date-time",
-                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
-                  },
                   "type": {
-                    "default": "MORNING",
                     "type": "string",
                     "enum": [
-                      "MORNING",
-                      "AFTERNOON"
+                      "DISPATCH",
+                      "RETURN"
                     ]
                   }
                 },
@@ -2862,7 +3031,6 @@
                   "times",
                   "startDate",
                   "endDate",
-                  "startTime",
                   "type"
                 ],
                 "additionalProperties": false
@@ -2902,11 +3070,11 @@
                         "bus": {
                           "$ref": "#/components/schemas/BusData"
                         },
+                        "driver": {
+                          "$ref": "#/components/schemas/DriverData"
+                        },
                         "times": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/TimeTable"
-                          }
+                          "$ref": "#/components/schemas/TimeTable"
                         },
                         "route": {
                           "$ref": "#/components/schemas/RouteData"
@@ -2922,29 +3090,23 @@
                           "format": "date-time",
                           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
                         },
-                        "startTime": {
-                          "type": "string",
-                          "format": "time",
-                          "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?$"
-                        },
                         "type": {
-                          "default": "MORNING",
                           "type": "string",
                           "enum": [
-                            "MORNING",
-                            "AFTERNOON"
+                            "DISPATCH",
+                            "RETURN"
                           ]
                         }
                       },
                       "required": [
                         "id",
                         "bus",
+                        "driver",
                         "times",
                         "route",
                         "meta",
                         "startDate",
                         "endDate",
-                        "startTime",
                         "type"
                       ],
                       "additionalProperties": false
@@ -3066,11 +3228,11 @@
                         "bus": {
                           "$ref": "#/components/schemas/BusData"
                         },
+                        "driver": {
+                          "$ref": "#/components/schemas/DriverData"
+                        },
                         "times": {
-                          "type": "array",
-                          "items": {
-                            "$ref": "#/components/schemas/TimeTable"
-                          }
+                          "$ref": "#/components/schemas/TimeTable"
                         },
                         "route": {
                           "$ref": "#/components/schemas/RouteData"
@@ -3086,29 +3248,23 @@
                           "format": "date-time",
                           "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
                         },
-                        "startTime": {
-                          "type": "string",
-                          "format": "time",
-                          "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?$"
-                        },
                         "type": {
-                          "default": "MORNING",
                           "type": "string",
                           "enum": [
-                            "MORNING",
-                            "AFTERNOON"
+                            "DISPATCH",
+                            "RETURN"
                           ]
                         }
                       },
                       "required": [
                         "id",
                         "bus",
+                        "driver",
                         "times",
                         "route",
                         "meta",
                         "startDate",
                         "endDate",
-                        "startTime",
                         "type"
                       ],
                       "additionalProperties": false
@@ -3227,42 +3383,30 @@
                     "type": "string"
                   },
                   "meta": {},
-                  "startTime": {
-                    "type": "string",
-                    "format": "time",
-                    "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?$"
-                  },
                   "startDate": {
                     "type": "string",
-                    "format": "date",
-                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
                   },
                   "endDate": {
                     "type": "string",
-                    "format": "date",
-                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
                   },
                   "type": {
-                    "default": "MORNING",
                     "type": "string",
                     "enum": [
-                      "MORNING",
-                      "AFTERNOON"
+                      "DISPATCH",
+                      "RETURN"
                     ]
                   },
                   "routeId": {
                     "type": "string"
                   },
                   "times": {
-                    "type": "array",
-                    "items": {
-                      "$ref": "#/components/schemas/TimeTable"
-                    }
+                    "$ref": "#/components/schemas/TimeTable"
                   }
                 },
-                "required": [
-                  "type"
-                ],
                 "additionalProperties": false
               }
             }
@@ -3276,9 +3420,7 @@
             "required": true,
             "schema": {
               "$schema": "https://json-schema.org/draft/2020-12/schema",
-              "type": "string",
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000)$"
+              "type": "string"
             }
           }
         ],
@@ -3582,7 +3724,7 @@
                               "type": {
                                 "type": "string",
                                 "enum": [
-                                  "DISPATH",
+                                  "DISPATCH",
                                   "RETURN"
                                 ]
                               },
@@ -3716,20 +3858,7 @@
                                 "type": "string"
                               },
                               "route": {
-                                "type": "object",
-                                "properties": {
-                                  "id": {
-                                    "type": "string"
-                                  },
-                                  "name": {
-                                    "type": "string"
-                                  }
-                                },
-                                "required": [
-                                  "id",
-                                  "name"
-                                ],
-                                "additionalProperties": false
+                                "$ref": "#/components/schemas/RouteInfo"
                               },
                               "bus": {
                                 "$ref": "#/components/schemas/BusInfo"
@@ -3737,8 +3866,8 @@
                               "type": {
                                 "type": "string",
                                 "enum": [
-                                  "MORNING",
-                                  "AFTERNOON"
+                                  "DISPATCH",
+                                  "RETURN"
                                 ]
                               },
                               "daysOfWeek": {
@@ -3926,41 +4055,7 @@
                         "stops": {
                           "type": "array",
                           "items": {
-                            "type": "object",
-                            "properties": {
-                              "id": {
-                                "type": "string"
-                              },
-                              "name": {
-                                "type": "string"
-                              },
-                              "location": {
-                                "type": "array",
-                                "items": {
-                                  "type": "number"
-                                }
-                              },
-                              "sequence": {
-                                "type": "number"
-                              },
-                              "status": {
-                                "type": "string",
-                                "enum": [
-                                  "PENDING",
-                                  "ARRIVED",
-                                  "DONE",
-                                  "SKIPPED"
-                                ]
-                              }
-                            },
-                            "required": [
-                              "id",
-                              "name",
-                              "location",
-                              "sequence",
-                              "status"
-                            ],
-                            "additionalProperties": false
+                            "$ref": "#/components/schemas/StopPointTrip"
                           }
                         }
                       },
@@ -5661,6 +5756,56 @@
           "StoppointsController"
         ],
         "summary": "Get all stoppoints",
+        "parameters": [
+          {
+            "name": "isUse",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "east",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "number"
+            }
+          },
+          {
+            "name": "north",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "number"
+            }
+          },
+          {
+            "name": "south",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "number"
+            }
+          },
+          {
+            "name": "west",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "number"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Success",
@@ -6679,64 +6824,6 @@
               }
             }
           },
-          "403": {
-            "description": "Conflict",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$schema": "http://json-schema.org/draft-07/schema#",
-                  "title": "ApiErrorResponse",
-                  "type": "object",
-                  "properties": {
-                    "code": {
-                      "type": "integer",
-                      "description": "HTTP status code of the error",
-                      "minimum": 400,
-                      "maximum": 599
-                    },
-                    "message": {
-                      "type": "string",
-                      "description": "Human-readable error message"
-                    },
-                    "name": {
-                      "type": "string",
-                      "description": "Error class name"
-                    }
-                  },
-                  "required": []
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Resource not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$schema": "http://json-schema.org/draft-07/schema#",
-                  "title": "ApiErrorResponse",
-                  "type": "object",
-                  "properties": {
-                    "code": {
-                      "type": "integer",
-                      "description": "HTTP status code of the error",
-                      "minimum": 400,
-                      "maximum": 599
-                    },
-                    "message": {
-                      "type": "string",
-                      "description": "Human-readable error message"
-                    },
-                    "name": {
-                      "type": "string",
-                      "description": "Error class name"
-                    }
-                  },
-                  "required": []
-                }
-              }
-            }
-          },
           "500": {
             "description": "Internal Server Error",
             "content": {
@@ -7264,6 +7351,695 @@
             "JWTAuth": []
           }
         ]
+      }
+    },
+    "/api/users/": {
+      "get": {
+        "tags": [
+          "UsersController"
+        ],
+        "summary": "Get All Users",
+        "parameters": [
+          {
+            "name": "search",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "description": "Search term to filter results",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "default": 1,
+              "description": "Page number, minimum is 1",
+              "type": "number",
+              "minimum": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "default": 10,
+              "description": "Number of items per page, minimum is 1 and maximum is 100",
+              "type": "number",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "username": {
+                                "type": "string"
+                              },
+                              "roles": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "email": {
+                                "type": "string"
+                              },
+                              "createdAt": {
+                                "type": "string"
+                              },
+                              "updatedAt": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "username",
+                              "roles",
+                              "email",
+                              "createdAt",
+                              "updatedAt"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "meta": {
+                          "$ref": "#/components/schemas/PaginationMetaData"
+                        }
+                      },
+                      "required": [
+                        "data",
+                        "meta"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "UsersController"
+        ],
+        "summary": "Create New User",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  },
+                  "roles": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "username",
+                  "email",
+                  "password",
+                  "roles"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/roles": {
+      "get": {
+        "tags": [
+          "UsersController"
+        ],
+        "summary": "Get All Roles",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "number"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "permissions": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name",
+                              "permissions"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "total": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "data",
+                        "total"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/permissions": {
+      "get": {
+        "tags": [
+          "UsersController"
+        ],
+        "summary": "Get All Permissions",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "number"
+                              },
+                              "name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "total": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "data",
+                        "total"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/permission": {
+      "post": {
+        "tags": [
+          "UsersController"
+        ],
+        "summary": "Create Permission",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "number"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/role/permission": {
+      "post": {
+        "tags": [
+          "UsersController"
+        ],
+        "summary": "Add Permission to Role",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$schema": "https://json-schema.org/draft/2020-12/schema",
+                "type": "object",
+                "properties": {
+                  "roleId": {
+                    "type": "number"
+                  },
+                  "permissions": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "roleId",
+                  "permissions"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "number"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "permissions": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "permissions"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "tags": [
+          "UsersController"
+        ],
+        "summary": "Get User by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$schema": "https://json-schema.org/draft/2020-12/schema",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 200,
+                      "maximum": 300
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "data": {
+                      "$schema": "https://json-schema.org/draft/2020-12/schema",
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "username": {
+                          "type": "string"
+                        },
+                        "roles": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "email": {
+                          "type": "string"
+                        },
+                        "createdAt": {
+                          "type": "string"
+                        },
+                        "updatedAt": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "username",
+                        "roles",
+                        "email",
+                        "createdAt",
+                        "updatedAt"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$schema": "http://json-schema.org/draft-07/schema#",
+                  "title": "ApiErrorResponse",
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "integer",
+                      "description": "HTTP status code of the error",
+                      "minimum": 400,
+                      "maximum": 599
+                    },
+                    "message": {
+                      "type": "string",
+                      "description": "Human-readable error message"
+                    },
+                    "name": {
+                      "type": "string",
+                      "description": "Error class name"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/health": {

@@ -1,52 +1,57 @@
 import { createBrowserRouter } from "react-router-dom";
 import { AdminLayout } from "../layouts/AdminLayout";
+import { DriverLayout } from "../layouts/DriverLayout";
 import { ParentLayout } from "../layouts/ParentLayout";
+import { RootLayout } from "../layouts/RootLayout";
 import { NotFoundPage } from "../pages/404Page";
 import { Bus } from "../pages/admin/Bus/getAllBus";
 import { Buss } from "../pages/admin/MapBuss";
 import { Overview } from "../pages/admin/Overview";
-import { RouteAdmin } from "../pages/admin/RouteAdmin";
+import { RouteAdmin } from "../pages/admin/Route/RouteAdmin";
 import { Schedules } from "../pages/admin/Schedules";
 import { Student } from "../pages/admin/Student";
+import { MapDriver } from "../pages/driver/Map";
 import { HomePage } from "../pages/HomePage";
 import { LoginPage } from "../pages/LoginPage";
 import { BusLocationPage } from "../pages/parent/busLocationPage";
 import { NotiPage } from "../pages/parent/notiPage";
 import { StudentPage } from "../pages/parent/studentPage";
 import { StopsPointsPage } from "../pages/stopPoint";
-import { DriverLayout } from "../layouts/DriverLayout";
-import { RootLayout } from "../layouts/RootLayout";
-import { MapDriver } from "../pages/driver/Map";
 
 import { GetAllStudent } from "../pages/admin/Students/getAllStudent";
 import NotificationsPage from "../pages/driver/NotificationsPage";
 
 export const path = {
-  INDEX: "/",
-  LOGIN: "/login",
-  ADMIN: "/admin",
+    INDEX: "/",
+    LOGIN: "/login",
+    ADMIN: "/admin",
 
-  ADMIN_OVERVIEW: "/admin",
-  ADMIN_BUSES: "/admin/buses",
-  ADMIN_BUS_MANAGEMENT: "/admin/bus-management",
-  ADMIN_STOPS_POINTS: "/admin/stops_points",
-  ADMIN_STUDENTS: "/admin/students",
-  ADMIN_STUDENTS_MANAGEMENT: "/admin/students-management",
-  ADMIN_SCHEDULES: "/admin/schedules",
-  ADMIN_ROUTES: "/admin/routes",
+    ADMIN_OVERVIEW: "/admin",
+    ADMIN_BUSES: "/admin/buses",
+    ADMIN_BUS_MANAGEMENT: "/admin/bus-management",
+    ADMIN_STOPS_POINTS: "/admin/stops_points",
+    ADMIN_STUDENTS: "/admin/students",
+    ADMIN_STUDENTS_MANAGEMENT: "/admin/students-management",
+    ADMIN_SCHEDULES: "/admin/schedules",
+    ADMIN_ROUTES: "/admin/routes",
+    ADMIN_ACCESS_MANAGEMENT: "/admin/access-management",
 
-  PARENT: "/parent",
-  PARENT_NOTIFICATIONS: "/parent/notifications",
-  PARENT_CHILD_INFO: "/parent/child-info",
+    PARENT: "/parent",
+    PARENT_NOTIFICATIONS: "/parent/notifications",
+    PARENT_CHILD_INFO: "/parent/child-info",
+    PARENT_STOP_POINT: "/parent/stop-point",
+    PARENT_CHOOSE_ROUTE: "/parent/choose-route",
+    PARENT_ASSIGN_ROUTE: "/parent/assign-route",
 
-  DRIVER: "/driver",
-  DRIVER_SCHEDULE: "/driver/schedule",
-  DRIVER_QR_ROLL_CALL: "/driver/qr-roll-call",
-  DRIVER_NOTIFICATIONS: "/driver/notifications",
-  DRIVER_TRIP: "/driver/trip/:id",
+    DRIVER: "/driver",
+    DRIVER_SCHEDULE: "/driver/schedule",
+    DRIVER_QR_ROLL_CALL: "/driver/qr-roll-call",
+    DRIVER_NOTIFICATIONS: "/driver/notifications",
+    DRIVER_TRIP: "/driver/trip/:id",
 };
 
 export const router = createBrowserRouter([
+  // provider api for all routes
   {
     path: "/",
     element: <RootLayout />,

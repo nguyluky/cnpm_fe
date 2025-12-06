@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react";
 import { Baby, School, Calendar, User, X, ChevronRight, Mars, Venus, MapPin } from "lucide-react";
+import { useApi } from "../../contexts/apiConetxt";
+import { useNavigate } from "react-router-dom";
+import { path } from "../../router";
+import type { StudentInfoReqAssignmetStop } from "../../api/data-contracts";
 
 interface Student {
     id: string;
@@ -13,55 +17,63 @@ interface Student {
         address?: string;
         parentName?: string;
         phone?: string;
+        school?: string;
     };
 }
 
+interface StudentAssignment {
+    studentId: string;
+    name: string;
+    assignment: {
+        pickupStop?: StudentInfoReqAssignmetStop;
+        dropoffStop?: StudentInfoReqAssignmetStop;
+    };
+}
+// api: getStudentInfoForParent()
+
 export function StudentPage() {
     const [students, setStudents] = useState<Student[]>([]);
+    const [studentAssignment, setStudentAssignment] = useState<StudentAssignment>();
     const [loading, setLoading] = useState(true);
     const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+    const {api} = useApi();
+    const navigate = useNavigate();
+
+    // fetch students from api
+    const fetchStudents = async() => {
+        setLoading(true);
+        try {
+            const data = await api.getStudentsForParent();
+            if (data.data.data) {
+                setStudents(data.data.data?.data);
+            }
+        } catch (error) {
+            console.error("Failed to fetch students:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchStudentAssignment = async(studentId: string) => {
+        if (!studentId) return;
+        try {
+            const data = await api.getStudentInfoForParent(studentId);
+            console.log("Student assignment data:", data);
+            if (data.data.data) {
+                setStudentAssignment(data.data.data);
+            }
+        } catch (error) {
+            console.error("Failed to fetch student assignment:", error);
+        }
+    };
 
     useEffect(() => {
-        const fetchStudents = async () => {
-            setLoading(true);
-            const mockData: Student[] = [
-                {
-                    id: "stu_001",
-                    name: "Dương Tùng Thiện",
-                    meta: {
-                        class: "6A1",
-                        gender: "Nam",
-                        birthday: "15/03/2014",
-                        nickname: "Con trai ngoan của mẹ",
-                        studentCode: "HS123456",
-                        address: "Số 123, đường ABC, Quận 1, TP.HCM",
-                        parentName: "Dương Thị Hồng",
-                        phone: "0901234567"
-                    }
-                },
-                {
-                    id: "stu_002",
-                    name: "Dương Minh Anh",
-                    meta: {
-                        class: "4A2",
-                        gender: "Nữ",
-                        birthday: "22/11/2016",
-                        nickname: "Công chúa nhỏ nhà mình",
-                        studentCode: "HS123457",
-                        address: "Số 123, đường ABC, Quận 1, TP.HCM",
-                        parentName: "Dương Thị Hồng",
-                        phone: "0901234567"
-                    }
-                }
-            ];
-
-            setTimeout(() => {
-                setStudents(mockData);
-                setLoading(false);
-            }, 800);
-        };
         fetchStudents();
     }, []);
+
+    useEffect(() => {
+        fetchStudentAssignment(selectedStudent?.id || "");
+    }, [selectedStudent]);
 
     if (loading) {
         return (
@@ -116,10 +128,10 @@ export function StudentPage() {
                                             <p className="text-indigo-600 font-medium text-sm mt-0.5">"{student.meta.nickname}"</p>
                                         )}
                                         <div className="flex items-center gap-4 mt-2 text-sm">
-                                            <span className="flex items-center gap-1 text-gray-600">
+                                            {/* <span className="flex items-center gap-1 text-gray-600">
                                                 <School className="w-4 h-4 text-green-600" />
-                                                Lớp {student.meta.class}
-                                            </span>
+                                                {student.meta.school}
+                                            </span> */}
                                             <span className={`font-bold ${student.meta.gender === "Nam" ? "text-blue-600" : "text-pink-600"}`}>
                                                 {student.meta.gender === "Nam" ? "♂" : "♀"} {student.meta.gender}
                                             </span>
@@ -158,10 +170,13 @@ export function StudentPage() {
                             </div>
 
                             {/* Nội dung */}
-                            <div className="px-6 pb-8 -mt-6">
+                            <div className="px-6 pb-8 mt-6">
                                 <div className="bg-white rounded-3xl shadow-xl p-6 space-y-6 -mt-12 relative z-10">
                                     {selectedStudent.meta.studentCode && (
                                         <InfoRow icon={<User className="w-6 h-6 text-indigo-600" />} label="Mã học sinh" value={selectedStudent.meta.studentCode} />
+                                    )}
+                                    {selectedStudent.meta.school && (
+                                        <InfoRow icon={<School className="w-6 h-6 text-green-600" />} label="Trường học" value={selectedStudent.meta.school} />
                                     )}
                                     {selectedStudent.meta.class && (
                                         <InfoRow icon={<School className="w-6 h-6 text-green-600" />} label="Lớp học" value={`Lớp ${selectedStudent.meta.class}`} />
@@ -174,10 +189,20 @@ export function StudentPage() {
                                         label="Giới tính"
                                         value={<span className={`text-2xl font-bold ${selectedStudent.meta.gender === "Nam" ? "text-blue-600" : "text-pink-600"}`}>{selectedStudent.meta.gender}</span>}
                                     />
-                                    {selectedStudent.meta.phone && (
-                                        <InfoRow icon={<MapPin className="w-6 h-6 text-green-600" />} label="Điểm đón" value={"**************"} onClick={() => {
-
-                                        }} />
+                                    {studentAssignment?.assignment.pickupStop ? (
+                                        <InfoRow
+                                            icon={<MapPin className="w-6 h-6 text-green-600" />}
+                                            label="Điểm đón"
+                                            value={studentAssignment.assignment.pickupStop.name}
+                                            onClick={() => { navigate(`${path.PARENT_STOP_POINT}?studentId=${selectedStudent.id}`); }}
+                                        />
+                                    ) : (
+                                        <InfoRow
+                                            icon={<MapPin className="w-6 h-6 text-green-600" />}
+                                            label="Điểm đón"
+                                            value={<span className="text-sm text-gray-500">Chưa có điểm đón</span>}
+                                            onClick={() => { navigate(`${path.PARENT_STOP_POINT}?studentId=${selectedStudent.id}`); }}
+                                        />
                                     )}
                                 </div>
 

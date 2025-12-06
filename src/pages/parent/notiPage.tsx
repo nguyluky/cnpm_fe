@@ -1,11 +1,24 @@
-import { Button } from "../../components/uiItem/button.tsx";
 import { Bell } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Button } from "../../components/uiItem/button.tsx";
 import { useSocketIo } from "../../hooks/useSocketIo.ts";
 
+const NOTIFICATIONS_KEY = 'parent_notifications'; // AI generated
+
 export function NotiPage() {
-  const [notifications, setNotifications] = useState<any[]>([]);
+
+  // AI Generated: save notifications to local storage
+  const [notifications, setNotifications] = useState<any[]>(() => {
+    const stored = localStorage.getItem(NOTIFICATIONS_KEY);
+    return stored ? JSON.parse(stored) : [];
+  });
+  
   const { socket, connected } = useSocketIo();
+
+  // save to local storage whenever notifications change
+  useEffect(() => {
+    localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(notifications));
+  }, [notifications]);
 
   useEffect(() => {
     if (!socket || !connected) return;
@@ -14,7 +27,10 @@ export function NotiPage() {
     // Listen for new notifications from backend
     socket.on('NewNotification', (data) => {
       console.log('Received notification:', data);
-      setNotifications(prev => [data, ...prev]); // Add to top of list
+      setNotifications(prev => {
+        const newNotifications = [data, ...prev];
+        return newNotifications.slice(0, 50);
+      }); // Add to top of list
     });
 
     // Cleanup when component unmounts
@@ -23,27 +39,32 @@ export function NotiPage() {
     };
   }, [socket, connected]);
 
+  const clearAllNotifications = () => {
+    setNotifications([]);
+    localStorage.removeItem(NOTIFICATIONS_KEY);
+  }
+
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* ...your existing header... */}
+      <div className="sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-4">
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-bold text-gray-900">Thông báo</h1>
+          {notifications.length > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={clearAllNotifications}
+              className="text-sm text-red-600"
+            >
+              Xóa tất cả
+            </Button>
+          )}
+        </div>
+      </div>
       
       <div className="px-4 pt-4 pb-24">
-        <Button 
-          onClick={() => {
-            // Simulate receiving a notification (for testing UI only)
-            const testData = {
-              type: 'BusArrived',
-              message: 'Test: Xe bus đã đến!',
-              timestamp: new Date().toISOString()
-            };
-            console.log('Simulating notification:', testData);
-            setNotifications(prev => [testData, ...prev]);
-          }}
-          className="mb-4"
-        >
-          Simulate Test Notification
-        </Button>
         {notifications.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-96 text-gray-400">
             <Bell className="w-16 h-16 mb-4 opacity-50" />

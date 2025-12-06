@@ -11,14 +11,17 @@
  */
 
 import type {
-  AnyObject,
   BusData,
   BusInfo,
   BusMetadata,
+  DriverData,
   GeoLocation,
   PaginationMetaData,
   RouteData,
+  RouteInfo,
+  RouteMeta,
   StopPointsMeta,
+  StopPointTrip,
   StudentInfoReqAssignmetStop,
   StudentMetadata,
   TimeTable,
@@ -684,6 +687,8 @@ export class Api<
        * @default 10
        */
       limit?: number;
+      /** Filter by stop ID, split by comma for multiple IDs */
+      stopId?: string;
     },
     params: RequestParams = {},
   ) =>
@@ -750,7 +755,7 @@ export class Api<
       name: string;
       startLocation: GeoLocation;
       endLocation: GeoLocation;
-      meta?: AnyObject;
+      meta: RouteMeta;
       /**
        * @maxItems 50
        * @minItems 1
@@ -781,7 +786,9 @@ export class Api<
             name: string;
             location: GeoLocation;
             sequence: number;
-            meta: AnyObject;
+            meta: {
+              __?: string;
+            };
           }[];
           /**
            * @format date-time
@@ -854,13 +861,7 @@ export class Api<
           name: string;
           startLocation: GeoLocation;
           endLocation: GeoLocation;
-          metadata: {
-            Color?: string;
-            Headway?: string;
-            Distance?: number;
-            encodedPath: any;
-            OperationTime?: string;
-          };
+          metadata: RouteMeta;
           stopPoints: {
             /**
              * @format uuid
@@ -925,7 +926,7 @@ export class Api<
     id: string,
     data: {
       name: string;
-      meta?: AnyObject;
+      meta?: RouteMeta;
       /**
        * @maxItems 50
        * @minItems 1
@@ -1048,6 +1049,49 @@ export class Api<
  * No description
  *
  * @tags SchedulesController
+ * @name GetAllTripsForToday
+ * @summary Get all trips for today
+ * @request GET:/api/schedules/trip/today*/
+
+  /**
+   */
+
+  getAllTripsForToday = (params: RequestParams = {}) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          data: {
+            scheduleId: string;
+            tripId: string;
+            sattus: "PLANNED" | "ONGOING" | "COMPLETED" | "CANCELLED";
+            route: RouteInfo;
+            bus: BusInfo;
+            driver: DriverData;
+            stops: StopPointTrip[];
+          }[];
+          total: number;
+        };
+      },
+      any
+    >({
+      path: `/api/schedules/trip/today`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags SchedulesController
  * @name GetAllSchedules
  * @summary Get all schedules
  * @request GET:/api/schedules/
@@ -1073,6 +1117,10 @@ export class Api<
        * @default 10
        */
       limit?: number;
+      /** Filter schedules by bus ID */
+      busId?: string;
+      /** Filter schedules by route ID */
+      routeId?: string;
     },
     params: RequestParams = {},
   ) =>
@@ -1094,7 +1142,8 @@ export class Api<
              */
             id: string;
             bus: BusData;
-            times: TimeTable[];
+            driver: DriverData;
+            times: TimeTable;
             route: RouteData;
             meta: any;
             /**
@@ -1107,13 +1156,7 @@ export class Api<
              * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
              */
             endDate: string;
-            /**
-             * @format time
-             * @pattern ^(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?$
-             */
-            startTime: string;
-            /** @default "MORNING" */
-            type: "MORNING" | "AFTERNOON";
+            type: "DISPATCH" | "RETURN";
           }[];
           meta: PaginationMetaData;
         };
@@ -1166,7 +1209,7 @@ export class Api<
       busId: string;
       routeId: string;
       driverId: string;
-      times: TimeTable[];
+      times: TimeTable;
       meta?: any;
       /**
        * @format date-time
@@ -1178,13 +1221,7 @@ export class Api<
        * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
        */
       endDate: string;
-      /**
-       * @format date-time
-       * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
-       */
-      startTime: string;
-      /** @default "MORNING" */
-      type: "MORNING" | "AFTERNOON";
+      type: "DISPATCH" | "RETURN";
     },
     params: RequestParams = {},
   ) =>
@@ -1205,7 +1242,8 @@ export class Api<
            */
           id: string;
           bus: BusData;
-          times: TimeTable[];
+          driver: DriverData;
+          times: TimeTable;
           route: RouteData;
           meta: any;
           /**
@@ -1218,13 +1256,7 @@ export class Api<
            * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
            */
           endDate: string;
-          /**
-           * @format time
-           * @pattern ^(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?$
-           */
-          startTime: string;
-          /** @default "MORNING" */
-          type: "MORNING" | "AFTERNOON";
+          type: "DISPATCH" | "RETURN";
         };
       },
       | {
@@ -1289,7 +1321,8 @@ export class Api<
            */
           id: string;
           bus: BusData;
-          times: TimeTable[];
+          driver: DriverData;
+          times: TimeTable;
           route: RouteData;
           meta: any;
           /**
@@ -1302,13 +1335,7 @@ export class Api<
            * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
            */
           endDate: string;
-          /**
-           * @format time
-           * @pattern ^(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?$
-           */
-          startTime: string;
-          /** @default "MORNING" */
-          type: "MORNING" | "AFTERNOON";
+          type: "DISPATCH" | "RETURN";
         };
       },
       | {
@@ -1360,24 +1387,18 @@ export class Api<
       driverId?: string;
       meta?: any;
       /**
-       * @format time
-       * @pattern ^(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?$
-       */
-      startTime?: string;
-      /**
-       * @format date
-       * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+       * @format date-time
+       * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
        */
       startDate?: string;
       /**
-       * @format date
-       * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))$
+       * @format date-time
+       * @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$
        */
       endDate?: string;
-      /** @default "MORNING" */
-      type: "MORNING" | "AFTERNOON";
+      type?: "DISPATCH" | "RETURN";
       routeId?: string;
-      times?: TimeTable[];
+      times?: TimeTable;
     },
     params: RequestParams = {},
   ) =>
@@ -1507,7 +1528,7 @@ export class Api<
             tripId: string;
             date: string;
             static: "PLANNED" | "ONGOING" | "COMPLETED" | "CANCELLED";
-            type: "DISPATH" | "RETURN";
+            type: "DISPATCH" | "RETURN";
             startTime: string;
           }[];
           total: number;
@@ -1569,12 +1590,9 @@ export class Api<
         data?: {
           data: {
             id: string;
-            route: {
-              id: string;
-              name: string;
-            };
+            route: RouteInfo;
             bus: BusInfo;
-            type: "MORNING" | "AFTERNOON";
+            type: "DISPATCH" | "RETURN";
             daysOfWeek: number[];
             /** HH:mm format */
             startTime: string;
@@ -1646,13 +1664,7 @@ export class Api<
             startTime: string;
           };
           bus: BusInfo;
-          stops: {
-            id: string;
-            name: string;
-            location: number[];
-            sequence: number;
-            status: "PENDING" | "ARRIVED" | "DONE" | "SKIPPED";
-          }[];
+          stops: StopPointTrip[];
         };
       },
       | {
@@ -2422,7 +2434,17 @@ export class Api<
   /**
    */
 
-  getAllStoppoints = (params: RequestParams = {}) =>
+  getAllStoppoints = (
+    query?: {
+      isUse?: boolean;
+      east?: number;
+      north?: number;
+      south?: number;
+      west?: number;
+      name?: string;
+    },
+    params: RequestParams = {},
+  ) =>
     this.request<
       {
         /**
@@ -2472,6 +2494,7 @@ export class Api<
     >({
       path: `/api/stoppoints/stoppoints`,
       method: "GET",
+      query: query,
       secure: true,
       format: "json",
       ...params,
@@ -3116,6 +3139,356 @@ export class Api<
       path: `/api/students/${id}`,
       method: "DELETE",
       secure: true,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags UsersController
+ * @name GetAllUsers
+ * @summary Get All Users
+ * @request GET:/api/users/*/
+
+  /**
+   */
+
+  getAllUsers = (
+    query?: {
+      /** Search term to filter results */
+      search?: string;
+      /**
+       * Page number, minimum is 1
+       * @min 1
+       * @default 1
+       */
+      page?: number;
+      /**
+       * Number of items per page, minimum is 1 and maximum is 100
+       * @min 1
+       * @max 100
+       * @default 10
+       */
+      limit?: number;
+      role?: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          data: {
+            id: string;
+            username: string;
+            roles: string[];
+            email: string;
+            createdAt: string;
+            updatedAt: string;
+          }[];
+          meta: PaginationMetaData;
+        };
+      },
+      any
+    >({
+      path: `/api/users/`,
+      method: "GET",
+      query: query,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags UsersController
+ * @name CreateNewUser
+ * @summary Create New User
+ * @request POST:/api/users/*/
+
+  /**
+   */
+
+  createNewUser = (
+    data: {
+      username: string;
+      email: string;
+      password: string;
+      roles: string[];
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+      },
+      {
+        /**
+         * HTTP status code of the error
+         * @min 400
+         * @max 599
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        /** Error class name */
+        name?: string;
+      }
+    >({
+      path: `/api/users/`,
+      method: "POST",
+      body: data,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags UsersController
+ * @name GetAllRoles
+ * @summary Get All Roles
+ * @request GET:/api/users/roles*/
+
+  /**
+   */
+
+  getAllRoles = (params: RequestParams = {}) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          data: {
+            id: number;
+            name: string;
+            permissions: string[];
+          }[];
+          total: number;
+        };
+      },
+      any
+    >({
+      path: `/api/users/roles`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags UsersController
+ * @name GetAllPermissions
+ * @summary Get All Permissions
+ * @request GET:/api/users/permissions*/
+
+  /**
+   */
+
+  getAllPermissions = (params: RequestParams = {}) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          data: {
+            id: number;
+            name: string;
+          }[];
+          total: number;
+        };
+      },
+      any
+    >({
+      path: `/api/users/permissions`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags UsersController
+ * @name CreatePermission
+ * @summary Create Permission
+ * @request POST:/api/users/permission*/
+
+  /**
+   */
+
+  createPermission = (
+    data: {
+      name: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          id: number;
+          name: string;
+        };
+      },
+      {
+        /**
+         * HTTP status code of the error
+         * @min 400
+         * @max 599
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        /** Error class name */
+        name?: string;
+      }
+    >({
+      path: `/api/users/permission`,
+      method: "POST",
+      body: data,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags UsersController
+ * @name AddPermissionToRole
+ * @summary Add Permission to Role
+ * @request POST:/api/users/role/permission*/
+
+  /**
+   */
+
+  addPermissionToRole = (
+    data: {
+      roleId: number;
+      permissions: string[];
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          id: number;
+          name: string;
+          permissions: string[];
+        };
+      },
+      {
+        /**
+         * HTTP status code of the error
+         * @min 400
+         * @max 599
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        /** Error class name */
+        name?: string;
+      }
+    >({
+      path: `/api/users/role/permission`,
+      method: "POST",
+      body: data,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags UsersController
+ * @name GetUserById
+ * @summary Get User by ID
+ * @request GET:/api/users/{id}*/
+
+  /**
+   */
+
+  getUserById = (id: string, params: RequestParams = {}) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          id: string;
+          username: string;
+          roles: string[];
+          email: string;
+          createdAt: string;
+          updatedAt: string;
+        };
+      },
+      {
+        /**
+         * HTTP status code of the error
+         * @min 400
+         * @max 599
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        /** Error class name */
+        name?: string;
+      }
+    >({
+      path: `/api/users/${id}`,
+      method: "GET",
       format: "json",
       ...params,
     });
