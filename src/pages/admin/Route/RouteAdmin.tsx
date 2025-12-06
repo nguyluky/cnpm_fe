@@ -8,6 +8,7 @@ import { Card } from '../../../components/uiItem/card.tsx';
 import { AutoComplete } from '../../../components/uiPart/AutoComplete.tsx';
 import { Pagination } from '../../../components/uiPart/Pagination.tsx';
 import { useApi } from '../../../contexts/apiConetxt.tsx';
+import { generateEncodedPath, calculateDistance, isValidCoordinate } from '../../../utils/mapboxUtils';
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_API_KEY;
 
@@ -192,8 +193,105 @@ function AutoCompleteStopPointInput({
 
 
 
-function CreateRouteForm({ onClose, }: { onClose?: () => void; }) {
+function CreateRouteForm({ onClose, onSuccess }: { onClose?: () => void; onSuccess?: () => void; }) {
+    const { api } = useApi();
     const [listStopPoints, setListStopPoints] = useState<(StopPointsData | null)[]>([]);
+    const [routeName, setRouteName] = useState("");
+    const [routeColor, setRouteColor] = useState("#3B82F6");
+    const [operationTime, setOperationTime] = useState("");
+    const [headway, setHeadway] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const validateForm = (): string | null => {
+        if (!routeName.trim()) return "Vui lòng nhập tên tuyến";
+        if (!operationTime.trim()) return "Vui lòng nhập thời gian hoạt động";
+        if (!headway.trim()) return "Vui lòng nhập khoảng cách giữa các chuyến";
+        
+        const validStopPoints = listStopPoints.filter(sp => sp !== null) as StopPointsData[];
+        if (validStopPoints.length < 2) return "Cần ít nhất 2 điểm dừng";
+        
+        // Validate coordinates
+        for (const sp of validStopPoints) {
+            if (!isValidCoordinate(sp.location)) {
+                return `Tọa độ không hợp lệ cho điểm ${sp.name}`;
+            }
+        }
+        
+        return null;
+    };
+
+    const handleCreateRoute = async () => {
+        const validationError = validateForm();
+        if (validationError) {
+            setError(validationError);
+            return;
+        }
+
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            const validStopPoints = listStopPoints.filter(sp => sp !== null) as StopPointsData[];
+            const stopPointIds = validStopPoints.map(sp => sp.id);
+
+            // Generate encoded path using Mapbox API
+            const stopPointCoords = validStopPoints.map(sp => ({
+                latitude: sp.location.latitude,
+                longitude: sp.location.longitude,
+            }));
+
+            const encodedPath = await generateEncodedPath(stopPointCoords);
+            
+            // Calculate total distance
+            const pickupRoute = encodedPath[0];
+            const totalDistance = calculateDistance(pickupRoute);
+
+            // Get start and end locations from first and last stop points
+            const startLocation = validStopPoints[0].location;
+            const endLocation = validStopPoints[validStopPoints.length - 1].location;
+
+            // Create route via API
+            const response = await api.createANewRoute({
+                name: routeName,
+                startLocation: {
+                    latitude: startLocation.latitude,
+                    longitude: startLocation.longitude,
+                },
+                endLocation: {
+                    latitude: endLocation.latitude,
+                    longitude: endLocation.longitude,
+                },
+                meta: {
+                    Color: routeColor,
+                    Headway: headway,
+                    Distance: totalDistance,
+                    encodedPath: JSON.stringify(encodedPath),
+                    OperationTime: operationTime,
+                },
+                stopPointIds,
+            });
+
+            if (response.data?.data) {
+                // Reset form
+                setRouteName("");
+                setRouteColor("#3B82F6");
+                setOperationTime("");
+                setHeadway("");
+                setListStopPoints([]);
+                setError(null);
+                
+                // Notify success and close form
+                if (onSuccess) onSuccess();
+                if (onClose) onClose();
+            }
+        } catch (err) {
+            console.error('Error creating route:', err);
+            setError(err instanceof Error ? err.message : "Có lỗi xảy ra khi tạo tuyến");
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return <>
         <header className="flex justify-between items-center">
@@ -205,29 +303,59 @@ function CreateRouteForm({ onClose, }: { onClose?: () => void; }) {
                 Đóng
             </Button>
         </header>
+        
+        {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                {error}
+            </div>
+        )}
+
         <aside className="grid grid-cols-[1fr_auto] gap-4">
             <div className="">
                 <label className="block mb-1 font-medium">Tên tuyến</label>
-                <input type="text" className="w-full border border-gray-300 rounded-lg p-2" placeholder="Nhập tên tuyến" />
+                <input 
+                    type="text" 
+                    className="w-full border border-gray-300 rounded-lg p-2" 
+                    placeholder="Nhập tên tuyến"
+                    value={routeName}
+                    onChange={(e) => setRouteName(e.target.value)}
+                />
             </div>
             <div>
                 <label className="block mb-1 font-medium">Màu tuyến</label>
-                <input type="color" className="w-16 h-10 border border-gray-300 rounded-lg p-1" defaultValue="#3B82F6" />
+                <input 
+                    type="color" 
+                    className="w-16 h-10 border border-gray-300 rounded-lg p-1" 
+                    value={routeColor}
+                    onChange={(e) => setRouteColor(e.target.value)}
+                />
             </div>
             <div className="col-span-2">
                 <label className="block mb-1 font-medium">Thời gian hoạt động</label>
-                <input type="text" className="w-full border border-gray-300 rounded-lg p-2" placeholder="Ví dụ: 07:00 - 17:00" />
+                <input 
+                    type="text" 
+                    className="w-full border border-gray-300 rounded-lg p-2" 
+                    placeholder="Ví dụ: 07:00 - 17:00"
+                    value={operationTime}
+                    onChange={(e) => setOperationTime(e.target.value)}
+                />
             </div>
             <div className="col-span-2">
                 <label className="block mb-1 font-medium">Khoảng cách giữa các chuyến (Headway)</label>
-                <input type="text" className="w-full border border-gray-300 rounded-lg p-2" placeholder="Ví dụ: 15 phút" />
+                <input 
+                    type="text" 
+                    className="w-full border border-gray-300 rounded-lg p-2" 
+                    placeholder="Ví dụ: 15 phút"
+                    value={headway}
+                    onChange={(e) => setHeadway(e.target.value)}
+                />
             </div>
             <div className="col-span-2">
                 <label className="block mb-1 font-medium">Điểm dừng</label>
 
                 <button
                     onClick={() => {
-                        setListStopPoints([null, ...listStopPoints,]);
+                        setListStopPoints([null, ...listStopPoints]);
                     }}
                     className="w-full border border-gray-300 border-dashed rounded-lg p-2 bg-gray-100 hover:bg-gray-200 mb-2">
                     + Thêm điểm dừng
@@ -268,11 +396,11 @@ function CreateRouteForm({ onClose, }: { onClose?: () => void; }) {
                 }
             </div>
             <Button
-                disabled
-                title="Chức năng này đang được phát triển"
-                className="bg-[#6366F1] text-white text-sm px-4 py-2 rounded-lg opacity-60 cursor-not-allowed"
+                onClick={handleCreateRoute}
+                disabled={isLoading}
+                className="bg-[#6366F1] text-white text-sm px-4 py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-                Tạo tuyến (chưa khả dụng)
+                {isLoading ? 'Đang tạo...' : 'Tạo tuyến'}
             </Button>
         </aside>
     </>
@@ -380,7 +508,13 @@ export const RouteAdmin: React.FC = () => {
                 <Card className="xl:w-96 w-full h-fit xl:h-full p-5 flex flex-col gap-4 overflow-hidden">
                     {
                         isCreate ? (
-                            <CreateRouteForm onClose={() => setIsCreate(false)} />
+                            <CreateRouteForm 
+                                onClose={() => setIsCreate(false)}
+                                onSuccess={() => {
+                                    // Refresh routes after successful creation
+                                    fetchRoutes(1, pageSize, search);
+                                }}
+                            />
                         ) : (
                             <>
                                 <div className="flex justify-between items-center">
