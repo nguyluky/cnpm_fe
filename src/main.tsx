@@ -13,7 +13,7 @@ import { queryClient } from './utils/queryClient.ts';
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
-            // Provide Socket Context
+        // Provide Socket Context
         // NOTE: Adjust the URL as needed for your backend
         // You can set VITE_API_BASE_URL in your .env file
         <SocketProvider url={import.meta.env.VITE_API_BASE_URL || "http://localhost:3000"}>

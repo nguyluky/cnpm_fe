@@ -17,6 +17,8 @@ import { BusLocationPage } from "../pages/parent/busLocationPage";
 import { NotiPage } from "../pages/parent/notiPage";
 import { StudentPage } from "../pages/parent/studentPage";
 import { StopsPointsPage } from "../pages/stopPoint";
+// import { AddSchedulePage } from "../pages/admin/test_ui1"
+// import DriverNotifications from "../pages/driver/Notifications"
 
 import { GetAllStudent } from "../pages/admin/Students/getAllStudent";
 import NotificationsPage from "../pages/driver/NotificationsPage";
