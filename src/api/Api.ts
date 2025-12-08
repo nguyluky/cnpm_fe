@@ -3492,4 +3492,143 @@ export class Api<
       format: "json",
       ...params,
     });
+  /**
+
+ * No description
+ *
+ * @tags NotifyController
+ * @name SaveSubscription
+ * @summary Save Subscription
+ * @request POST:/api/notifications/save_subscription
+ * @secure*/
+
+  /**
+   */
+
+  saveSubscription = (
+    data: {
+      subscription: {
+        endpoint: string;
+        keys: {
+          p256dh: string;
+          auth: string;
+        };
+      };
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+      },
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+        }
+      | {
+          /**
+           * HTTP status code of the error
+           * @min 400
+           * @max 599
+           */
+          code?: number;
+          /** Human-readable error message */
+          message?: string;
+          /** Error class name */
+          name?: string;
+        }
+    >({
+      path: `/api/notifications/save_subscription`,
+      method: "POST",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags NotifyController
+ * @name NotificationsTestNotifyCreate
+ * @request POST:/api/notifications/test_notify*/
+
+  /**
+   */
+
+  notificationsTestNotifyCreate = (
+    data: {
+      userId: string;
+      body: string;
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+      },
+      any
+    >({
+      path: `/api/notifications/test_notify`,
+      method: "POST",
+      body: data,
+      type: ContentType.Json,
+      format: "json",
+      ...params,
+    });
+  /**
+
+ * No description
+ *
+ * @tags NotifyController
+ * @name GetVapidPublicKey
+ * @summary Get VAPID Public Key
+ * @request GET:/api/notifications/getVAPIDpub*/
+
+  /**
+   */
+
+  getVapidPublicKey = (params: RequestParams = {}) =>
+    this.request<
+      {
+        /**
+         * HTTP status code of the error
+         * @min 200
+         * @max 300
+         */
+        code?: number;
+        /** Human-readable error message */
+        message?: string;
+        data?: {
+          vapidPublicKey: string;
+        };
+      },
+      any
+    >({
+      path: `/api/notifications/getVAPIDpub`,
+      method: "GET",
+      format: "json",
+      ...params,
+    });
 }

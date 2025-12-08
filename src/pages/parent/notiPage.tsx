@@ -1,47 +1,95 @@
 import { Bell } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "../../components/uiItem/button.tsx";
-import { useSocketIo } from "../../hooks/useSocketIo.ts";
 
-const NOTIFICATIONS_KEY = 'parent_notifications'; // AI generated
+const DB_NAME = "messages_db";
+const DB_VERSION = 1;
+const STORE_NAME = "messages_store";
+
+function openDatabase(): Promise<IDBDatabase> {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+        request.onupgradeneeded = (event) => {
+            const db = (event.target as any).result as IDBDatabase;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+                db.createObjectStore(STORE_NAME, { keyPath: "id", autoIncrement: true });
+            }
+        };
+
+        request.onsuccess = (event) => {
+            resolve(
+                (event.target as any).result as IDBDatabase
+            );
+        };
+
+        request.onerror = (event) => {
+            reject(
+                (event.target as any).error
+            );
+        };
+    });
+}
+
+
+async function getAllMessages() {
+    const db = await openDatabase();
+    return new Promise<any[]>((resolve, reject) => {
+        const transaction = db.transaction([STORE_NAME], "readonly");
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.getAll();
+
+        request.onsuccess = (event) => {
+            resolve((event.target as any).result as any[]);
+        };
+
+        request.onerror = (event) => {
+            reject((event.target as any).error);
+        };
+    });
+}
+
+async function clearAllMessages() {
+    const db = await openDatabase();
+    return new Promise<void>((resolve, reject) => {
+        const transaction = db.transaction([STORE_NAME], "readwrite");
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.clear();
+
+        request.onsuccess = () => {
+            resolve();
+        };
+
+        request.onerror = (event) => {
+            reject((event.target as any).error);
+        };
+    });
+}
+
 
 export function NotiPage() {
 
-    // AI Generated: save notifications to local storage
-    const [notifications, setNotifications] = useState<any[]>(() => {
-        const stored = localStorage.getItem(NOTIFICATIONS_KEY);
-        return stored ? JSON.parse(stored) : [];
-    });
-
-    const { socket, connected } = useSocketIo();
+    const [notifications, setNotifications] = useState<any[]>([]);
 
     // save to local storage whenever notifications change
     useEffect(() => {
-        localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(notifications));
-    }, [notifications]);
-
-    useEffect(() => {
-        if (!socket || !connected) return;
-        console.log('Socket connected:', connected);
-        console.log('Socket object:', socket);
-        // Listen for new notifications from backend
-        socket.on('NewNotification', (data) => {
-            console.log('Received notification:', data);
-            setNotifications(prev => {
-                const newNotifications = [data, ...prev];
-                return newNotifications.slice(0, 50);
-            }); // Add to top of list
+        // get notifycations from indedexedDB
+        getAllMessages().then((msgs) => {
+            console.log('Loaded messages from IndexedDB:', msgs);
+            setNotifications(msgs);
+        }).catch((err) => {
+            console.error('Error loading messages from IndexedDB:', err);
         });
 
-        // Cleanup when component unmounts
-        return () => {
-            socket.off('NewNotification');
-        };
-    }, [socket, connected]);
+    }, [notifications]);
 
     const clearAllNotifications = () => {
         setNotifications([]);
-        localStorage.removeItem(NOTIFICATIONS_KEY);
+        clearAllMessages().then(() => {
+            console.log('All messages cleared from IndexedDB');
+        }).catch((err) => {
+            console.error('Error clearing messages from IndexedDB:', err);
+        });
     }
 
 
@@ -73,8 +121,8 @@ export function NotiPage() {
                 ) : (
                     notifications.map((notif, index) => (
                         <div key={index} className="mb-4 bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-                            <p className="font-semibold">{notif.type}</p>
-                            <p className="text-sm text-gray-600">{notif.message}</p>
+                            <p className="font-semibold">{notif.message.title}</p>
+                            <p className="text-sm text-gray-600">{notif.message.message}</p>
                             <p className="text-xs text-gray-500 mt-1">
                                 {new Date(notif.timestamp).toLocaleTimeString()}
                             </p>

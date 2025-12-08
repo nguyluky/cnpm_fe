@@ -4,6 +4,7 @@ import { useApi } from "../../contexts/apiConetxt";
 import { useNavigate } from "react-router-dom";
 import { path } from "../../router";
 import type { StudentInfoReqAssignmetStop } from "../../api/data-contracts";
+import { setupPush } from "../../utils/webPush";
 
 interface Student {
     id: string;
@@ -36,11 +37,11 @@ export function StudentPage() {
     const [studentAssignment, setStudentAssignment] = useState<StudentAssignment>();
     const [loading, setLoading] = useState(true);
     const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
-    const {api} = useApi();
+    const { api } = useApi();
     const navigate = useNavigate();
 
     // fetch students from api
-    const fetchStudents = async() => {
+    const fetchStudents = async () => {
         setLoading(true);
         try {
             const data = await api.getStudentsForParent();
@@ -54,7 +55,7 @@ export function StudentPage() {
         }
     };
 
-    const fetchStudentAssignment = async(studentId: string) => {
+    const fetchStudentAssignment = async (studentId: string) => {
         if (!studentId) return;
         try {
             const data = await api.getStudentInfoForParent(studentId);
@@ -89,17 +90,48 @@ export function StudentPage() {
     return (
         <>
             {/* Background nhẹ cho mobile */}
-            <div className="min-h-screen bg-gradient-to-b from-indigo-50 via-purple-50 to-pink-50">
-                <div className="pb-20 pt-6 px-4">
-                    {/* Header */}
-                    <div className="text-center mb-8">
-                        <h1 className="text-3xl font-bold text-indigo-800 flex items-center justify-center gap-3">
-                            <Baby className="w-10 h-10 text-indigo-600" />
-                            Các bé của bạn
-                        </h1>
-                        <p className="text-gray-600 mt-2">Chọn bé để xem thông tin chi tiết</p>
-                    </div>
+            <div className="min-h-screen bg-gradient-to-b from-indigo-50 via-purple-50 to-pink-50 pb-16 flex flex-col">
+                <div className="pb-20 pt-6 px-4 h-auto flex-1">
+                    { /* setting notify */}
+                    {
+                        Notification.permission !== "granted" && (
 
+                            <div className="max-w-md mx-auto mb-6">
+                                <div className="bg-white/70 backdrop-blur-sm rounded-3xl shadow-lg p-4 flex items-center gap-4 border border-gray-200">
+                                    <Baby className="w-10 h-10 text-indigo-500" />
+                                    <div className="flex-1">
+                                        <h3 className="text-lg font-bold text-gray-800">Thông báo hành trình</h3>
+                                        <p className="text-sm text-gray-600 mt-1">Bật thông báo để nhận cập nhật về hành trình của bé.</p>
+                                    </div>
+                                    <button
+                                        onClick={() => {
+                                            if (!("Notification" in window)) {
+                                                alert("Trình duyệt của bạn không hỗ trợ thông báo.");
+                                                return;
+                                            }
+
+                                            // yêu cầu quyền thông báo
+                                            Notification.requestPermission().then((permission) => {
+                                                if (permission === "granted") {
+                                                    setupPush(api);
+                                                } else {
+                                                    alert("Vui lòng cho phép thông báo để nhận cập nhật hành trình của bé.");
+                                                }
+                                            });
+
+                                        }}
+                                        className="bg-indigo-600 text-white px-4 py-2 rounded-full font-medium hover:bg-indigo-700 active:scale-95 transition-all"
+                                    >
+                                        Bật thông báo
+                                    </button>
+                                </div>
+                            </div>
+                        )
+                    }
+                    {/* Tiêu đề */}
+                    <h1 className="text-xl font-bold text-left text-gray-800 mb-2">
+                        Danh sách học sinh
+                    </h1>
                     {/* Danh sách học sinh */}
                     <div className="space-y-4 max-w-md mx-auto">
                         {students.map((student) => (
@@ -144,6 +176,26 @@ export function StudentPage() {
                         ))}
                     </div>
                 </div>
+
+
+                {
+                    // logout button fixed bottom
+                }
+                <div className="p-4">
+                    <div className="max-w-md mx-auto">
+                        <button
+                            onClick={() => {
+                                api.setSecurityData(null);
+                                navigate('/login');
+                            }}
+                            className="w-full bg-red-600 text-white px-6 py-3 rounded-full font-bold text-lg shadow-lg hover:shadow-xl active:scale-95 transition-all"
+                        >
+                            Đăng xuất
+                        </button>
+                    </div>
+                </div>
+
+
 
                 {/* Modal Chi tiết - Full màn hình mobile style */}
                 {selectedStudent && (
@@ -220,17 +272,6 @@ export function StudentPage() {
                 )}
             </div>
 
-            {/* Animation cho modal 
-            <style jsx>{`
-        @keyframes slide-up {
-          from { transform: translateY(100%); }
-          to { transform: translateY(0); }
-        }
-        .animate-slide-up {
-          animation: slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-      `}</style>
-            */}
         </>
     );
 }

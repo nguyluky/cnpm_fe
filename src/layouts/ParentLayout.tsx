@@ -5,12 +5,12 @@ import { path } from '../router';
 // mobile ui
 export function ParentLayout() {
     return (
-        <div className="flex h-screen bg-slate-50">
-            <div className="flex-1 overflow-y-auto pb-16">
+        <div className="h-screen bg-slate-50 relative">
+            <div className="overflow-y-auto h-full">
                 <Outlet />
             </div>
 
-            <nav className="fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-slate-200 flex items-center justify-around md:hidden">
+            <nav className="absolute flex bottom-0 left-0 right-0 h-16 z-10 bg-white border-t border-slate-200 items-center justify-around md:hidden ">
                 <NavLink to={path.PARENT} 
                     end={true}
                     className={

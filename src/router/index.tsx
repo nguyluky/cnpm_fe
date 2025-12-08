@@ -22,6 +22,8 @@ import { StopsPointsPage } from "../pages/stopPoint";
 
 import { GetAllStudent } from "../pages/admin/Students/getAllStudent";
 import NotificationsPage from "../pages/driver/NotificationsPage";
+import { DriverHome } from "../pages/driver/Home";
+import { DriverSchedule } from "../pages/driver/Schedule";
 
 export const path = {
     INDEX: "/",
@@ -52,111 +54,115 @@ export const path = {
     DRIVER_TRIP: "/driver/trip/:id",
 };
 
-export const router = createBrowserRouter([
-  // provider api for all routes
-  {
-    path: "/",
-    element: <RootLayout />,
+
+const ParentRoutes = [{
+    path: path.PARENT,
+    element: <ParentLayout />,
     children: [
-      {
-        index: true,
-        element: <HomePage />,
-      },
-      {
-        path: path.LOGIN,
-        element: <LoginPage />,
-      },
-      {
-        path: path.PARENT,
-        element: <ParentLayout />,
-        children: [
-          {
+        {
             index: true,
             element: <BusLocationPage />,
-          },
-          {
+        },
+        {
             path: path.PARENT_NOTIFICATIONS,
             element: <NotiPage />,
-          },
-          {
+        },
+        {
             path: path.PARENT_CHILD_INFO,
             element: <StudentPage />,
-          },
-        ],
-      },
-      {
+        },
+    ],
+},]
+
+const AdminRoutes = [
+
+    {
         path: path.ADMIN,
         element: <AdminLayout />,
         children: [
-          {
-            index: true,
-            element: <Overview />,
-          },
-          {
-            path: path.ADMIN_BUSES,
-            element: <Buss />,
-          },
-          {
-            path: path.ADMIN_BUS_MANAGEMENT,
-            element: <Bus />,
-          },
-          {
-            path: path.ADMIN_STUDENTS_MANAGEMENT,
-            element: <GetAllStudent />,
-          },
-          {
-            path: path.ADMIN_STOPS_POINTS,
-            element: <StopsPointsPage />,
-          },
-          {
-            path: path.ADMIN_STUDENTS,
-            element: <Student />,
-          },
-          {
-            path: path.ADMIN_SCHEDULES,
-            element: <Schedules />,
-          },
-          {
-            path: path.ADMIN_ROUTES,
-            element: <RouteAdmin />,
-          },
+            {
+                index: true,
+                element: <Overview />,
+            },
+            {
+                path: path.ADMIN_BUSES,
+                element: <Buss />,
+            },
+            {
+                path: path.ADMIN_BUS_MANAGEMENT,
+                element: <Bus />,
+            },
+            {
+                path: path.ADMIN_STUDENTS_MANAGEMENT,
+                element: <GetAllStudent />,
+            },
+            {
+                path: path.ADMIN_STOPS_POINTS,
+                element: <StopsPointsPage />,
+            },
+            {
+                path: path.ADMIN_STUDENTS,
+                element: <Student />,
+            },
+            {
+                path: path.ADMIN_SCHEDULES,
+                element: <Schedules />,
+            },
+            {
+                path: path.ADMIN_ROUTES,
+                element: <RouteAdmin />,
+            },
         ],
-      },
-      {
+    },
+]
+
+const DriverRoutes = [
+    {
         path: path.DRIVER,
         element: <DriverLayout />,
         children: [
-          // {
-          //     index: true,
-          //     element: <DriverHome />
-          // },
-          // {
-          //     path: path.DRIVER_SCHEDULE,
-          //     element: <DriverSchedule />
-          // },
-          // {
-          //     path: path.DRIVER_QR_ROLL_CALL,
-          //     element: <QRRollCall />
-          // },
-          // ... other driver routes
+            {
+                index: true,
+                element: <DriverHome />
+            },
+            {
+                path: path.DRIVER_SCHEDULE,
+                element: <DriverSchedule />
+            },
+            // ... other driver routes
         ],
-      },
-      {
+    },
+    {
         path: path.DRIVER_TRIP,
         element: <MapDriver />,
-      },
-    //   {
-    //     path: "/test",
-    //     element: <ScheduleAdminTable />,
-    //   },
-      {
-        path: "*",
-        element: <NotFoundPage />,
-      },
-      {
-        path: path.DRIVER_NOTIFICATIONS,
-        element: <NotificationsPage />,
-      },
-    ],
-  },
+    },
+]
+
+export const router = createBrowserRouter([
+    // provider api for all routes
+    {
+        path: "/",
+        element: <RootLayout />,
+        children: [
+            {
+                index: true,
+                element: <HomePage />,
+            },
+            {
+                path: path.LOGIN,
+                element: <LoginPage />,
+            },
+            ...AdminRoutes,
+            ...ParentRoutes,
+            ...DriverRoutes,
+            {
+                path: "*",
+                element: <NotFoundPage />,
+            },
+            {
+                path: path.DRIVER_NOTIFICATIONS,
+                element: <NotificationsPage />,
+            },
+        ],
+    },
 ]);
