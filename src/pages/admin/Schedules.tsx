@@ -164,6 +164,8 @@ function EditAndCreateScheduleModal({
 
     const createNewSchedule = useMutation({
         mutationFn: async () => {
+
+            console.log("formData", formData);
             if (type === 'create') {
                 const response = await api.api.createANewSchedule({
                     driverId: formData.driverId,
