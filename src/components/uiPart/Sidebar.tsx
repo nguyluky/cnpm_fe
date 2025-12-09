@@ -6,7 +6,6 @@ import {
     Key,
     LayoutDashboard,
     MapPin,
-    MessageSquare,
     Route,
     User,
     Users,
@@ -38,7 +37,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
         { icon: Route, label: "Tuyến đường", path: path.ADMIN_ROUTES },
         { icon: ClipboardList, label: "Điểm dừng", path: path.ADMIN_STOPS_POINTS }, // Đã thay đổi
         { icon: Calendar, label: "Lịch trình", path: path.ADMIN_SCHEDULES }, // Đã thay đổi
-        { icon: MessageSquare, label: "Tin nhắn", path: "/admin/messages" }, // Giữ nguyên, không có trong path mới
         { icon: Bus, label: "Quản lý xe Bus", path: path.ADMIN_BUS_MANAGEMENT },
         //
         {
@@ -51,7 +49,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
             label: "Quản lý quyền truy cập",
             path: path.ADMIN_ACCESS_MANAGEMENT,
         }
-
     ];
 
     const parentMenuItems = [

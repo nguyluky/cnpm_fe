@@ -3,7 +3,8 @@ import { ApiProvider } from "../contexts/apiConetxt";
 import { ModalProvider } from "../contexts/modalContext";
 import { SocketProvider } from "../contexts/socketContext";
 import { NotifyWrap } from "../components/uiPart/NotifyWrap";
-
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export function RootLayout() {
     return <ApiProvider>
@@ -15,7 +16,10 @@ export function RootLayout() {
             }
             <SocketProvider url={import.meta.env.VITE_API_BASE_URL || "http://localhost:3000"}>
                 <ModalProvider>
-                    <Outlet />
+                    <>
+                        <ToastContainer position='bottom-center'/>
+                        <Outlet />
+                    </>
                 </ModalProvider>
             </SocketProvider>
         </NotifyWrap>

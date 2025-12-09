@@ -24,6 +24,7 @@ import { GetAllStudent } from "../pages/admin/Students/getAllStudent";
 import NotificationsPage from "../pages/driver/NotificationsPage";
 import { DriverHome } from "../pages/driver/Home";
 import { DriverSchedule } from "../pages/driver/Schedule";
+import { Roles } from "../pages/admin/Roles";
 
 export const path = {
     INDEX: "/",
@@ -95,8 +96,7 @@ const AdminRoutes = [
             {
                 path: path.ADMIN_STUDENTS_MANAGEMENT,
                 element: <GetAllStudent />,
-            },
-            {
+            }, {
                 path: path.ADMIN_STOPS_POINTS,
                 element: <StopsPointsPage />,
             },
@@ -112,6 +112,10 @@ const AdminRoutes = [
                 path: path.ADMIN_ROUTES,
                 element: <RouteAdmin />,
             },
+            {
+                path: path.ADMIN_ACCESS_MANAGEMENT,
+                element: <Roles />,
+            }
         ],
     },
 ]
@@ -129,7 +133,10 @@ const DriverRoutes = [
                 path: path.DRIVER_SCHEDULE,
                 element: <DriverSchedule />
             },
-            // ... other driver routes
+            {
+                path: path.DRIVER_NOTIFICATIONS,
+                element: <NotificationsPage />,
+            },
         ],
     },
     {
@@ -158,10 +165,6 @@ export const router = createBrowserRouter([
             {
                 path: "*",
                 element: <NotFoundPage />,
-            },
-            {
-                path: path.DRIVER_NOTIFICATIONS,
-                element: <NotificationsPage />,
             },
         ],
     },

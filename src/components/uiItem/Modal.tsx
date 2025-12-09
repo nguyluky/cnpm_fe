@@ -8,19 +8,25 @@ import ReactDOM from 'react-dom';
 // Lấy DOM node từ file HTML
 const modalRoot = document.getElementById('modal-root')!;
 
-const Modal = ({ 
-    children,
-    onClose,
-}: {
+interface ModalProps {
     children: React.ReactNode;
     onClose?: () => void;
     enableClickOutsideToClose?: boolean;
-}) => {
+}
+
+const Modal = ({ 
+    children,
+    onClose,
+    enableClickOutsideToClose = true
+}: ModalProps) => {
     const modalContentRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (modalContentRef.current && !modalContentRef.current.contains(event.target as Node)) {
+                if (!enableClickOutsideToClose) {
+                    return;
+                }
                 // Nếu click bên ngoài modalContent, ta có thể gọi hàm đóng modal ở đây
                 console.log('Clicked outside modal content');
                 if (onClose) {

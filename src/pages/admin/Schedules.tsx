@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Calendar, ChevronLeft, ChevronRight, Clock, Edit, Plus, Search, Trash2, X } from "lucide-react";
-import { useState } from "react";
+import {useLayoutEffect, useRef, useState } from "react";
 import type { BusData, RouteData, TimeTable } from "../../api/data-contracts";
 import { AutoComplete } from "../../components/uiPart/AutoComplete";
 import { useApi } from "../../contexts/apiConetxt";
@@ -70,7 +70,8 @@ function EditAndCreateScheduleModal({
     const [busData, setBusData] = useState<BusData[]>(busesData || []);
 
     const [counter, setCounter] = useState(0);
-
+    const [loadingInit, setLoadingInit] = useState(true);
+    const preCounter = useRef<number>(0);
 
     const queryFnDrivers = async (s: string) => {
         setCounter(e => e + 1);
@@ -151,6 +152,16 @@ function EditAndCreateScheduleModal({
         return data;
     }
 
+    useLayoutEffect(() => {
+        console.log("Counter:", counter, "PreCounter:", preCounter.current);
+        if (preCounter.current < counter) {
+            preCounter.current = counter;
+        } else if ((preCounter.current > 0 && counter === 0) || counter < 0) {
+            setLoadingInit(false);
+        }
+
+    }, [counter]);
+
     const createNewSchedule = useMutation({
         mutationFn: async () => {
             if (type === 'create') {
@@ -188,7 +199,7 @@ function EditAndCreateScheduleModal({
         <div className={"relative w-4xl transform rounded-lg bg-white p-8 shadow-xl transition-all " +
             (createNewSchedule.status === "pending" ? "pointer-events-none" : "")
         }>
-            {(createNewSchedule.status === "pending" || counter > 0) && (
+            {(createNewSchedule.status === "pending" || loadingInit) && (
                 <div className="absolute z-100 inset-0 bg-white/50 flex items-center justify-center rounded-lg">
                     <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
                 </div>
@@ -445,11 +456,15 @@ export const Schedules = () => {
     const pagination = data?.meta;
 
     const handleAddSchedule = () => {
-        openModal(<EditAndCreateScheduleModal type="create" />);
+        openModal(<EditAndCreateScheduleModal type="create" />, {
+            clickOutsideToClose: false
+        });
     };
 
     const handleEditSchedule = (schedule: ScheduleInfo) => {
-        openModal(<EditAndCreateScheduleModal type="edit" defaultValue={schedule} />);
+        openModal(<EditAndCreateScheduleModal type="edit" defaultValue={schedule} />, {
+            clickOutsideToClose: false
+        });
     };
 
     const handleDeleteSchedule = async (_id: string) => {

@@ -23,11 +23,14 @@ export const Forbidden = () => {
                         <button onClick={() => navigate(path.INDEX)} className="w-1/2 px-5 py-2 text-sm tracking-wide text-white transition-colors duration-200 bg-red-500 rounded-lg shrink-0 sm:w-auto hover:bg-red-600 ">
                             Take me home
                         </button>
+
+                        <button onClick={() => navigate(path.LOGIN)} className="w-1/2 px-5 py-2 text-sm tracking-wide text-white transition-colors duration-200 bg-blue-500 rounded-lg shrink-0 sm:w-auto hover:bg-blue-600 ">
+                            Login Page
+                        </button>
                     </div>
                 </div>
 
                 <div className="relative w-full mt-8 lg:w-1/2 lg:mt-0">
-                    {/* Hình ảnh minh họa cho việc bị chặn/cấm. Bạn có thể thay đổi link ảnh khác nếu muốn. */}
                     <img className="w-full lg:h-[32rem] h-80 md:h-96 rounded-lg object-cover" src="https://images.unsplash.com/photo-1555861496-0666c8981751?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Forbidden Access" />
                 </div>
             </div>
